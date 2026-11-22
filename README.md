@@ -33,6 +33,8 @@ npm run lint
 | `SUPABASE_URL` | No | Supabase project URL. When set with the service role key, waitlist emails are stored in Postgres. |
 | `SUPABASE_SERVICE_ROLE_KEY` | No | Service role key for server-side `waitlist` inserts. **Never expose to the client.** |
 | `NEXT_PUBLIC_PREORDER_URL` | No | Checkout URL for founding member preorder. Button shows **Coming soon** when unset. |
+| `RESEND_API_KEY` | No | Resend API key for waitlist confirmation emails (skipped when unset). |
+| `WAITLIST_FROM_EMAIL` | No | From address for waitlist mail, e.g. `GraphMyAnything <hello@graphmyanything.com>`. |
 
 Vercel Web Analytics is enabled via `@vercel/analytics` in the root layout (automatic on Vercel deploys).
 
@@ -42,7 +44,7 @@ Vercel Web Analytics is enabled via `@vercel/analytics` in the root layout (auto
 2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in Vercel (or `.env.local` for dev).
 3. `POST /api/waitlist` accepts `{ "email": "...", "source"?: "..." }`.
 
-Without Supabase, the route logs signups and returns `{ "ok": true }`—useful for preview deploys.
+In **production** (`VERCEL_ENV=production`), the API requires working storage; otherwise it returns `500`. Local/preview may log signups without storage. New signups trigger a Resend confirmation when `RESEND_API_KEY` and `WAITLIST_FROM_EMAIL` are set; email failures do not fail the signup.
 
 ### Custom analytics events
 

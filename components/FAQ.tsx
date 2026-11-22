@@ -12,10 +12,6 @@ const faqs = [
     a: "Each namespace can expose a stable chart URL. Query params adjust range, chart type, and forecast—like image transforms. The image updates when new points arrive.",
   },
   {
-    q: "Do I need Supabase for the waitlist?",
-    a: "No. Without SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, signups are logged server-side and the API still returns success—handy for previews.",
-  },
-  {
     q: "When do you launch?",
     a: "Waitlist members hear first. Founding members get refundable preorder until public launch.",
   },
