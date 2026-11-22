@@ -98,7 +98,7 @@ claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.2
 
 ## n8n
 
-Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, pin `graphmyanything-mcp@0.1.1`).
+Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, pin `graphmyanything-mcp@0.1.2`).
 
 ## Why tokens matter (one chart question)
 
