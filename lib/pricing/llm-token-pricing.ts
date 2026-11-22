@@ -57,22 +57,22 @@ export const LLM_MODELS: LlmModelPricing[] = [
     modelId: "gemini-4-carbon",
     label: "Gemini 4 Carbon",
     tier: "flagship",
-    inputPerMillion: 2.0,
-    outputPerMillion: 10.0,
+    inputPerMillion: 4.0,
+    outputPerMillion: 20.0,
     sourceUrl: "https://ai.google.dev/gemini-api/docs/pricing",
     notes:
-      "Paid standard tier. List price $2/$10 per 1M tokens through Nov 30, 2026 on Google's pricing page.",
+      "Standard paid tier after promotional period: $4/$20 per 1M effective Dec 1, 2026 (per Google pricing page).",
   },
   {
     provider: "Google",
     modelId: "gemini-3.8-flash",
     label: "Gemini 3.8 Flash",
     tier: "economy",
-    inputPerMillion: 0.75,
-    outputPerMillion: 3.75,
+    inputPerMillion: 1.5,
+    outputPerMillion: 7.5,
     sourceUrl: "https://ai.google.dev/gemini-api/docs/pricing",
     notes:
-      "Paid standard tier. List price $0.75/$3.75 per 1M tokens through Dec 31, 2026 on Google's pricing page.",
+      "Standard paid tier after promotional period: $1.50/$7.50 per 1M effective Jan 1, 2027 (per Google pricing page).",
   },
 ];
 

@@ -246,9 +246,10 @@ export function TokenComparison() {
               </a>
             </span>
           ))}{" "}
-          (checked {PRICING_CHECKED_AT}). Google: Gemini 4 Carbon and Gemini 3.8
-          Flash per current Gemini API pricing (2.5 Pro/Flash deprecated on that
-          page).
+          (checked {PRICING_CHECKED_AT}). Google uses standard post-promotional
+          list prices: Gemini 4 Carbon $4/$20 per 1M from Dec 1, 2026; Gemini 3.8
+          Flash $1.50/$7.50 per 1M from Jan 1, 2027. OpenAI and Anthropic models
+          use current standard API rates with no scheduled step-up on those SKUs.
         </p>
       </div>
     </section>
