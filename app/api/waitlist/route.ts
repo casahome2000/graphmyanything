@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendWaitlistConfirmationEmail } from "@/lib/waitlist-confirmation-email";
 import { storeWaitlistEmail } from "@/lib/waitlist";
 
 export async function POST(request: Request) {
@@ -30,7 +31,16 @@ export async function POST(request: Request) {
 
   const result = await storeWaitlistEmail(email, source);
   if (!result.ok) {
-    return NextResponse.json(result, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: result.error },
+      { status: result.status },
+    );
   }
+
+  if (result.isNew) {
+    const normalized = email.trim().toLowerCase();
+    void sendWaitlistConfirmationEmail(normalized);
+  }
+
   return NextResponse.json({ ok: true });
 }
