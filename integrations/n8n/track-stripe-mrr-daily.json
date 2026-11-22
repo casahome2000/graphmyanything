@@ -68,7 +68,7 @@
         }
       },
       "notesInFlow": true,
-      "notes": "Stdio MCP: npx -y graphmyanything-mcp@0.1.1 (Node 22.13+)."
+      "notes": "Stdio MCP: npx -y graphmyanything-mcp@0.1.2 (Node 22.13+)."
     },
     {
       "parameters": {
@@ -126,7 +126,7 @@
     },
     {
       "parameters": {
-        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule pulls (or mocks) Stripe MRR, writes one point with `track`, then runs `query` (90d), `insight`, and `chart` via the GraphMyAnything MCP server. Ingestion runs inside n8n — zero tokens in the agent chat that later asks for the trend. Charts land as SVG files on the n8n host.\n\n## Set up steps\n1. Import this workflow and open **Credentials → MCP Client** (stdio): Command `npx`, Args `-y`, `graphmyanything-mcp@0.1.1`.\n2. Attach that credential to all four MCP Client Tool nodes.\n3. Disable **HTTP track (cloud placeholder)**; enable the MCP path.\n4. Run once manually, then enable the schedule.\n\n## Requirements\n- n8n **1.76+** with MCP Client Tool nodes enabled.\n- **Node.js 22.13+** on the worker (`node:sqlite`).\n- Pin package **graphmyanything-mcp@0.1.1**.\n\n## Customize\nSwap **Mock Stripe MRR** for a Stripe or HTTP billing node; change metric name, `token_budget`, chart `type`/`theme`, or cron hour. Waitlist: https://graphmyanything.com",
+        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule pulls (or mocks) Stripe MRR, writes one point with `track`, then runs `query` (90d), `insight`, and `chart` via the GraphMyAnything MCP server. Ingestion runs inside n8n — zero tokens in the agent chat that later asks for the trend. Charts land as SVG files on the n8n host.\n\n## Set up steps\n1. Import this workflow and open **Credentials → MCP Client** (stdio): Command `npx`, Args `-y`, `graphmyanything-mcp@0.1.2`.\n2. Attach that credential to all four MCP Client Tool nodes.\n3. Disable **HTTP track (cloud placeholder)**; enable the MCP path.\n4. Run once manually, then enable the schedule.\n\n## Requirements\n- n8n **1.76+** with MCP Client Tool nodes enabled.\n- **Node.js 22.13+** on the worker (`node:sqlite`).\n- Pin package **graphmyanything-mcp@0.1.2**.\n\n## Customize\nSwap **Mock Stripe MRR** for a Stripe or HTTP billing node; change metric name, `token_budget`, chart `type`/`theme`, or cron hour. Waitlist: https://graphmyanything.com",
         "height": 520,
         "width": 420
       },
@@ -198,7 +198,7 @@
     },
     {
       "parameters": {
-        "content": "### Section: Chart\n**MCP chart SVG** writes a dark area chart to disk (`path` in the tool result; `url` is null in 0.1.1). Open the file on the n8n host or ship it to object storage in a follow-up node.",
+        "content": "### Section: Chart\n**MCP chart SVG** writes a dark area chart to disk (`path` in the tool result; `url` is null until hosted charts ship). Open the file on the n8n host or ship it to object storage in a follow-up node.",
         "height": 160,
         "width": 320
       },

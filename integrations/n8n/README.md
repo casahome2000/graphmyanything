@@ -16,7 +16,7 @@ We chose **MCP Client** as the primary path because n8n supports stdio MCP serve
 1. **Credentials → New → MCP Client** (name: `graphmyanything-mcp (stdio)`).
 2. Transport: **stdio**.
 3. Command: `npx`
-4. Arguments: `-y`, `graphmyanything-mcp@0.1.1`
+4. Arguments: `-y`, `graphmyanything-mcp@0.1.2`
 5. Ensure **Node 22.13+** on the n8n worker (built-in `node:sqlite`).
 
 On the imported workflow:
@@ -35,7 +35,7 @@ The imported workflow includes an **overview sticky** (How it works, Set up step
 2. Read MRR (mock code node in template).
 3. `track` → `query` (90d, token_budget 300) → `insight` → `chart` (area, dark).
 
-Pin **`graphmyanything-mcp@0.1.1`** and **Node 22.13+** on any worker that runs MCP stdio.
+Pin **`graphmyanything-mcp@0.1.2`** and **Node 22.13+** on any worker that runs MCP stdio.
 
 Chart files land on the n8n host under `~/.graphmyanything/charts/` (or `charts/` beside `GRAPHMYANYTHING_DB_PATH`). The `chart` tool returns a local `path` only (`url` is null until hosted charts ship).
 
