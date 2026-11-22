@@ -14,18 +14,15 @@ packages/*/dist
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-
 # production
 /build
 
 # misc
 .DS_Store
 *.pem
-.env*.local
-.vercel
+.env
+.env.*
+!.env.example
 
 # debug
 npm-debug.log*
@@ -36,6 +33,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# legacy / local
-casahome2000.xml
-legacy/.idea/
+# local SQLite (MCP default path when testing)
+*.db
