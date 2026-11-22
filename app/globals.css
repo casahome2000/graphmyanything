@@ -140,6 +140,20 @@ body {
     );
 }
 
+@keyframes how-story-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.how-story-caret {
+  animation: how-story-caret 1s ease-in-out infinite;
+}
+
 .how-chart-line {
   animation: chart-spark 3s ease-in-out infinite;
 }
@@ -188,6 +202,11 @@ body {
 
   .how-it-works-motion {
     display: none;
+  }
+
+  .how-story-caret {
+    animation: none;
+    opacity: 0.85;
   }
 
   .how-chart-line {

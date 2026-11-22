@@ -1,7 +1,7 @@
 "use client";
 
-import { FlowCanvas } from "./how-it-works/FlowCanvas";
 import { HowItWorksStatic } from "./how-it-works/HowItWorksStatic";
+import { HowItWorksStory } from "./how-it-works/HowItWorksStory";
 
 export function HowItWorks() {
   return (
@@ -30,7 +30,7 @@ export function HowItWorks() {
           permanent chart URL.
         </p>
 
-        <FlowCanvas />
+        <HowItWorksStory />
         <HowItWorksStatic />
       </div>
     </section>
