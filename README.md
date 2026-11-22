@@ -6,11 +6,19 @@
 
 **Registry name:** `io.github.casahome2000/graphmyanything-mcp` · **License:** MIT
 
+## Quick start
+
+```bash
+claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.1
+```
+
+Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days and tell me the trend.*
+
 ## What it does
 
 1. **Track** values (single points, batches, or historical series).
-2. **Query** terse summaries and optional LTTB downsampling (`token_budget`, `points=auto|0|N`).
-3. **Insight** trend, anomaly (MAD), and naive forecast in plain language.
+2. **Query** compact numeric summaries and optional downsampled points within a token budget.
+3. **Insight** plain-English trend, anomalies, and a simple forecast.
 4. **Chart** dark/light SVG files locally — `path` on disk; **`url` is `null`** until hosted live charts ship (see `hosted_url_note` in the response).
 
 Data stays on your machine unless you opt into future cloud APIs.
@@ -44,8 +52,8 @@ Published package: **0.1.1** — `npx -y graphmyanything-mcp@0.1.1`
 | Tool | One-liner | Tiny example |
 |------|-----------|--------------|
 | **track** | Write metric point(s) to local SQLite | `track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})` |
-| **query** | Terse summary `s.*`; `points`: auto \| 0 \| N | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
-| **insight** | Trend, MAD anomalies, naive forecast | `insight(metric="stripe.mrr", range="90d")` |
+| **query** | Compact summary (latest, min, max, mean, trend, % change), optional downsampled points within a token budget | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
+| **insight** | Plain-English trend, anomalies, and a simple forecast | `insight(metric="stripe.mrr", range="90d")` |
 | **chart** | SVG to local file; no public URL yet | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark")` → `{"path":"…/stripe.mrr-….svg","url":null,"hosted_url_note":"Hosted live chart URLs are coming soon: graphmyanything.com"}` |
 
 Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-server/src/tool-catalog.ts).
@@ -96,7 +104,7 @@ Scheduled **track → query → insight → chart** template: [`integrations/n8n
 
 Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchmark/) — run `npm run benchmark:tokens` from a full repo checkout.
 
-**End-to-end agent tokens** (single “show me the chart + trend” flow, warm session):
+**End-to-end agent tokens** (single “show me the chart + trend” flow, **single question, end-to-end (cold)**):
 
 | Approach | Tokens |
 |----------|--------|
@@ -104,7 +112,7 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 | Python file off-context (E2E) | **658** |
 | **GMA lean** (`query` + `chart`, `points=auto`, `also_chart`) | **284** (**56.8% fewer** than file E2E) |
 
-**30 warm sessions (cumulative):** file E2E **21,390** vs GMA lean **8,520**.
+**file E2E warm × 30** **21,390** vs **GMA lean** **8,520** (**60.2% fewer**).
 
 **Caveats (read before citing):**
 
@@ -112,7 +120,7 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 - MCP **tool schema overhead** ~342 tokens vs ~248 for a minimal Python harness (see benchmark tables).
 - **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — optimistic floor, not typical agent E2E.
 
-GMA wins on **repeatable, low-ceremony** chart answers with **local** data and **structured** summaries; it does not beat a hand-tuned one-off script on raw token count alone.
+A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
 
 ## Hosted live charts (coming soon)
 
