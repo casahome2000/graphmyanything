@@ -21,7 +21,6 @@ function featureTile(
   assets: EmailAssetUrls,
   accent: string,
   iconKey: "iconTrack" | "iconQuery" | "iconChart",
-  codeLabel: string,
   title: string,
   desc: string,
 ): string {
@@ -34,8 +33,7 @@ function featureTile(
         </tr>
         <tr>
           <td style="padding:16px 10px 14px;text-align:center;">
-            <img src="${iconSrc}" width="56" height="56" alt="${title} — ${codeLabel}" style="display:block;width:56px;height:56px;margin:0 auto 10px;border:0;" />
-            <p style="margin:0 0 6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:600;color:${accent};">${codeLabel}</p>
+            <img src="${iconSrc}" width="56" height="56" alt="${title} feature" style="display:block;width:56px;height:56px;margin:0 auto 10px;border:0;" />
             <p style="margin:0 0 4px;font-family:${FONT_STACK};font-size:11px;font-weight:600;color:${EMAIL_BRAND.text};text-transform:uppercase;letter-spacing:0.08em;">${title}</p>
             <p style="margin:0;font-family:${FONT_STACK};font-size:11px;line-height:1.45;color:${EMAIL_BRAND.muted};">${desc}</p>
           </td>
@@ -119,9 +117,9 @@ We'll email you at launch. Reply to this message to unsubscribe from waitlist up
         <p style="margin:0 0 12px;font-family:${FONT_STACK};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.14em;color:${EMAIL_BRAND.violet};text-align:center;">What you'll get</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            ${featureTile(assets, EMAIL_BRAND.violet, "iconTrack", "track()", "track", "Agents &amp; cron streams")}
-            ${featureTile(assets, EMAIL_BRAND.cyan, "iconQuery", "query()", "query", "Budgeted insight")}
-            ${featureTile(assets, EMAIL_BRAND.emerald, "iconChart", "chart()", "chart", "Live chart URLs")}
+            ${featureTile(assets, EMAIL_BRAND.violet, "iconTrack", "track", "Agents &amp; cron streams")}
+            ${featureTile(assets, EMAIL_BRAND.cyan, "iconQuery", "query", "Budgeted insight")}
+            ${featureTile(assets, EMAIL_BRAND.emerald, "iconChart", "chart", "Live chart URLs")}
           </tr>
         </table>
       </td>
