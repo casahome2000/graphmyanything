@@ -21,8 +21,7 @@ server.registerTool(
   "track",
   {
     title: "Track metric",
-    description:
-      "Record one or many metric points (single value, batch, or historical timestamps). Stored locally in SQLite.",
+    description: "Write metric point(s) to local SQLite.",
     inputSchema: {
       metric: z.string().describe("Metric name, e.g. stripe.mrr"),
       value: z.number().optional().describe("Single value to record now"),
@@ -52,7 +51,7 @@ server.registerTool(
   {
     title: "Query metric",
     description:
-      "Terse summary (l/mn/mx/mu/tr/pct/n). points=0 or auto (default) omits series when also_chart or small token_budget; set points>0 for LTTB series.",
+      "Terse summary (s.l/mn/mx/mu/tr/pct/n). points: auto|0|N for LTTB series.",
     inputSchema: {
       metric: z.string(),
       range: z
@@ -85,8 +84,7 @@ server.registerTool(
   "insight",
   {
     title: "Metric insight",
-    description:
-      "Plain-English trend, robust anomalies (MAD z-score), and naive linear forecast.",
+    description: "Trend, MAD anomalies, naive forecast.",
     inputSchema: {
       metric: z.string(),
       range: z.string().optional(),
@@ -104,8 +102,7 @@ server.registerTool(
   "chart",
   {
     title: "Render chart",
-    description:
-      "Render a dark-theme SVG chart to a local file and return its path.",
+    description: "SVG to local file; returns path and URL.",
     inputSchema: {
       metric: z.string(),
       range: z.string().optional(),

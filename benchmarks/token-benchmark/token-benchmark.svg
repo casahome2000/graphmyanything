@@ -9,7 +9,7 @@
   <rect width="100%" height="100%" fill="#06060a" rx="16"/>
   <rect x="1" y="1" width="1198" height="1018" rx="15" fill="none" stroke="url(#title-grad)" stroke-opacity="0.35"/>
   <text x="24" y="40" fill="url(#title-grad)" font-family="system-ui,sans-serif" font-size="24" font-weight="700">End-to-end agent tokens · one chart question</text>
-  <text x="24" y="62" fill="#8b8b9e" font-family="system-ui,sans-serif" font-size="12">o200k_base · log-scaled · discovery → script → env → run → answer</text>
+  <text x="24" y="62" fill="#8b8b9e" font-family="system-ui,sans-serif" font-size="12">o200k_base · excludes tool schemas (see results.md) · identical final answer step</text>
   
   <g transform="translate(24, 88)">
     <rect width="172" height="26" rx="13" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
@@ -34,42 +34,42 @@
   <text x="24" y="132" fill="#f4f4f7" font-size="15" font-weight="600" font-family="system-ui,sans-serif">Single question (90 points)</text>
   
   <text x="16" y="191" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python file E2E · cold</text>
-  <rect x="300" y="160" width="493.6" height="48" rx="8" fill="url(#grad-file_e2e)" />
-  <text x="783.6" y="191" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">648</text>
-  <text x="300" y="222" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">8.6 turns · 6.3 tool calls</text>
+  <rect x="300" y="160" width="494.6" height="48" rx="8" fill="url(#grad-file_e2e)" />
+  <text x="784.6" y="191" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">658</text>
+  <text x="300" y="222" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">8.6 turns · +2,133 w/ harness defs×turns</text>
   <text x="16" y="273" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python file E2E · warm (re-discovery)</text>
-  <rect x="300" y="242" width="499.8" height="48" rx="8" fill="url(#grad-file_e2e)" />
-  <text x="789.8" y="273" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">703</text>
+  <rect x="300" y="242" width="500.7" height="48" rx="8" fill="url(#grad-file_e2e)" />
+  <text x="790.7" y="273" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">713</text>
   <text x="300" y="304" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">6.6 turns · 4.3 tool calls</text>
   <text x="16" y="355" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python inline JSON E2E · cold</text>
-  <rect x="300" y="324" width="594.6" height="48" rx="8" fill="url(#grad-inline_e2e)" />
-  <text x="884.6" y="355" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">2,437</text>
+  <rect x="300" y="324" width="594.7" height="48" rx="8" fill="url(#grad-inline_e2e)" />
+  <text x="884.7" y="355" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">2,447</text>
   <text x="300" y="386" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">5.6 turns · series in context</text>
   <text x="16" y="437" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">GMA lean (auto pts + also_chart)</text>
-  <rect x="300" y="406" width="399.2" height="48" rx="8" fill="url(#grad-gma)" />
-  <text x="689.2" y="437" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">188</text>
-  <text x="300" y="468" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">71% fewer vs file E2E cold</text>
+  <rect x="300" y="406" width="428.4" height="48" rx="8" fill="url(#grad-gma)" />
+  <text x="718.4" y="437" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">276</text>
+  <text x="300" y="468" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">58.1% fewer excl. defs · +1,026 GMA defs×turns</text>
   <text x="16" y="519" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">GMA full query (pts=50)</text>
-  <rect x="300" y="488" width="508.9" height="48" rx="8" fill="url(#grad-gma)" />
-  <text x="798.9" y="519" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">792</text>
+  <rect x="300" y="488" width="556.6" height="48" rx="8" fill="url(#grad-gma)" />
+  <text x="846.6" y="519" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">1,484</text>
   <text x="300" y="550" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">query JSON 1747 chars</text>
   <text x="16" y="601" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Best-case file Python (script turn only)</text>
-  <rect x="300" y="570" width="373.4" height="48" rx="8" fill="url(#grad-best)" stroke-dasharray="6 4" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
-  <text x="663.4" y="601" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">134</text>
+  <rect x="300" y="570" width="390.1" height="48" rx="8" fill="url(#grad-best)" stroke-dasharray="6 4" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+  <text x="680.1" y="601" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">167</text>
   <text x="300" y="632" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">Lower bound — omits discovery/env/retries</text>
   <text x="24" y="676" fill="#f4f4f7" font-size="15" font-weight="600" font-family="system-ui,sans-serif">30 warm repeats (re-discovery / re-query each session)</text>
   
   <text x="16" y="735" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python file E2E warm × 30</text>
-  <rect x="300" y="704" width="759.1" height="48" rx="8" fill="url(#grad-file_e2e)" />
-  <text x="1049.1" y="735" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">21,090</text>
+  <rect x="300" y="704" width="759.9" height="48" rx="8" fill="url(#grad-file_e2e)" />
+  <text x="1049.9" y="735" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">21,390</text>
   
   <text x="16" y="799" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python inline E2E warm × 30</text>
   <rect x="300" y="768" width="852.0" height="48" rx="8" fill="url(#grad-inline_e2e)" />
-  <text x="1142.0" y="799" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">71,310</text>
+  <text x="1142.0" y="799" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">71,610</text>
   
   <text x="16" y="863" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">GMA lean × 30</text>
-  <rect x="300" y="832" width="658.6" height="48" rx="8" fill="url(#grad-gma)" />
-  <text x="948.6" y="863" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">5,640</text>
-  <text x="300" y="894" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">73.3% fewer vs file E2E warm</text>
+  <rect x="300" y="832" width="687.6" height="48" rx="8" fill="url(#grad-gma)" />
+  <text x="977.6" y="863" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">8,280</text>
+  <text x="300" y="894" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">61.3% fewer vs file E2E warm</text>
   <text x="24" y="998" fill="#8b8b9e" font-size="11" font-family="system-ui,sans-serif">graphmyanything.com · npm run run · 2026-11-22</text>
 </svg>

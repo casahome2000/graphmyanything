@@ -2,15 +2,17 @@
 
 ## Headline (defensible)
 
-**Best-case file Python (~134 tokens) is ~5× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → answer): **648** tokens (8.6 turns, 6.3 tool calls).
+> End-to-end (excl. tool defs), GMA lean is **276** tokens vs **658** file-Python (**58.1% fewer**), with **342**-token MCP schemas vs **248**-token file/shell harness schemas.
 
-**GMA lean (`points=auto`, `also_chart`):** 115 in / 73 out = **188** vs file E2E cold (188 vs 648 (71% fewer)). **GMA full (`points=50`):** **792** (719 in · 73 out).
+**Best-case file Python (~167 tokens) is ~4× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → **shared final answer**): **658** tokens (8.6 turns, 6.3 tool calls).
 
-**vs inline JSON E2E:** lean 188 vs 2,437 (92.3% fewer).
+**GMA lean (`points=auto`, `also_chart`):** **182** in · **94** out · **276** total — 58.1% fewer than file E2E cold (658). **GMA full (`points=50`):** **1,484** (1,390 in · 94 out).
 
-**30 warm sessions:** file E2E 21,090 · GMA lean 5,640 · inline 71,310.
+**vs inline JSON E2E:** lean 276 vs 2,447 (88.7% fewer).
 
-**Cost @ 1,000 Q (GPT-5.2, in $1.75/M · out $14/M):** file E2E cold **$5.86** · GMA lean **$1.22** · GMA full **$2.28**.
+**30 warm sessions:** file E2E 21,390 · GMA lean 8,280 · inline 71,610.
+
+**Cost @ 1,000 Q (GPT-5.2, in $1.75/M · out $14/M):** file E2E cold **$6.00** · GMA lean **$1.63** · GMA full **$3.75**.
 
 ## Assumptions (transparent)
 
@@ -37,7 +39,7 @@
 - **Schema preview** — Head rows tool result in context (0 tool calls)
 - **pip / import check** — Model runs env tools (1 tool calls)
 - **pip install results** — stderr/stdout from tools in context (1 tool calls)
-- **Run stdout + answer** — stdout tool result + model summary (0 tool calls)
+- **Final answer to user** — stdout tool result in context; shared closing message (0 tool calls)
 - **Run failure (stderr)** — 30% weighted (0 tool calls, weight 0.3)
 - **Fix + re-run stdout** — Weighted retry path (1 tool calls, weight 0.3)
 
@@ -45,13 +47,13 @@
 
 | Flow | Input (context) | Output (model) | **Total** | Turns | Tool calls |
 |------|-----------------|----------------|-----------|-------|------------|
-| Python file E2E (cold start) | 262 | 386 | **648** | 8.6 | 6.3 |
-| Python file E2E (warm, re-discovery) | 180 | 523 | **703** | 6.6 | 4.3 |
-| Python inline JSON E2E (cold) | 1,219 | 1,218 | **2,437** | 5.6 | 3.3 |
-| Python inline JSON E2E (warm) | 1,170 | 1,207 | **2,377** | 4.6 | 2.3 |
-| GMA query+chart lean (auto pts, also_chart) | 115 | 73 | **188** | 3 | 2 |
-| GMA query+chart full (pts=50) | 719 | 73 | **792** | 3 | 2 |
-| Best-case file Python (1 turn) | 56 | 78 | **134** | 1 | 0 |
+| Python file E2E (cold start) | 262 | 396 | **658** | 8.6 | 6.3 |
+| Python file E2E (warm, re-discovery) | 180 | 533 | **713** | 6.6 | 4.3 |
+| Python inline JSON E2E (cold) | 1,219 | 1,228 | **2,447** | 5.6 | 3.3 |
+| Python inline JSON E2E (warm) | 1,170 | 1,217 | **2,387** | 4.6 | 2.3 |
+| GMA query+chart lean (auto pts, also_chart) | 182 | 94 | **276** | 3 | 2 |
+| GMA query+chart full (pts=50) | 1,390 | 94 | **1,484** | 3 | 2 |
+| Best-case file Python (1 turn) | 56 | 111 | **167** | 1 | 0 |
 
 ## Per-step breakdown (auditable)
 
@@ -66,10 +68,10 @@
 | Schema preview | 56 | 229 | 285 |
 | pip / import check | 10 | 12 | 22 |
 | pip install results | 31 | 14 | 45 |
-| Run stdout + answer | 33 | 30 | 63 |
+| Final answer to user | 33 | 40 | 73 |
 | Run failure (stderr) | 6 | 3 | 9 |
 | Fix + re-run stdout | 8 | 3 | 11 |
-| **Sum** | **262** | **386** | **648** |
+| **Sum** | **262** | **396** | **658** |
 
 ### Python file E2E (warm, re-discovery)
 
@@ -80,10 +82,10 @@
 | Rewrite script | 8 | 215 | 223 |
 | Schema preview | 56 | 229 | 285 |
 | pip show | 13 | 14 | 27 |
-| Run stdout + answer | 33 | 30 | 63 |
+| Final answer to user | 33 | 40 | 73 |
 | Run failure (stderr) | 6 | 3 | 9 |
 | Fix + re-run stdout | 8 | 3 | 11 |
-| **Sum** | **180** | **523** | **703** |
+| **Sum** | **180** | **533** | **713** |
 
 ### Python inline JSON E2E (cold)
 
@@ -93,10 +95,10 @@
 | Inline matplotlib script | 6 | 1,148 | 1,154 |
 | pip / import check | 10 | 12 | 22 |
 | pip install results | 31 | 14 | 45 |
-| Run stdout + answer | 33 | 30 | 63 |
+| Final answer to user | 33 | 40 | 73 |
 | Run failure (stderr) | 6 | 3 | 9 |
 | Fix + re-run stdout | 8 | 3 | 11 |
-| **Sum** | **1,219** | **1,218** | **2,437** |
+| **Sum** | **1,219** | **1,228** | **2,447** |
 
 ### Python inline JSON E2E (warm)
 
@@ -105,10 +107,10 @@
 | Re-attach series | 1,104 | 9 | 1,113 |
 | Inline matplotlib script | 6 | 1,148 | 1,154 |
 | pip show | 13 | 14 | 27 |
-| Run stdout + answer | 33 | 30 | 63 |
+| Final answer to user | 33 | 40 | 73 |
 | Run failure (stderr) | 6 | 3 | 9 |
 | Fix + re-run stdout | 8 | 3 | 11 |
-| **Sum** | **1,170** | **1,207** | **2,377** |
+| **Sum** | **1,170** | **1,217** | **2,387** |
 
 ### GMA query+chart lean (auto pts, also_chart)
 
@@ -116,8 +118,8 @@
 |------|----------------|-------------|-------|
 | query call | 17 | 32 | 49 |
 | query tool result → chart call | 59 | 22 | 81 |
-| chart tool result | 39 | 19 | 58 |
-| **Sum** | **115** | **73** | **188** |
+| Final answer to user | 106 | 40 | 146 |
+| **Sum** | **182** | **94** | **276** |
 
 ### GMA query+chart full (pts=50)
 
@@ -125,18 +127,32 @@
 |------|----------------|-------------|-------|
 | query call | 17 | 32 | 49 |
 | query tool result → chart call | 663 | 22 | 685 |
-| chart tool result | 39 | 19 | 58 |
-| **Sum** | **719** | **73** | **792** |
+| Final answer to user | 710 | 40 | 750 |
+| **Sum** | **1,390** | **94** | **1,484** |
+
+## Tool definition overhead
+
+| Bundle | Tools | Schema tokens (tools/list JSON) |
+|--------|-------|----------------------------------|
+| GraphMyAnything MCP | 4 | **342** |
+| Python agent harness (representative) | 6 | **248** |
+
+| Flow | Excl. defs | + defs × turns | + defs once (cached) |
+|------|------------|----------------|----------------------|
+| Python file E2E cold | 658 | **2,791** | 906 |
+| GMA lean | 276 | **1,302** | 618 |
+
+Prompt caching often discounts repeated tool schemas after turn 1; we show both **worst-case (× turns)** and **cached-once**.
 
 ## $ cost per 1,000 identical questions
 
 | Flow | Tokens / question | Est. API cost |
 |------|-------------------|---------------|
-| Python file E2E cold | 648 | $5.86 |
-| Python file E2E warm | 703 | $7.64 |
-| GMA lean | 188 | $1.22 |
-| GMA full pts=50 | 792 | $2.28 |
-| Best-case file Python | 134 | $1.19 |
+| Python file E2E cold | 658 | $6.00 |
+| Python file E2E warm | 713 | $7.78 |
+| GMA lean | 276 | $1.63 |
+| GMA full pts=50 | 1,484 | $3.75 |
+| Best-case file Python | 167 | $1.65 |
 
 Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
 
@@ -144,9 +160,9 @@ Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
 
 | Flow | Per session | × 30 |
 |------|-------------|-------------|
-| Python file E2E warm | 703 | **21,090** |
-| Python inline E2E warm | 2,377 | **71,310** |
-| GMA lean | 188 | **5,640** |
+| Python file E2E warm | 713 | **21,390** |
+| Python inline E2E warm | 2,387 | **71,610** |
+| GMA lean | 276 | **8,280** |
 
 ## Answer quality (same prompt)
 
@@ -163,6 +179,8 @@ Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
 - File E2E assumes the agent does not paste the whole JSON into chat when told to read from disk.
 - GMA `chart` returns a path, not image bytes (same as Python PNG on disk).
 - Other model tokenizers differ slightly; dollar lines scale linearly with token split.
+- **Shared** `SHARED_USER_CONTEXT` on turn 1 and `SHARED_FINAL_ANSWER` on the last step for every flow (`e2e-assumptions.ts`).
+- Python harness defs are a **representative** Cursor-style 6-tool bundle, not a live session export.
 
 ## Reproduce
 

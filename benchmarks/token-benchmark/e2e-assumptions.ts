@@ -1,7 +1,16 @@
 /** Conservative, documented constants for end-to-end agent flows. */
 
+const USER_Q = "Chart my last 90 days of MRR and tell me the trend.";
+
+/** Identical user turn on every flow (counted once on turn 1). */
+export const SHARED_USER_CONTEXT = `User: ${USER_Q}`;
+
+/** Identical final assistant message on every flow (dedicated last step). */
+export const SHARED_FINAL_ANSWER =
+  "MRR is up 13.15% over the last 90 days (65000 → 73550). Chart saved locally; see tool output for path. Trend is upward across the window.";
+
 export const ASSUMPTIONS = {
-  userQuestion: "Chart my last 90 days of MRR and tell me the trend.",
+  userQuestion: USER_Q,
   pointCount: 90,
   sessions: 30,
   errorRetryRate: 0.3,

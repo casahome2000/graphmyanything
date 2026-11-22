@@ -5,9 +5,17 @@ import { getEncoding } from "js-tiktoken";
 import sharp from "sharp";
 import { computeSummary } from "../../packages/mcp-server/src/lib/summary.js";
 import { generateInsight } from "../../packages/mcp-server/src/lib/insight.js";
-import { ASSUMPTIONS } from "./e2e-assumptions.js";
+import {
+  ASSUMPTIONS,
+  SHARED_FINAL_ANSWER,
+  SHARED_USER_CONTEXT,
+} from "./e2e-assumptions.js";
 import { buildAllE2EFlows } from "./e2e-flows.js";
 import { buildGmaPayloads } from "./gma-payloads.js";
+import {
+  gmaToolDefsJson,
+  PYTHON_HARNESS_TOOLS_JSON,
+} from "./tool-definitions.js";
 import type { E2EFlow } from "./e2e-assumptions.js";
 
 const enc = getEncoding("o200k_base");
@@ -55,6 +63,14 @@ type MeasuredFlow = {
   toolCalls: number;
 };
 
+function toolDefOverhead(base: MeasuredFlow, defTokens: number) {
+  return {
+    base: base.total,
+    perTurn: Math.round(base.total + defTokens * base.turns),
+    onceCached: base.total + defTokens,
+  };
+}
+
 function measureFlow(flow: E2EFlow): MeasuredFlow {
   const steps: MeasuredStep[] = flow.steps.map((step) => {
     const w = step.weight ?? 1;
@@ -98,7 +114,7 @@ function costUsd(inTokens: number, outTokens: number): number {
 /** Best-case Python: final code-gen turn only (Carlos's lower bound). */
 function buildFilePythonBestCase(pointCount: number) {
   const input = [
-    `User: ${USER_QUESTION}`,
+    SHARED_USER_CONTEXT,
     "Daily MRR JSON on disk at /data/exports/stripe_mrr_daily.json",
     `(${pointCount} rows; do not load into chat)`,
     "Write short Python reading file, stats, save PNG.",
@@ -111,7 +127,7 @@ function buildFilePythonBestCase(pointCount: number) {
     "plt.plot(ys); plt.savefig('/tmp/mrr.png')",
     "print('pct_change',(ys[-1]-ys[0])/ys[0]*100)",
     "```",
-    "Trend up; chart on disk.",
+    SHARED_FINAL_ANSWER,
   ].join("\n");
   const out = output.slice(0, Math.floor(output.length * RETRY_FACTOR));
   const inTokens = countTokens(input);
@@ -236,7 +252,7 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   <rect width="100%" height="100%" fill="${bg}" rx="16"/>
   <rect x="1" y="1" width="${W - 2}" height="${H - 2}" rx="15" fill="none" stroke="url(#title-grad)" stroke-opacity="0.35"/>
   <text x="24" y="40" fill="url(#title-grad)" font-family="system-ui,sans-serif" font-size="24" font-weight="700">End-to-end agent tokens · one chart question</text>
-  <text x="24" y="62" fill="${muted}" font-family="system-ui,sans-serif" font-size="12">o200k_base · log-scaled · discovery → script → env → run → answer</text>
+  <text x="24" y="62" fill="${muted}" font-family="system-ui,sans-serif" font-size="12">o200k_base · excludes tool schemas (see results.md) · identical final answer step</text>
   ${chips}
   <text x="24" y="${panel1TitleY}" fill="${fg}" font-size="15" font-weight="600" font-family="system-ui,sans-serif">Single question (90 points)</text>
   ${bars1.join("")}
@@ -262,7 +278,11 @@ const gmaLean = byId("gma_lean");
 const gmaFull = byId("gma_full");
 const bestCase = buildFilePythonBestCase(POINT_COUNT);
 
-const gmaCallout = `${pctDeltaLabel(fileCold.total, gmaLean.total)} vs file E2E cold`;
+const gmaDefTokens = countTokens(gmaToolDefsJson());
+const pyDefTokens = countTokens(PYTHON_HARNESS_TOOLS_JSON);
+const fileColdDefs = toolDefOverhead(fileCold, pyDefTokens);
+const gmaLeanDefs = toolDefOverhead(gmaLean, gmaDefTokens);
+const gmaCallout = `${pctDeltaLabel(fileCold.total, gmaLean.total)} excl. defs · +${formatNum(gmaLeanDefs.perTurn - gmaLean.total)} GMA defs×turns`;
 
 const primaryBars: ChartBar[] = [
   {
@@ -270,7 +290,7 @@ const primaryBars: ChartBar[] = [
     label: "Python file E2E · cold",
     total: fileCold.total,
     gradientId: "file_e2e",
-    callout: `${fileCold.turns} turns · ${fileCold.toolCalls} tool calls`,
+    callout: `${fileCold.turns} turns · +${formatNum(fileColdDefs.perTurn - fileCold.total)} w/ harness defs×turns`,
   },
   {
     id: "python_file_e2e_warm",
@@ -375,11 +395,27 @@ const costRows = [
 const insight = generateInsight("stripe.mrr", series, "90d");
 const summary = computeSummary(series);
 
+const defTable = `| Bundle | Tools | Schema tokens (tools/list JSON) |
+|--------|-------|----------------------------------|
+| GraphMyAnything MCP | 4 | **${formatNum(gmaDefTokens)}** |
+| Python agent harness (representative) | 6 | **${formatNum(pyDefTokens)}** |
+
+| Flow | Excl. defs | + defs × turns | + defs once (cached) |
+|------|------------|----------------|----------------------|
+| Python file E2E cold | ${formatNum(fileCold.total)} | **${formatNum(fileColdDefs.perTurn)}** | ${formatNum(fileColdDefs.onceCached)} |
+| GMA lean | ${formatNum(gmaLean.total)} | **${formatNum(gmaLeanDefs.perTurn)}** | ${formatNum(gmaLeanDefs.onceCached)} |
+
+Prompt caching often discounts repeated tool schemas after turn 1; we show both **worst-case (× turns)** and **cached-once**.`;
+
+const oneLiner = `End-to-end (excl. tool defs), GMA lean is **${formatNum(gmaLean.total)}** tokens vs **${formatNum(fileCold.total)}** file-Python (**${pctDeltaLabel(fileCold.total, gmaLean.total)}**), with **${formatNum(gmaDefTokens)}**-token MCP schemas vs **${formatNum(pyDefTokens)}**-token file/shell harness schemas.`;
+
 const md = `# Token benchmark (end-to-end)
 
 ## Headline (defensible)
 
-**Best-case file Python (~${formatNum(bestCase.total)} tokens) is ~${Math.round(fileCold.total / bestCase.total)}× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → answer): **${formatNum(fileCold.total)}** tokens (${fileCold.turns} turns, ${fileCold.toolCalls} tool calls).
+> ${oneLiner}
+
+**Best-case file Python (~${formatNum(bestCase.total)} tokens) is ~${Math.round(fileCold.total / bestCase.total)}× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → **shared final answer**): **${formatNum(fileCold.total)}** tokens (${fileCold.turns} turns, ${fileCold.toolCalls} tool calls).
 
 **GMA lean (\`points=auto\`, \`also_chart\`):** **${formatNum(gmaLean.inTokens)}** in · **${formatNum(gmaLean.outTokens)}** out · **${formatNum(gmaLean.total)}** total — ${pctDeltaLabel(fileCold.total, gmaLean.total)} than file E2E cold (${formatNum(fileCold.total)}). **GMA full (\`points=50\`):** **${formatNum(gmaFull.total)}** (${formatNum(gmaFull.inTokens)} in · ${formatNum(gmaFull.outTokens)} out).
 
@@ -415,6 +451,10 @@ ${e2eTable}
 
 ${breakdownMd}
 
+## Tool definition overhead
+
+${defTable}
+
 ## $ cost per 1,000 identical questions
 
 | Flow | Tokens / question | Est. API cost |
@@ -446,6 +486,8 @@ Pricing: [${ASSUMPTIONS.costModel.label}](${ASSUMPTIONS.costModel.source}).
 - File E2E assumes the agent does not paste the whole JSON into chat when told to read from disk.
 - GMA \`chart\` returns a path, not image bytes (same as Python PNG on disk).
 - Other model tokenizers differ slightly; dollar lines scale linearly with token split.
+- **Shared** \`SHARED_USER_CONTEXT\` on turn 1 and \`SHARED_FINAL_ANSWER\` on the last step for every flow (\`e2e-assumptions.ts\`).
+- Python harness defs are a **representative** Cursor-style 6-tool bundle, not a live session export.
 
 ## Reproduce
 
