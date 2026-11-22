@@ -44,7 +44,7 @@ export function Hero() {
               <WaitlistForm />
             </div>
             <div className="mt-4">
-              <PreorderButton />
+              <PreorderButton placement="hero" />
             </div>
             <p className="mt-8 max-w-xl text-sm text-[#8b8b9e]/90">
               Sits next to text-memory tools like Mem0 and Zep—complementary,

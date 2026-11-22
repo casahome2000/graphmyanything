@@ -1,6 +1,31 @@
 import { NextResponse } from "next/server";
 import { sendWaitlistConfirmationEmail } from "@/lib/waitlist-confirmation-email";
-import { storeWaitlistEmail } from "@/lib/waitlist";
+import { storeWaitlistEmail, type WaitlistSignupInput } from "@/lib/waitlist";
+
+function pickString(
+  body: Record<string, unknown>,
+  key: string,
+): string | undefined {
+  const value = body[key];
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function parseBody(body: unknown): WaitlistSignupInput | null {
+  if (typeof body !== "object" || body === null) return null;
+  const record = body as Record<string, unknown>;
+  const email = pickString(record, "email");
+  if (!email) return null;
+  return {
+    email,
+    source: pickString(record, "source"),
+    utm_source: pickString(record, "utm_source") ?? null,
+    utm_medium: pickString(record, "utm_medium") ?? null,
+    utm_campaign: pickString(record, "utm_campaign") ?? null,
+    utm_content: pickString(record, "utm_content") ?? null,
+    referrer: pickString(record, "referrer") ?? null,
+    landing_path: pickString(record, "landing_path") ?? null,
+  };
+}
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -13,23 +38,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const email =
-    typeof body === "object" &&
-    body !== null &&
-    "email" in body &&
-    typeof (body as { email: unknown }).email === "string"
-      ? (body as { email: string }).email
-      : "";
+  const signup = parseBody(body);
+  if (!signup) {
+    return NextResponse.json(
+      { ok: false, error: "Email is required." },
+      { status: 400 },
+    );
+  }
 
-  const source =
-    typeof body === "object" &&
-    body !== null &&
-    "source" in body &&
-    typeof (body as { source: unknown }).source === "string"
-      ? (body as { source: string }).source
-      : undefined;
-
-  const result = await storeWaitlistEmail(email, source);
+  const result = await storeWaitlistEmail(signup);
   if (!result.ok) {
     return NextResponse.json(
       { ok: false, error: result.error },
@@ -38,9 +55,9 @@ export async function POST(request: Request) {
   }
 
   if (result.isNew) {
-    const normalized = email.trim().toLowerCase();
+    const normalized = signup.email.trim().toLowerCase();
     void sendWaitlistConfirmationEmail(normalized);
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, isNew: result.isNew });
 }
