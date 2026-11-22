@@ -9,7 +9,7 @@
 ## Install
 
 ```bash
-npx graphmyanything-mcp
+npx -y graphmyanything-mcp@0.1.1
 ```
 
 Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
@@ -23,9 +23,9 @@ Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Me
 | `track` | Record a value, batch, or historical points (`metric`, `value` or `points[]`, optional `tags`) |
 | `query` | Summary + LTTB series within `token_budget` (`metric`, `range` like `90d`, `token_budget`) |
 | `insight` | Plain-English trend, MAD anomalies, naive forecast |
-| `chart` | Dark-theme SVG on disk (`path`); `url` is `null` until hosted charts ship (`hosted_url_note`) |
+| `chart` | Writes a dark/light **SVG on disk** (`path`). **`url` is always `null`** in 0.1.1 (no dead `graphmyanything.com/c/â€¦` links). `hosted_url_note` explains that public URLs are not live yet. |
 
-Hosted live chart URLs on graphmyanything.com are coming for founding members â€” the tool does not return a public URL yet.
+Open the file at `path` in your IDE or browser locally. Hosted live chart URLs on [graphmyanything.com](https://graphmyanything.com) are coming for founding members â€” the tool does not return a fetchable public URL today.
 
 ## Cursor
 
@@ -36,7 +36,7 @@ Hosted live chart URLs on graphmyanything.com are coming for founding members â€
   "mcpServers": {
     "graphmyanything": {
       "command": "npx",
-      "args": ["-y", "graphmyanything-mcp"]
+      "args": ["-y", "graphmyanything-mcp@0.1.1"]
     }
   }
 }
@@ -51,7 +51,7 @@ Hosted live chart URLs on graphmyanything.com are coming for founding members â€
   "mcpServers": {
     "graphmyanything": {
       "command": "npx",
-      "args": ["-y", "graphmyanything-mcp"]
+      "args": ["-y", "graphmyanything-mcp@0.1.1"]
     }
   }
 }
@@ -60,7 +60,7 @@ Hosted live chart URLs on graphmyanything.com are coming for founding members â€
 ## Claude Code
 
 ```bash
-claude mcp add graphmyanything -- npx -y graphmyanything-mcp
+claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.1
 ```
 
 ## Example session

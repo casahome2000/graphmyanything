@@ -16,8 +16,8 @@ We chose **MCP Client** as the primary path because n8n supports stdio MCP serve
 1. **Credentials → New → MCP Client** (name: `graphmyanything-mcp (stdio)`).
 2. Transport: **stdio**.
 3. Command: `npx`
-4. Arguments: `-y`, `graphmyanything-mcp`
-5. Ensure Node 20+ on the n8n worker.
+4. Arguments: `-y`, `graphmyanything-mcp@0.1.1`
+5. Ensure **Node 22.13+** on the n8n worker (built-in `node:sqlite`).
 
 On the imported workflow:
 
