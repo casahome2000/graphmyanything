@@ -9,13 +9,13 @@
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "graphmyanything-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },
@@ -23,6 +23,13 @@
         {
           "name": "GRAPHMYANYTHING_DB_PATH",
           "description": "Optional SQLite path (default ~/.graphmyanything/metrics.db)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "GRAPHMYANYTHING_CHARTS_DIR",
+          "description": "Optional chart SVG output directory (default: charts/ beside DB, or ~/.graphmyanything/charts/)",
           "isRequired": false,
           "format": "string",
           "isSecret": false

@@ -66,7 +66,8 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "chart",
     title: "Render chart",
-    description: "SVG to local file; returns path and URL.",
+    description:
+      "SVG to local file; returns path (url is null until hosted charts ship).",
     inputSchema: {
       type: "object",
       properties: {

@@ -2,17 +2,17 @@
 
 ## Headline (defensible)
 
-> End-to-end (excl. tool defs), GMA lean is **276** tokens vs **658** file-Python (**58.1% fewer**), with **342**-token MCP schemas vs **248**-token file/shell harness schemas.
+> End-to-end (excl. tool defs), GMA lean is **284** tokens vs **658** file-Python (**56.8% fewer**), with **349**-token MCP schemas vs **248**-token file/shell harness schemas.
 
 **Best-case file Python (~167 tokens) is ~4× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → **shared final answer**): **658** tokens (8.6 turns, 6.3 tool calls).
 
-**GMA lean (`points=auto`, `also_chart`):** **182** in · **94** out · **276** total — 58.1% fewer than file E2E cold (658). **GMA full (`points=50`):** **1,484** (1,390 in · 94 out).
+**GMA lean (`points=auto`, `also_chart`):** **190** in · **94** out · **284** total — 56.8% fewer than file E2E cold (658). **GMA full (`points=50`):** **1,492** (1,398 in · 94 out).
 
-**vs inline JSON E2E:** lean 276 vs 2,447 (88.7% fewer).
+**vs inline JSON E2E:** lean 284 vs 2,447 (88.4% fewer).
 
-**30 warm sessions:** file E2E warm 21,390 · GMA lean 8,280 (61.3% fewer vs file warm) · inline 71,610.
+**30 warm sessions:** file E2E warm 21,390 · GMA lean 8,520 (60.2% fewer vs file warm) · inline 71,610.
 
-**Cost @ 1,000 Q (GPT-5.2, in $1.75/M · out $14/M):** file E2E cold **$6.00** · GMA lean **$1.63** · GMA full **$3.75**.
+**Cost @ 1,000 Q (GPT-5.2, in $1.75/M · out $14/M):** file E2E cold **$6.00** · GMA lean **$1.65** · GMA full **$3.76**.
 
 ## Assumptions (transparent)
 
@@ -51,8 +51,8 @@
 | Python file E2E (warm, re-discovery) | 180 | 533 | **713** | 6.6 | 4.3 |
 | Python inline JSON E2E (cold) | 1,219 | 1,228 | **2,447** | 5.6 | 3.3 |
 | Python inline JSON E2E (warm) | 1,170 | 1,217 | **2,387** | 4.6 | 2.3 |
-| GMA query+chart lean (auto pts, also_chart) | 182 | 94 | **276** | 3 | 2 |
-| GMA query+chart full (pts=50) | 1,390 | 94 | **1,484** | 3 | 2 |
+| GMA query+chart lean (auto pts, also_chart) | 190 | 94 | **284** | 3 | 2 |
+| GMA query+chart full (pts=50) | 1,398 | 94 | **1,492** | 3 | 2 |
 | Best-case file Python (1 turn) | 56 | 111 | **167** | 1 | 0 |
 
 ## Per-step breakdown (auditable)
@@ -118,8 +118,8 @@
 |------|----------------|-------------|-------|
 | query call | 17 | 32 | 49 |
 | query tool result → chart call | 59 | 22 | 81 |
-| Final answer to user | 106 | 40 | 146 |
-| **Sum** | **182** | **94** | **276** |
+| Final answer to user | 114 | 40 | 154 |
+| **Sum** | **190** | **94** | **284** |
 
 ### GMA query+chart full (pts=50)
 
@@ -127,20 +127,20 @@
 |------|----------------|-------------|-------|
 | query call | 17 | 32 | 49 |
 | query tool result → chart call | 663 | 22 | 685 |
-| Final answer to user | 710 | 40 | 750 |
-| **Sum** | **1,390** | **94** | **1,484** |
+| Final answer to user | 718 | 40 | 758 |
+| **Sum** | **1,398** | **94** | **1,492** |
 
 ## Tool definition overhead
 
 | Bundle | Tools | Schema tokens (tools/list JSON) |
 |--------|-------|----------------------------------|
-| GraphMyAnything MCP | 4 | **342** |
+| GraphMyAnything MCP | 4 | **349** |
 | Python agent harness (representative) | 6 | **248** |
 
 | Flow | Excl. defs | + defs × turns | + defs once (cached) |
 |------|------------|----------------|----------------------|
 | Python file E2E cold | 658 | **2,791** | 906 |
-| GMA lean | 276 | **1,302** | 618 |
+| GMA lean | 284 | **1,331** | 633 |
 
 Prompt caching often discounts repeated tool schemas after turn 1; we show both **worst-case (× turns)** and **cached-once**.
 
@@ -150,8 +150,8 @@ Prompt caching often discounts repeated tool schemas after turn 1; we show both 
 |------|-------------------|---------------|
 | Python file E2E cold | 658 | $6.00 |
 | Python file E2E warm | 713 | $7.78 |
-| GMA lean | 276 | $1.63 |
-| GMA full pts=50 | 1,484 | $3.75 |
+| GMA lean | 284 | $1.65 |
+| GMA full pts=50 | 1,492 | $3.76 |
 | Best-case file Python | 167 | $1.65 |
 
 Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
@@ -162,7 +162,7 @@ Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
 |------|-------------|-------------|
 | Python file E2E warm | 713 | **21,390** |
 | Python inline E2E warm | 2,387 | **71,610** |
-| GMA lean | 276 | **8,280** |
+| GMA lean | 284 | **8,520** |
 
 ## Answer quality (same prompt)
 

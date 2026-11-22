@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { resolveChartsDir } from "../paths.js";
 import type { DataPoint } from "./lttb.js";
 
 export type ChartType = "line" | "bar" | "area";
@@ -123,13 +124,7 @@ export function writeChartFile(
   svg: string,
   outDir?: string,
 ): string {
-  const dir =
-    outDir ??
-    path.join(
-      process.env.HOME ?? process.env.USERPROFILE ?? ".",
-      ".graphmyanything",
-      "charts",
-    );
+  const dir = outDir ?? resolveChartsDir();
   fs.mkdirSync(dir, { recursive: true });
   const safe = metric.replace(/[^a-zA-Z0-9._-]/g, "_");
   const file = path.join(dir, `${safe}-${Date.now()}.svg`);

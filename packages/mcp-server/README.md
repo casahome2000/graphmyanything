@@ -12,7 +12,7 @@
 npx graphmyanything-mcp
 ```
 
-Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`).
+Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
 
 **No telemetry** — we do not phone home; install counts come from npm downloads only.
 
@@ -23,9 +23,9 @@ Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Me
 | `track` | Record a value, batch, or historical points (`metric`, `value` or `points[]`, optional `tags`) |
 | `query` | Summary + LTTB series within `token_budget` (`metric`, `range` like `90d`, `token_budget`) |
 | `insight` | Plain-English trend, MAD anomalies, naive forecast |
-| `chart` | Dark-theme SVG to `~/.graphmyanything/charts/` (`type`: line \| bar \| area) |
+| `chart` | Dark-theme SVG on disk (`path`); `url` is `null` until hosted charts ship (`hosted_url_note`) |
 
-Permanent live chart URLs at **https://graphmyanything.com/c/&lt;metric&gt;** are coming for founding members.
+Hosted live chart URLs on graphmyanything.com are coming for founding members — the tool does not return a public URL yet.
 
 ## Cursor
 
@@ -70,6 +70,7 @@ track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})
 query(metric="stripe.mrr", range="90d", token_budget=200)
 insight(metric="stripe.mrr", range="90d")
 chart(metric="stripe.mrr", range="90d", type="area", theme="dark")
+→ {"path":"/Users/you/.graphmyanything/charts/stripe.mrr-….svg","url":null,"hosted_url_note":"Hosted live chart URLs are coming soon: graphmyanything.com"}
 ```
 
 ## Develop

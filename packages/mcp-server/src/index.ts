@@ -15,7 +15,7 @@ const db = openDatabase();
 
 const server = new McpServer({
   name: "graphmyanything",
-  version: "0.1.0",
+  version: "0.1.1",
 });
 
 server.registerTool(
@@ -103,7 +103,8 @@ server.registerTool(
   "chart",
   {
     title: "Render chart",
-    description: "SVG to local file; returns path and URL.",
+    description:
+      "SVG to local file; returns path (url is null until hosted charts ship).",
     inputSchema: {
       metric: z.string(),
       range: z.string().optional(),
