@@ -1,64 +1,147 @@
 # GraphMyAnything
 
-Landing page for [graphmyanything.com](https://graphmyanything.com)—**metric memory for AI agents**.
+**Chart & metric memory for AI agents.**
 
-The original 2016 Flask stub lives in [`legacy/`](legacy/).
+[`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local-first [Model Context Protocol](https://modelcontextprotocol.io) server: store time-series metrics in SQLite, answer chart questions with token-efficient tool calls instead of throwaway Python, and render SVG charts on disk. No cloud required for core flows.
 
-## Stack
+**Registry name:** `io.github.casahome2000/graphmyanything-mcp` · **License:** MIT
 
-- [Next.js](https://nextjs.org/) 15 (App Router)
-- TypeScript, Tailwind CSS v4
-- Deployed on [Vercel](https://vercel.com)
-
-## Develop
+## Quick start
 
 ```bash
-npm install
-npm run dev
+claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.1
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days and tell me the trend.*
 
-## Build & lint
+## What it does
+
+1. **Track** values (single points, batches, or historical series).
+2. **Query** compact numeric summaries and optional downsampled points within a token budget.
+3. **Insight** plain-English trend, anomalies, and a simple forecast.
+4. **Chart** dark/light SVG files locally — `path` on disk; **`url` is `null`** until hosted live charts ship (see `hosted_url_note` in the response).
+
+Data stays on your machine unless you opt into future cloud APIs.
+
+## Install
+
+**Node.js 22.13+** (built-in `node:sqlite`, no native compile step):
 
 ```bash
-npm run build
-npm run lint
-npm run email:preview
+npx -y graphmyanything-mcp
 ```
 
-`email:preview` writes HTML to `/opt/cursor/artifacts/waitlist-email-preview.html` and desktop/mobile screenshots (requires Playwright).
+Published package: **0.1.1** — `npx -y graphmyanything-mcp@0.1.1`
 
-## Environment variables
+### Local paths & env vars
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SUPABASE_URL` | No | Supabase project URL. When set with the service role key, waitlist emails are stored in Postgres. |
-| `SUPABASE_SERVICE_ROLE_KEY` | No | Service role key for server-side `waitlist` inserts. **Never expose to the client.** |
-| `NEXT_PUBLIC_PREORDER_URL` | No | Checkout URL for founding member preorder. Button shows **Coming soon** when unset. |
-| `RESEND_API_KEY` | No | Resend API key for waitlist confirmation emails (skipped when unset). |
-| `WAITLIST_FROM_EMAIL` | No | From address for waitlist mail, e.g. `GraphMyAnything <hello@graphmyanything.com>`. |
+| Location | Default |
+|----------|---------|
+| SQLite DB | `~/.graphmyanything/metrics.db` |
+| Chart SVGs | `~/.graphmyanything/charts/` |
 
-Vercel Web Analytics is enabled via `@vercel/analytics` in the root layout (automatic on Vercel deploys).
+| Variable | Purpose |
+|----------|---------|
+| `GRAPHMYANYTHING_DB_PATH` | Custom SQLite file path |
+| `GRAPHMYANYTHING_CHARTS_DIR` | Custom chart output directory (otherwise `charts/` next to the DB when the DB path is custom) |
 
-### Waitlist storage
+**No telemetry** in the MCP server — we do not phone home from your agent sessions.
 
-1. Run migrations in [`supabase/migrations/`](supabase/migrations/) on your Supabase project (SQL editor or CLI), including attribution columns.
-2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in Vercel (or `.env.local` for dev).
-3. `POST /api/waitlist` accepts email, `source`, and optional UTM / referrer / `landing_path` fields.
+## Tools (four)
 
-In **production** (`VERCEL_ENV=production`), the API requires working storage; otherwise it returns `500`. Local/preview may log signups without storage. New signups trigger a Resend confirmation when `RESEND_API_KEY` and `WAITLIST_FROM_EMAIL` are set; email failures do not fail the signup.
+| Tool | One-liner | Tiny example |
+|------|-----------|--------------|
+| **track** | Write metric point(s) to local SQLite | `track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})` |
+| **query** | Compact summary (latest, min, max, mean, trend, % change), optional downsampled points within a token budget | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
+| **insight** | Plain-English trend, anomalies, and a simple forecast | `insight(metric="stripe.mrr", range="90d")` |
+| **chart** | SVG to local file; no public URL yet | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark")` → `{"path":"…/stripe.mrr-….svg","url":null,"hosted_url_note":"Hosted live chart URLs are coming soon: graphmyanything.com"}` |
 
-### Custom analytics events
+Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-server/src/tool-catalog.ts).
 
-- `waitlist_submit` — new waitlist row persisted (not duplicate resubmits)
-- `waitlist_error` — signup failed (validation, network, or server)
-- `preorder_click` — founding member CTA (includes `placement`; 350ms flush before navigation)
+## Client config
 
-## Vercel
+### Cursor
 
-Import the repo, set environment variables as needed, and deploy. No extra configuration required.
+`.cursor/mcp.json` or **Settings → MCP**:
+
+```json
+{
+  "mcpServers": {
+    "graphmyanything": {
+      "command": "npx",
+      "args": ["-y", "graphmyanything-mcp@0.1.1"]
+    }
+  }
+}
+```
+
+### Claude Desktop
+
+`claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "graphmyanything": {
+      "command": "npx",
+      "args": ["-y", "graphmyanything-mcp@0.1.1"]
+    }
+  }
+}
+```
+
+### Claude Code
+
+```bash
+claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.1
+```
+
+## n8n
+
+Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, pin `graphmyanything-mcp@0.1.1`).
+
+## Why tokens matter (one chart question)
+
+Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchmark/) — run `npm run benchmark:tokens` from a full repo checkout.
+
+**End-to-end agent tokens** (single “show me the chart + trend” flow, **single question, end-to-end (cold)**):
+
+| Approach | Tokens |
+|----------|--------|
+| Inline JSON + matplotlib in chat | **2,447** |
+| Python file off-context (E2E) | **658** |
+| **GMA lean** (`query` + `chart`, `points=auto`, `also_chart`) | **284** (**56.8% fewer** than file E2E) |
+
+**file E2E warm × 30** **21,390** vs **GMA lean** **8,520** (**60.2% fewer**).
+
+**Caveats (read before citing):**
+
+- Synthetic MRR series and simulated tool turns — not a live agent trace.
+- MCP **tool schema overhead** ~342 tokens vs ~248 for a minimal Python harness (see benchmark tables).
+- **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — optimistic floor, not typical agent E2E.
+
+A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
+
+## Hosted live charts (coming soon)
+
+The `chart` tool writes SVG files locally today. Public URLs at **graphmyanything.com** are on the roadmap for founding members — [join the waitlist](https://graphmyanything.com).
+
+## Repo map
+
+| Path | Contents |
+|------|----------|
+| [`packages/mcp-server/`](packages/mcp-server/) | npm package, tests, `server.json` |
+| [`integrations/n8n/`](integrations/n8n/) | Workflow template |
+| [`benchmarks/token-benchmark/`](benchmarks/token-benchmark/) | Token comparison + chart |
+| [`docs/DEVELOPING.md`](docs/DEVELOPING.md) | Landing-site developer notes |
+| [`legacy/`](legacy/) | 2016 Flask archive |
+
+## Develop the MCP server
+
+```bash
+cd packages/mcp-server && npm install && npm run build && npm test
+```
 
 ## License
 
-See repository history; legacy Python sample included for archival purposes.
+MIT — see [`packages/mcp-server/LICENSE`](packages/mcp-server/LICENSE).

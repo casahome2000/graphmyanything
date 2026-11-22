@@ -68,7 +68,7 @@
         }
       },
       "notesInFlow": true,
-      "notes": "n8n ≥1.76: MCP Client credentials → Command: npx, Args: -y graphmyanything-mcp, transport stdio."
+      "notes": "n8n ≥1.76: MCP Client credentials → Command: npx, Args: -y, graphmyanything-mcp@0.1.1, transport stdio. Node 22.13+."
     },
     {
       "parameters": {
@@ -126,7 +126,7 @@
     },
     {
       "parameters": {
-        "content": "## GraphMyAnything validation workflow\n\n1. **Local (recommended today):** Configure MCP Client credential with `npx -y graphmyanything-mcp`, enable MCP nodes, disable HTTP placeholder.\n2. **Cloud (later):** `POST https://api.graphmyanything.com/v1/track` — documented placeholder; enable HTTP node when API launches.\n\nWaitlist: https://graphmyanything.com"
+        "content": "## GraphMyAnything validation workflow\n\n1. **Local (recommended today):** MCP Client stdio → `npx -y graphmyanything-mcp@0.1.1` (Node 22.13+). Enable MCP nodes; disable HTTP placeholder.\n2. **Cloud (later):** `POST https://api.graphmyanything.com/v1/track` — placeholder until API ships.\n\nWaitlist: https://graphmyanything.com"
       },
       "id": "sticky",
       "name": "Sticky Note",
