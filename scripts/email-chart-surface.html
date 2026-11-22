@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 536px; height: 168px; background: #0c0c12; font-family: ui-monospace, monospace; }
+  .wrap { position: relative; width: 536px; height: 168px; padding: 12px 14px; }
+  .grid line { stroke: rgba(255,255,255,0.07); stroke-width: 1; }
+  .area { fill: url(#areaGrad); }
+  .line { fill: none; stroke: url(#lineGrad); stroke-width: 2.5; stroke-linecap: round; }
+  .dot { fill: #34d399; filter: drop-shadow(0 0 6px rgba(52,211,153,0.75)); }
+  .badge {
+    position: absolute; right: 16px; top: 14px;
+    font-size: 12px; font-weight: 600; color: #6ee7b7;
+    background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px; padding: 6px 10px; letter-spacing: -0.02em;
+  }
+  .label { position: absolute; left: 16px; top: 14px; font-size: 10px; color: #8b8b9e; text-transform: uppercase; letter-spacing: 0.12em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="label">stripe.mrr</span>
+  <span class="badge">$12.4k ↑18%</span>
+  <svg width="508" height="120" viewBox="0 0 508 120" style="position:absolute;left:14px;bottom:12px;">
+    <defs>
+      <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8b5cf6"/>
+        <stop offset="55%" stop-color="#22d3ee"/>
+        <stop offset="100%" stop-color="#34d399"/>
+      </linearGradient>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g class="grid">
+      <line x1="0" y1="30" x2="508" y2="30"/>
+      <line x1="0" y1="60" x2="508" y2="60"/>
+      <line x1="0" y1="90" x2="508" y2="90"/>
+    </g>
+    <path class="area" d="M0,98 L0,88 C40,82 80,78 120,72 C160,66 200,58 240,52 C280,44 320,36 360,30 C400,24 440,18 480,12 L508,8 L508,120 L0,120 Z"/>
+    <path class="line" d="M0,88 C40,82 80,78 120,72 C160,66 200,58 240,52 C280,44 320,36 360,30 C400,24 440,18 480,12 L508,8"/>
+    <circle class="dot" cx="508" cy="8" r="5"/>
+  </svg>
+</div>
+</body>
+</html>
