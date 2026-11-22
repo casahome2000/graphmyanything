@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  body { margin: 0; background: transparent; }
+  .tile {
+    width: 360px;
+    height: 360px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0c0c12;
+    border-radius: 40px;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 48px var(--glow);
+    overflow: visible;
+  }
+  .track { --glow: rgba(139,92,246,0.35); border-top: 6px solid #8b5cf6; }
+  .query { --glow: rgba(34,211,238,0.35); border-top: 6px solid #22d3ee; }
+  .chart { --glow: rgba(52,211,153,0.35); border-top: 6px solid #34d399; }
+  .tile svg {
+    width: 260px;
+    height: 260px;
+    overflow: visible;
+  }
+</style>
+</head>
+<body>
+<div id="track" class="tile track">
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <filter id="glow-track" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- track: glowing dot + bold up arrow + plus -->
+    <circle cx="38" cy="86" r="13" fill="#22d3ee" filter="url(#glow-track)"/>
+    <circle cx="38" cy="86" r="20" fill="#22d3ee" opacity="0.3"/>
+    <path d="M38 64 V26 M26 38 L38 26 L50 38" stroke="#e9d5ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-track)"/>
+    <path d="M72 70 H90 M81 61 V79" stroke="#8b5cf6" stroke-width="12" stroke-linecap="round" filter="url(#glow-track)"/>
+  </svg>
+</div>
+<div id="query" class="tile query" style="display:none">
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <filter id="glow-query" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+  <!-- bars -->
+    <rect x="18" y="56" width="18" height="42" rx="4" fill="#22d3ee" opacity="0.5"/>
+    <rect x="40" y="38" width="18" height="60" rx="4" fill="#22d3ee" opacity="0.75"/>
+    <rect x="62" y="48" width="18" height="50" rx="4" fill="#22d3ee" opacity="0.6"/>
+    <rect x="18" y="56" width="18" height="42" rx="4" stroke="#67e8f9" stroke-width="5" filter="url(#glow-query)"/>
+    <rect x="40" y="38" width="18" height="60" rx="4" stroke="#67e8f9" stroke-width="5" filter="url(#glow-query)"/>
+    <!-- magnifier (over right bars) -->
+    <circle cx="72" cy="44" r="24" stroke="#c4b5fd" stroke-width="11" filter="url(#glow-query)"/>
+    <path d="M88 60 L106 78" stroke="#c4b5fd" stroke-width="12" stroke-linecap="round" filter="url(#glow-query)"/>
+  </svg>
+</div>
+<div id="chart" class="tile chart" style="display:none">
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <filter id="glow-chart" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <linearGradient id="area-chart" x1="60" y1="32" x2="60" y2="92" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#34d399" stop-opacity="0.35"/>
+        <stop offset="1" stop-color="#34d399" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="M16 92 L16 36 L104 36 L104 92 Z" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+    <path d="M22 78 L38 66 L54 72 L72 48 L98 32 L98 92 L22 92 Z" fill="url(#area-chart)"/>
+    <path d="M22 78 L38 66 L54 72 L72 48 L98 32" stroke="#6ee7b7" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-chart)"/>
+    <circle cx="98" cy="32" r="8" fill="#6ee7b7" filter="url(#glow-chart)"/>
+    <circle cx="98" cy="32" r="14" fill="#34d399" opacity="0.35"/>
+  </svg>
+</div>
+</body>
+</html>

@@ -15,23 +15,26 @@ export function Footer() {
           </p>
         </div>
         <nav
-          className="flex flex-wrap gap-6 text-sm text-[#8b8b9e]"
+          className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[#8b8b9e]"
           aria-label="Footer"
         >
-          <a href="#waitlist" className="hover:text-[#f4f4f7]">
+          <Link href="/#waitlist" className="hover:text-[#f4f4f7]">
             Waitlist
-          </a>
-          <a href="#tools" className="hover:text-[#f4f4f7]">
+          </Link>
+          <Link href="/#tools" className="hover:text-[#f4f4f7]">
             MCP tools
-          </a>
-          <a href="#pricing" className="hover:text-[#f4f4f7]">
+          </Link>
+          <Link href="/#pricing" className="hover:text-[#f4f4f7]">
             Pricing
-          </a>
-          <Link
-            href="https://graphmyanything.com"
-            className="hover:text-[#f4f4f7]"
-          >
-            graphmyanything.com
+          </Link>
+          <Link href="/support" className="hover:text-[#f4f4f7]">
+            Support
+          </Link>
+          <Link href="/privacy" className="hover:text-[#f4f4f7]">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-[#f4f4f7]">
+            Terms
           </Link>
         </nav>
         <p className="text-xs text-[#8b8b9e]">

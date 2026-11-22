@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "email:preview": "tsx scripts/email-preview.ts",
     "build:mcp": "npm run build --prefix packages/mcp-server",
     "test:mcp": "npm test --prefix packages/mcp-server",
     "benchmark:tokens": "npm run run --prefix benchmarks/token-benchmark",
@@ -29,6 +30,7 @@
     "eslint-config-next": "^15.5.7",
     "playwright": "^1.49.1",
     "tailwindcss": "^4.1.4",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
 }

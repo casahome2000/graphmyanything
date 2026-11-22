@@ -1,20 +1,23 @@
+import "./bootstrap.js";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import Database from "better-sqlite3";
+import { DatabaseSync } from "node:sqlite";
 
 const DEFAULT_DIR = path.join(os.homedir(), ".graphmyanything");
 const DEFAULT_DB = path.join(DEFAULT_DIR, "metrics.db");
+
+export type GmaDatabase = DatabaseSync;
 
 export function resolveDbPath(): string {
   return process.env.GRAPHMYANYTHING_DB_PATH ?? DEFAULT_DB;
 }
 
-export function openDatabase(dbPath = resolveDbPath()): Database.Database {
+export function openDatabase(dbPath = resolveDbPath()): GmaDatabase {
   const dir = path.dirname(dbPath);
   fs.mkdirSync(dir, { recursive: true });
-  const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
+  const db = new DatabaseSync(dbPath);
+  db.exec("PRAGMA journal_mode = WAL");
   db.exec(`
     CREATE TABLE IF NOT EXISTS metric_points (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,29 +39,28 @@ export type MetricPoint = {
 };
 
 export function insertPoints(
-  db: Database.Database,
+  db: GmaDatabase,
   metric: string,
   points: MetricPoint[],
 ): number {
   const stmt = db.prepare(
-    `INSERT INTO metric_points (metric, ts, value, tags) VALUES (@metric, @ts, @value, @tags)`,
+    `INSERT INTO metric_points (metric, ts, value, tags) VALUES (?, ?, ?, ?)`,
   );
-  const insertMany = db.transaction((rows: MetricPoint[]) => {
-    for (const row of rows) {
-      stmt.run({
-        metric,
-        ts: row.ts,
-        value: row.value,
-        tags: JSON.stringify(row.tags ?? {}),
-      });
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    for (const row of points) {
+      stmt.run(metric, row.ts, row.value, JSON.stringify(row.tags ?? {}));
     }
-    return rows.length;
-  });
-  return insertMany(points);
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
+  }
+  return points.length;
 }
 
 export function queryPoints(
-  db: Database.Database,
+  db: GmaDatabase,
   metric: string,
   fromTs?: number,
   toTs?: number,

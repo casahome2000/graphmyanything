@@ -12,7 +12,7 @@
 npx graphmyanything-mcp
 ```
 
-Requires Node.js 20+. Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`).
+Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`).
 
 **No telemetry** — we do not phone home; install counts come from npm downloads only.
 

@@ -1,5 +1,4 @@
-import type Database from "better-sqlite3";
-import { insertPoints, queryPoints, type MetricPoint } from "../db.js";
+import { insertPoints, queryPoints, type GmaDatabase, type MetricPoint } from "../db.js";
 import { generateInsight } from "../lib/insight.js";
 import { lttb, type DataPoint } from "../lib/lttb.js";
 import {
@@ -24,7 +23,7 @@ function normalizeTags(tags?: Record<string, string>): Record<string, string> {
 }
 
 export function handleTrack(
-  db: Database.Database,
+  db: GmaDatabase,
   args: {
     metric: string;
     value?: number;
@@ -62,7 +61,7 @@ export function handleTrack(
 const DEFAULT_LTTB = 50;
 
 export function handleQuery(
-  db: Database.Database,
+  db: GmaDatabase,
   args: {
     metric: string;
     range?: string;
@@ -131,7 +130,7 @@ export function handleQuery(
 }
 
 export function handleInsight(
-  db: Database.Database,
+  db: GmaDatabase,
   args: { metric: string; range?: string },
 ): ReturnType<typeof generateInsight> {
   const metric = args.metric.trim();
@@ -143,7 +142,7 @@ export function handleInsight(
 }
 
 export function handleChart(
-  db: Database.Database,
+  db: GmaDatabase,
   args: {
     metric: string;
     range?: string;
