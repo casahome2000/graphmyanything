@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const tools = [
   {
     name: "track",
@@ -34,6 +36,16 @@ export function Tools() {
         <p className="mt-2 max-w-2xl text-[#8b8b9e]">
           Everything an agent needs to remember and reason about numbers over
           time—without touching raw series.
+        </p>
+        <p className="mt-4 text-sm text-[#8b8b9e]">
+          Install the local MCP server from npm — see{" "}
+          <Link
+            href="/docs"
+            className="text-cyan-300/90 underline underline-offset-2 hover:text-cyan-200"
+          >
+            installation docs
+          </Link>
+          .
         </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {tools.map((t) => (
