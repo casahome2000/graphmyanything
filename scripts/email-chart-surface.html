@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1120px;
+    height: 400px;
+    background: #08080e;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    overflow: hidden;
+  }
+  .wrap {
+    position: relative;
+    width: 1120px;
+    height: 400px;
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(34, 211, 238, 0.12), transparent 70%), #0a0a10;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .shine {
+    position: absolute;
+  }
+  .label {
+    position: absolute;
+    left: 40px;
+    top: 36px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: #a78bfa;
+    text-transform: uppercase;
+  }
+  .badge {
+    position: absolute;
+    right: 40px;
+    top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(6, 6, 10, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 12px 18px;
+    box-shadow: 0 0 40px rgba(52, 211, 153, 0.2);
+  }
+  .badge .val {
+    font-size: 28px;
+    font-weight: 700;
+    color: #6ee7b7;
+    letter-spacing: -0.03em;
+  }
+  .badge .delta {
+    font-size: 20px;
+    font-weight: 600;
+    color: #22d3ee;
+  }
+  svg {
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    bottom: 28px;
+    width: calc(100% - 64px);
+    height: 260px;
+  }
+  .grid line { stroke: rgba(255,255,255,0.08); stroke-width: 1.5; }
+  .area { fill: url(#areaGrad); filter: drop-shadow(0 0 24px rgba(34, 211, 238, 0.35)); }
+  .line { fill: none; stroke: url(#lineGrad); stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.5)); }
+  .glow { fill: #34d399; filter: drop-shadow(0 0 16px rgba(52, 211, 153, 0.95)); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="label">MRR</span>
+  <div class="badge">
+    <span class="val">$12.4k</span>
+    <span class="delta">↑18% WoW</span>
+  </div>
+  <svg viewBox="0 0 1056 260" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8b5cf6"/>
+        <stop offset="50%" stop-color="#22d3ee"/>
+        <stop offset="100%" stop-color="#34d399"/>
+      </linearGradient>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.45"/>
+        <stop offset="55%" stop-color="#8b5cf6" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g class="grid">
+      <line x1="0" y1="52" x2="1056" y2="52"/>
+      <line x1="0" y1="104" x2="1056" y2="104"/>
+      <line x1="0" y1="156" x2="1056" y2="156"/>
+      <line x1="0" y1="208" x2="1056" y2="208"/>
+    </g>
+    <path class="area" d="M0,220 L0,195 C70,182 140,172 210,158 C280,142 350,128 420,112 C490,96 560,78 630,62 C700,48 770,36 840,26 C910,18 980,12 1050,8 L1056,6 L1056,260 L0,260 Z"/>
+  <path class="line" d="M0,195 C70,182 140,172 210,158 C280,142 350,128 420,112 C490,96 560,78 630,62 C700,48 770,36 840,26 C910,18 980,12 1050,8 L1056,6"/>
+    <circle class="glow" cx="1056" cy="6" r="10"/>
+    <circle fill="#ecfdf5" cx="1056" cy="6" r="5"/>
+  </svg>
+</div>
+</body>
+</html>
