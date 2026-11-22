@@ -3,11 +3,11 @@
 import Link from "next/link";
 
 const links = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#demo", label: "Demo" },
-  { href: "#tools", label: "Tools" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#demo", label: "Demo" },
+  { href: "/#tools", label: "Tools" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 export function Nav() {
@@ -26,21 +26,21 @@ export function Nav() {
         <ul className="hidden items-center gap-8 text-sm text-[#8b8b9e] md:flex">
           {links.map((l) => (
             <li key={l.href}>
-              <a
+              <Link
                 href={l.href}
                 className="transition-colors hover:text-[#f4f4f7]"
               >
                 {l.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
-        <a
-          href="#waitlist"
+        <Link
+          href="/#waitlist"
           className="rounded-full bg-white/[0.08] px-3.5 py-1.5 text-xs font-medium text-[#f4f4f7] ring-1 ring-white/[0.1] transition hover:bg-white/[0.12] sm:text-sm sm:px-4 sm:py-2"
         >
           Join waitlist
-        </a>
+        </Link>
       </nav>
     </header>
   );
