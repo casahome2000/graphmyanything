@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
+    "@vercel/analytics": "^2.0.1",
     "next": "^15.5.7",
-    "posthog-js": "^1.234.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

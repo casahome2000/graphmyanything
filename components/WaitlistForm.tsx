@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { captureEvent } from "@/lib/posthog-client";
+import { track } from "@vercel/analytics";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -26,7 +26,7 @@ export function WaitlistForm({ id }: { id?: string }) {
         setMessage(data.error ?? "Something went wrong.");
         return;
       }
-      captureEvent("waitlist_submit", { source: "landing-hero" });
+      track("waitlist_submit", { source: "landing-hero" });
       setStatus("success");
       setMessage("You're on the list. We'll be in touch.");
       setEmail("");

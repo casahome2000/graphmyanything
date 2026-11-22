@@ -1,13 +1,13 @@
 "use client";
 
-import { captureEvent } from "@/lib/posthog-client";
+import { track } from "@vercel/analytics";
 
 export function PreorderButton() {
   const url = process.env.NEXT_PUBLIC_PREORDER_URL;
   const isReady = Boolean(url && url.length > 0);
 
   function handleClick() {
-    captureEvent("preorder_click", { available: isReady });
+    track("preorder_click", { available: isReady });
     if (!isReady) return;
     window.open(url, "_blank", "noopener,noreferrer");
   }
