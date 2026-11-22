@@ -3,6 +3,7 @@ import type { DataPoint } from "../src/lib/lttb.js";
 import {
   formatXAxisTick,
   markerPointIndices,
+  niceYAxisTicks,
   pickXAxisTicks,
   renderSvgChart,
   valueLabelIndices,
@@ -54,6 +55,48 @@ describe("pickXAxisTicks", () => {
     expect(ticks[ticks.length - 1]).toBe(1_730_000_000);
     expect(ticks.length).toBeGreaterThanOrEqual(5);
     expect(ticks.length).toBeLessThanOrEqual(8);
+  });
+
+  it("uses exact point timestamps when n ≤ 12", () => {
+    const base = Date.UTC(2025, 0, 6) / 1000;
+    const pts: DataPoint[] = [0, 1, 2, 3].map((w) => ({
+      ts: base + w * 7 * 86_400,
+      value: 180 - w,
+    }));
+    const ticks = pickXAxisTicks(pts[0].ts, pts[3].ts, 520, pts);
+    expect(ticks).toEqual(pts.map((p) => p.ts));
+  });
+
+  it("ends multi-year series on the last data timestamp", () => {
+    const start = Date.UTC(1995, 0, 1) / 1000;
+    const end = Date.UTC(2024, 0, 1) / 1000;
+    const ticks = pickXAxisTicks(start, end, 520);
+    expect(ticks[ticks.length - 1]).toBe(end);
+    expect(formatXAxisTick(ticks[ticks.length - 1], end - start)).toBe("2024");
+  });
+});
+
+describe("niceYAxisTicks", () => {
+  it("uses round steps for weight-scale data", () => {
+    const { ticks, y0, y1 } = niceYAxisTicks(179.8, 182.4, 5);
+    expect(y0).toBeLessThanOrEqual(179.8);
+    expect(y1).toBeGreaterThanOrEqual(182.4);
+    for (let i = 1; i < ticks.length; i++) {
+      const step = ticks[i] - ticks[i - 1];
+      expect([0.5, 1, 2, 2.5, 5, 10].some((s) => Math.abs(step - s) < 1e-6 || step / s > 0.99 && step / s < 1.01)).toBe(
+        true,
+      );
+    }
+    expect(ticks.some((t) => t === 180 || t === 179.5 || t === 181)).toBe(true);
+  });
+
+  it("uses k/M-friendly steps for large populations", () => {
+    const { ticks, y0, y1 } = niceYAxisTicks(128_400, 297_100, 5);
+    expect(y0).toBeLessThan(128_400);
+    expect(y1).toBeGreaterThan(297_100);
+    const step = ticks[1] - ticks[0];
+    expect(step).toBeGreaterThanOrEqual(25_000);
+    expect(step % 25_000).toBe(0);
   });
 });
 
@@ -109,5 +152,20 @@ describe("renderSvgChart markup", () => {
     expect(svg.match(/<circle/g)?.length).toBe(29);
     expect(svg).toContain('text-anchor="end"');
     expect(svg).toContain('text-anchor="start"');
+  });
+
+  it("labels each weight point date on the x-axis when n ≤ 12", () => {
+    const base = Date.UTC(2025, 0, 6) / 1000;
+    const points: DataPoint[] = [
+      { ts: base, value: 182.4 },
+      { ts: base + 7 * 86_400, value: 181.1 },
+      { ts: base + 14 * 86_400, value: 180.6 },
+      { ts: base + 21 * 86_400, value: 179.8 },
+    ];
+    const svg = renderSvgChart("health.weight.lb", points, "line", "light");
+    expect(svg).toContain("1/6");
+    expect(svg).toContain("1/13");
+    expect(svg).toContain("1/20");
+    expect(svg).toContain("1/27");
   });
 });

@@ -3,63 +3,63 @@
   <text x="60" y="22" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="15" font-weight="600">city · plano · population</text>
   <text x="612" y="22" text-anchor="end" fill="#a8a8b8" font-size="11" font-family="system-ui,sans-serif">graphmyanything</text>
   <line x1="60" y1="264.00" x2="612" y2="264.00" stroke="rgba(255,255,255,0.08)"/>
-  <text x="54" y="268.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">170.5k</text>
-  <line x1="60" y1="207.00" x2="612" y2="207.00" stroke="rgba(255,255,255,0.08)"/>
-  <text x="54" y="211.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">207.0k</text>
-  <line x1="60" y1="150.00" x2="612" y2="150.00" stroke="rgba(255,255,255,0.08)"/>
-  <text x="54" y="154.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">243.4k</text>
-  <line x1="60" y1="93.00" x2="612" y2="93.00" stroke="rgba(255,255,255,0.08)"/>
-  <text x="54" y="97.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">279.9k</text>
+  <text x="54" y="268.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">100.0k</text>
+  <line x1="60" y1="218.40" x2="612" y2="218.40" stroke="rgba(255,255,255,0.08)"/>
+  <text x="54" y="222.40" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">150.0k</text>
+  <line x1="60" y1="172.80" x2="612" y2="172.80" stroke="rgba(255,255,255,0.08)"/>
+  <text x="54" y="176.80" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">200.0k</text>
+  <line x1="60" y1="127.20" x2="612" y2="127.20" stroke="rgba(255,255,255,0.08)"/>
+  <text x="54" y="131.20" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">250.0k</text>
+  <line x1="60" y1="81.60" x2="612" y2="81.60" stroke="rgba(255,255,255,0.08)"/>
+  <text x="54" y="85.60" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">300.0k</text>
   <line x1="60" y1="36.00" x2="612" y2="36.00" stroke="rgba(255,255,255,0.08)"/>
-  <text x="54" y="40.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">316.4k</text>
+  <text x="54" y="40.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">350.0k</text>
   <line x1="60" y1="264.00" x2="612" y2="264.00" stroke="rgba(255,255,255,0.08)"/>
   <line x1="60.00" y1="264.00" x2="60.00" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
   <text x="60.00" y="282.00" text-anchor="start" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">1995</text>
-  <line x1="138.86" y1="264.00" x2="138.86" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
-  <text x="138.86" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">1999</text>
-  <line x1="217.71" y1="264.00" x2="217.71" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
-  <text x="217.71" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2003</text>
-  <line x1="296.57" y1="264.00" x2="296.57" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
-  <text x="296.57" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2007</text>
-  <line x1="375.43" y1="264.00" x2="375.43" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
-  <text x="375.43" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2011</text>
-  <line x1="454.29" y1="264.00" x2="454.29" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
-  <text x="454.29" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2015</text>
-  <line x1="533.14" y1="264.00" x2="533.14" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
-  <text x="533.14" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2019</text>
+  <line x1="155.22" y1="264.00" x2="155.22" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
+  <text x="155.22" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2000</text>
+  <line x1="250.50" y1="264.00" x2="250.50" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
+  <text x="250.50" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2005</text>
+  <line x1="345.73" y1="264.00" x2="345.73" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
+  <text x="345.73" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2010</text>
+  <line x1="440.95" y1="264.00" x2="440.95" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
+  <text x="440.95" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2015</text>
+  <line x1="536.17" y1="264.00" x2="536.17" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
+  <text x="536.17" y="282.00" text-anchor="middle" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2020</text>
   <line x1="612.00" y1="264.00" x2="612.00" y2="269.00" stroke="#a8a8b8" opacity="0.45"/>
   <text x="612.00" y="282.00" text-anchor="end" fill="#a8a8b8" font-size="10" font-family="ui-monospace,monospace">2023</text>
-  <polyline fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round" points="60.00,241.94 79.03,235.42 98.07,228.91 117.10,222.95 136.14,216.44 155.17,209.92 174.21,203.97 193.24,197.46 212.28,190.94 231.31,184.99 250.34,178.47 269.38,171.96 288.41,166.01 307.45,159.49 326.48,152.98 345.52,147.02 364.55,140.51 383.59,133.99 402.62,128.04 421.66,121.53 440.69,115.01 459.72,109.06 478.76,102.54 497.79,96.03 516.83,90.08 535.86,83.56 554.90,77.05 573.93,71.09 592.97,64.58 612.00,58.06"/>
-  <circle cx="60.00" cy="241.94" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1995-01-01 00:00:00 UTC — 184.6k</title></circle>
-  <circle cx="79.03" cy="235.42" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1996-01-01 00:00:00 UTC — 188.8k</title></circle>
-  <circle cx="98.07" cy="228.91" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1996-12-31 00:00:00 UTC — 192.9k</title></circle>
-  <circle cx="117.10" cy="222.95" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1997-12-31 00:00:00 UTC — 196.8k</title></circle>
-  <circle cx="136.14" cy="216.44" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1998-12-31 00:00:00 UTC — 200.9k</title></circle>
-  <circle cx="155.17" cy="209.92" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1999-12-31 00:00:00 UTC — 205.1k</title></circle>
-  <circle cx="174.21" cy="203.97" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2000-12-30 00:00:00 UTC — 208.9k</title></circle>
-  <circle cx="193.24" cy="197.46" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2001-12-30 00:00:00 UTC — 213.1k</title></circle>
-  <circle cx="212.28" cy="190.94" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2002-12-30 00:00:00 UTC — 217.2k</title></circle>
-  <circle cx="231.31" cy="184.99" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2003-12-30 00:00:00 UTC — 221.1k</title></circle>
-  <circle cx="250.34" cy="178.47" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2004-12-29 00:00:00 UTC — 225.2k</title></circle>
-  <circle cx="269.38" cy="171.96" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2005-12-29 00:00:00 UTC — 229.4k</title></circle>
-  <circle cx="288.41" cy="166.01" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2006-12-29 00:00:00 UTC — 233.2k</title></circle>
-  <circle cx="307.45" cy="159.49" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2007-12-29 00:00:00 UTC — 237.4k</title></circle>
-  <circle cx="326.48" cy="152.98" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2008-12-28 00:00:00 UTC — 241.5k</title></circle>
-  <circle cx="345.52" cy="147.02" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2009-12-28 00:00:00 UTC — 245.3k</title></circle>
-  <circle cx="364.55" cy="140.51" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2010-12-28 00:00:00 UTC — 249.5k</title></circle>
-  <circle cx="383.59" cy="133.99" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2011-12-28 00:00:00 UTC — 253.7k</title></circle>
-  <circle cx="402.62" cy="128.04" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2012-12-27 00:00:00 UTC — 257.5k</title></circle>
-  <circle cx="421.66" cy="121.53" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2013-12-27 00:00:00 UTC — 261.7k</title></circle>
-  <circle cx="440.69" cy="115.01" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2014-12-27 00:00:00 UTC — 265.8k</title></circle>
-  <circle cx="459.72" cy="109.06" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2015-12-27 00:00:00 UTC — 269.6k</title></circle>
-  <circle cx="478.76" cy="102.54" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2016-12-26 00:00:00 UTC — 273.8k</title></circle>
-  <circle cx="497.79" cy="96.03" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2017-12-26 00:00:00 UTC — 278.0k</title></circle>
-  <circle cx="516.83" cy="90.08" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2018-12-26 00:00:00 UTC — 281.8k</title></circle>
-  <circle cx="535.86" cy="83.56" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2019-12-26 00:00:00 UTC — 286.0k</title></circle>
-  <circle cx="554.90" cy="77.05" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2020-12-25 00:00:00 UTC — 290.1k</title></circle>
-  <circle cx="573.93" cy="71.09" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2021-12-25 00:00:00 UTC — 293.9k</title></circle>
-  <circle cx="592.97" cy="64.58" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2022-12-25 00:00:00 UTC — 298.1k</title></circle>
-  <circle cx="612.00" cy="58.06" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2023-12-25 00:00:00 UTC — 302.3k</title></circle>
-  <text x="64.00" y="231.94" text-anchor="start" fill="#f4f4f7" font-size="9" font-family="ui-monospace,monospace" opacity="0.92">184.6k</text>
-  <text x="608.00" y="48.06" text-anchor="end" fill="#f4f4f7" font-size="9" font-family="ui-monospace,monospace" opacity="0.92">302.3k</text>
+  <polyline fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linejoin="round" points="60.00,238.10 79.03,235.55 98.07,231.35 117.10,226.15 136.14,219.13 155.17,210.28 174.21,200.62 193.24,189.12 212.28,175.72 231.31,165.96 250.34,152.46 269.38,139.15 288.41,127.11 307.45,118.26 326.48,111.33 345.52,103.58 364.55,98.75 383.59,94.73 402.62,91.72 421.66,89.72 440.69,88.53 459.72,87.25 478.76,86.62 497.79,85.98 516.83,85.16 535.86,84.88 554.90,85.07 573.93,85.34 592.97,84.52 612.00,84.24"/>
+  <circle cx="60.00" cy="238.10" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1995-01-01 00:00:00 UTC — 128.4k</title></circle>
+  <circle cx="79.03" cy="235.55" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1996-01-01 00:00:00 UTC — 131.2k</title></circle>
+  <circle cx="98.07" cy="231.35" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1996-12-31 00:00:00 UTC — 135.8k</title></circle>
+  <circle cx="117.10" cy="226.15" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1997-12-31 00:00:00 UTC — 141.5k</title></circle>
+  <circle cx="136.14" cy="219.13" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1998-12-31 00:00:00 UTC — 149.2k</title></circle>
+  <circle cx="155.17" cy="210.28" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>1999-12-31 00:00:00 UTC — 158.9k</title></circle>
+  <circle cx="174.21" cy="200.62" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2000-12-30 00:00:00 UTC — 169.5k</title></circle>
+  <circle cx="193.24" cy="189.12" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2001-12-30 00:00:00 UTC — 182.1k</title></circle>
+  <circle cx="212.28" cy="175.72" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2002-12-30 00:00:00 UTC — 196.8k</title></circle>
+  <circle cx="231.31" cy="165.96" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2003-12-30 00:00:00 UTC — 207.5k</title></circle>
+  <circle cx="250.34" cy="152.46" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2004-12-29 00:00:00 UTC — 222.3k</title></circle>
+  <circle cx="269.38" cy="139.15" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2005-12-29 00:00:00 UTC — 236.9k</title></circle>
+  <circle cx="288.41" cy="127.11" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2006-12-29 00:00:00 UTC — 250.1k</title></circle>
+  <circle cx="307.45" cy="118.26" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2007-12-29 00:00:00 UTC — 259.8k</title></circle>
+  <circle cx="326.48" cy="111.33" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2008-12-28 00:00:00 UTC — 267.4k</title></circle>
+  <circle cx="345.52" cy="103.58" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2009-12-28 00:00:00 UTC — 275.9k</title></circle>
+  <circle cx="364.55" cy="98.75" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2010-12-28 00:00:00 UTC — 281.2k</title></circle>
+  <circle cx="383.59" cy="94.73" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2011-12-28 00:00:00 UTC — 285.6k</title></circle>
+  <circle cx="402.62" cy="91.72" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2012-12-27 00:00:00 UTC — 288.9k</title></circle>
+  <circle cx="421.66" cy="89.72" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2013-12-27 00:00:00 UTC — 291.1k</title></circle>
+  <circle cx="440.69" cy="88.53" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2014-12-27 00:00:00 UTC — 292.4k</title></circle>
+  <circle cx="459.72" cy="87.25" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2015-12-27 00:00:00 UTC — 293.8k</title></circle>
+  <circle cx="478.76" cy="86.62" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2016-12-26 00:00:00 UTC — 294.5k</title></circle>
+  <circle cx="497.79" cy="85.98" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2017-12-26 00:00:00 UTC — 295.2k</title></circle>
+  <circle cx="516.83" cy="85.16" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2018-12-26 00:00:00 UTC — 296.1k</title></circle>
+  <circle cx="535.86" cy="84.88" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2019-12-26 00:00:00 UTC — 296.4k</title></circle>
+  <circle cx="554.90" cy="85.07" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2020-12-25 00:00:00 UTC — 296.2k</title></circle>
+  <circle cx="573.93" cy="85.34" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2021-12-25 00:00:00 UTC — 295.9k</title></circle>
+  <circle cx="592.97" cy="84.52" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2022-12-25 00:00:00 UTC — 296.8k</title></circle>
+  <circle cx="612.00" cy="84.24" r="3.5" fill="#8b5cf6" stroke="#0d0d12" stroke-width="1.5"><title>2023-12-25 00:00:00 UTC — 297.1k</title></circle>
+  <text x="64.00" y="228.10" text-anchor="start" fill="#f4f4f7" font-size="9" font-family="ui-monospace,monospace" opacity="0.92">128.4k</text>
+  <text x="608.00" y="74.24" text-anchor="end" fill="#f4f4f7" font-size="9" font-family="ui-monospace,monospace" opacity="0.92">297.1k</text>
 </svg>

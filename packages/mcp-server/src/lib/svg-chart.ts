@@ -98,12 +98,103 @@ export function formatMarkerTooltip(ts: number, value: number): string {
   return `${iso} — ${formatNumber(value)}`;
 }
 
+/** Smallest “nice” step ≥ rawStep (1/2/2.5/5×10ⁿ). */
+function niceStepCeil(rawStep: number): number {
+  if (rawStep <= 0 || !Number.isFinite(rawStep)) return 1;
+  const exp = Math.floor(Math.log10(rawStep));
+  const mag = 10 ** exp;
+  const norm = rawStep / mag;
+  let mult = 10;
+  if (norm <= 1) mult = 1;
+  else if (norm <= 2) mult = 2;
+  else if (norm <= 2.5) mult = 2.5;
+  else if (norm <= 5) mult = 5;
+  return mult * mag;
+}
+
 /**
- * Build 5–8 x-axis tick timestamps (unix sec), always including first and last.
+ * Y-axis domain and tick values on 1/2/2.5/5×10ⁿ steps; data sits inside with margin.
  */
-export function pickXAxisTicks(xMin: number, xMax: number, innerWidthPx: number): number[] {
+export function niceYAxisTicks(
+  dataMin: number,
+  dataMax: number,
+  targetTicks = 5,
+): { y0: number; y1: number; ticks: number[] } {
+  if (dataMin === dataMax) {
+    const bump = Math.abs(dataMin) * 0.08 || 1;
+    dataMin -= bump;
+    dataMax += bump;
+  }
+  const margin = (dataMax - dataMin) * 0.06 || Math.abs(dataMax) * 0.02 || 0.5;
+  const wantLo = dataMin - margin;
+  const wantHi = dataMax + margin;
+  const rawRange = wantHi - wantLo;
+  const step = niceStepCeil(rawRange / Math.max(2, targetTicks - 1));
+  let y0 = Math.floor(wantLo / step) * step;
+  let y1 = Math.ceil(wantHi / step) * step;
+  while (y0 > dataMin - margin * 0.25) y0 -= step;
+  while (y1 < dataMax + margin * 0.25) y1 += step;
+
+  const ticks: number[] = [];
+  for (let v = y0; v <= y1 + step * 1e-9; v += step) {
+    const r = Math.round(v * 1e9) / 1e9;
+    ticks.push(r);
+  }
+  return { y0, y1, ticks };
+}
+
+function pickYearlyXTicks(
+  xMin: number,
+  xMax: number,
+  innerWidthPx: number,
+): number[] {
+  const yStart = new Date(xMin * 1000).getUTCFullYear();
+  const yEnd = new Date(xMax * 1000).getUTCFullYear();
+  const yearSpan = Math.max(0, yEnd - yStart);
+  const minLabelPx = 52;
+  const maxTicks = Math.min(8, Math.max(5, Math.floor(innerWidthPx / minLabelPx)));
+  let yearStep = 1;
+  const steps = [1, 2, 5, 10, 20, 25];
+  for (const s of steps) {
+    yearStep = s;
+    const n = Math.floor(yearSpan / s) + 1;
+    if (n + 2 <= maxTicks) break;
+  }
+  const out: number[] = [xMin];
+  const firstLabeled = Math.ceil(yStart / yearStep) * yearStep;
+  for (let y = firstLabeled; y < yEnd; y += yearStep) {
+    const ts = Date.UTC(y, 0, 1) / 1000;
+    if (ts > xMin && ts < xMax) out.push(ts);
+  }
+  out.push(xMax);
+  const uniq = [...new Set(out)].sort((a, b) => a - b);
+  if (uniq.length > maxTicks) {
+    const stride = Math.ceil(uniq.length / maxTicks);
+    const thinned = uniq.filter((_, i) => i === 0 || i === uniq.length - 1 || i % stride === 0);
+    if (thinned[thinned.length - 1] !== xMax) thinned.push(xMax);
+    return thinned.slice(0, maxTicks);
+  }
+  return uniq;
+}
+
+/**
+ * Build x-axis tick timestamps. Small series (n≤12): exact point dates. Larger: span-aware, first+last always.
+ */
+export function pickXAxisTicks(
+  xMin: number,
+  xMax: number,
+  innerWidthPx: number,
+  points?: DataPoint[],
+): number[] {
+  if (points && points.length > 0 && points.length <= 12) {
+    return points.map((p) => p.ts);
+  }
+
   const span = xMax - xMin;
   if (span <= 0) return [xMin];
+  if (xAxisTimeGranularity(span) === "yearly") {
+    return pickYearlyXTicks(xMin, xMax, innerWidthPx);
+  }
 
   const minLabelPx = 52;
   const maxTicks = Math.min(8, Math.max(5, Math.floor(innerWidthPx / minLabelPx)));
@@ -112,7 +203,7 @@ export function pickXAxisTicks(xMin: number, xMax: number, innerWidthPx: number)
   const ticks: number[] = [];
   for (let i = 0; i < count; i++) {
     const t = xMin + (span * i) / (count - 1);
-    ticks.push(Math.round(t));
+    ticks.push(i === 0 ? xMin : i === count - 1 ? xMax : Math.round(t));
   }
   ticks[0] = xMin;
   ticks[ticks.length - 1] = xMax;
@@ -183,9 +274,7 @@ export function renderSvgChart(
   const yMin = Math.min(...ys);
   const yMax = Math.max(...ys);
   const spanSec = xMax - xMin;
-  const yPad = (yMax - yMin) * 0.12 || 1;
-  const y0 = yMin - yPad;
-  const y1 = yMax + yPad;
+  const { y0, y1, ticks: yTicks } = niceYAxisTicks(yMin, yMax, 5);
 
   const scaleX = (ts: number) =>
     pad.l + ((ts - xMin) / (xMax - xMin || 1)) * innerW;
@@ -217,15 +306,15 @@ export function renderSvgChart(
     series = `<polyline fill="none" stroke="${t.stroke}" stroke-width="2" stroke-linejoin="round" points="${coords.join(" ")}"/>`;
   }
 
-  const gridLines = 4;
-  const yGrid = Array.from({ length: gridLines + 1 }, (_, i) => {
-    const v = y0 + ((y1 - y0) * i) / gridLines;
-    const y = scaleY(v);
-    return `<line x1="${pad.l}" y1="${y.toFixed(2)}" x2="${W - pad.r}" y2="${y.toFixed(2)}" stroke="${t.grid}"/>
+  const yGrid = yTicks
+    .map((v) => {
+      const y = scaleY(v);
+      return `<line x1="${pad.l}" y1="${y.toFixed(2)}" x2="${W - pad.r}" y2="${y.toFixed(2)}" stroke="${t.grid}"/>
   <text x="${pad.l - 6}" y="${(y + 4).toFixed(2)}" text-anchor="end" fill="${t.text}" font-size="10" font-family="ui-monospace,monospace">${formatNumber(v)}</text>`;
-  }).join("\n  ");
+    })
+    .join("\n  ");
 
-  const xTicks = pickXAxisTicks(xMin, xMax, innerW);
+  const xTicks = pickXAxisTicks(xMin, xMax, innerW, points);
   const xAxisY = baseY.toFixed(2);
   const xBaseline = `<line x1="${pad.l}" y1="${xAxisY}" x2="${W - pad.r}" y2="${xAxisY}" stroke="${t.grid}"/>`;
   const xTickEls = xTicks

@@ -17,12 +17,19 @@ const { renderSvgChart } = await import(
   path.join(pkgRoot, "dist/lib/svg-chart.js")
 );
 
+/** Approximate Plano, TX–style growth: boom years, then slower / flat tail (1995–2024). */
 function populationSeries() {
+  const populations = [
+    128_400, 131_200, 135_800, 141_500, 149_200, 158_900, 169_500, 182_100,
+    196_800, 207_500, 222_300, 236_900, 250_100, 259_800, 267_400, 275_900,
+    281_200, 285_600, 288_900, 291_100, 292_400, 293_800, 294_500, 295_200,
+    296_100, 296_400, 296_200, 295_900, 296_800, 297_100,
+  ];
   const start = Date.UTC(1995, 0, 1) / 1000;
   const year = 365 * 86_400;
-  return Array.from({ length: 30 }, (_, i) => ({
+  return populations.map((value, i) => ({
     ts: start + i * year,
-    value: 184_600 + i * 4_050 + (i % 3) * 120,
+    value,
   }));
 }
 
