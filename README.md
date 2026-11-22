@@ -24,7 +24,10 @@ Open [http://localhost:3000](http://localhost:3000).
 ```bash
 npm run build
 npm run lint
+npm run email:preview
 ```
+
+`email:preview` writes HTML to `/opt/cursor/artifacts/waitlist-email-preview.html` and desktop/mobile screenshots (requires Playwright).
 
 ## Environment variables
 
