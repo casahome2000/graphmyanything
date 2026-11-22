@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="280" viewBox="0 0 720 280">
+  <rect width="100%" height="100%" fill="#0d0d12"/>
+  <text x="56" y="26" fill="#f4f4f7" font-size="16" font-weight="600" font-family="system-ui">Tokens: throwaway Python vs GraphMyAnything</text>
+  <text x="696" y="26" text-anchor="end" fill="#8b8b9e" font-size="11" font-family="system-ui">o200k_base · 2026-11-22</text>
+  <text x="12" y="90" fill="#f43f5e" font-size="10" font-family="system-ui">Python</text>
+  <text x="12" y="104" fill="#34d399" font-size="10" font-family="system-ui">GMA</text>
+  <rect x="98.93333333333334" y="228.19586934280463" width="59.73333333333334" height="3.804130657195379" fill="#f43f5e" rx="3"/>
+  <rect x="166.66666666666669" y="230.69362767523685" width="59.73333333333334" height="1.3063723247631485" fill="#34d399" rx="3"/>
+  <text x="162.66666666666669" y="260" text-anchor="middle" fill="#a8a8b8" font-size="12" font-family="system-ui">90 pts</text>
+  <rect x="312.2666666666667" y="217.65545694251517" width="59.73333333333334" height="14.34454305748484" fill="#f43f5e" rx="3"/>
+  <rect x="380.00000000000006" y="230.69362767523685" width="59.73333333333334" height="1.3063723247631485" fill="#34d399" rx="3"/>
+  <text x="376.00000000000006" y="260" text-anchor="middle" fill="#a8a8b8" font-size="12" font-family="system-ui">365 pts</text>
+  <rect x="525.6" y="40" width="59.73333333333334" height="192" fill="#f43f5e" rx="3"/>
+  <rect x="593.3333333333334" y="230.69362767523685" width="59.73333333333334" height="1.3063723247631485" fill="#34d399" rx="3"/>
+  <text x="589.3333333333334" y="260" text-anchor="middle" fill="#a8a8b8" font-size="12" font-family="system-ui">5000 pts</text>
+</svg>

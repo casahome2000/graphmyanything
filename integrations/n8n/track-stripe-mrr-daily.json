@@ -1,0 +1,166 @@
+{
+  "name": "Track Stripe MRR daily → chart + insight (GraphMyAnything)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "Every day 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Demo: replace with Stripe node or HTTP to billing API.\nconst base = 78000;\nconst day = Math.floor(Date.now() / 86400000);\nconst mrr = Math.round(base + (day % 90) * 120 + Math.sin(day / 7) * 400);\nreturn [{ json: { metric: 'stripe.mrr', value: mrr, tags: { source: 'stripe', currency: 'usd' } } }];"
+      },
+      "id": "mock-stripe",
+      "name": "Mock Stripe MRR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.graphmyanything.com/v1/track",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ metric: $json.metric, value: $json.value, tags: $json.tags }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-track-placeholder",
+      "name": "HTTP track (cloud placeholder)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, -120],
+      "notesInFlow": true,
+      "notes": "Placeholder until cloud API ships. For local validation, disable this node and use MCP Client → track below."
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "track",
+        "toolParameters": "={{ JSON.stringify({ metric: $json.metric, value: $json.value, tags: $json.tags }) }}"
+      },
+      "id": "mcp-track",
+      "name": "MCP track",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [460, 120],
+      "credentials": {
+        "mcpClientApi": {
+          "id": "CONFIGURE_ME",
+          "name": "graphmyanything-mcp (stdio)"
+        }
+      },
+      "notesInFlow": true,
+      "notes": "n8n ≥1.76: MCP Client credentials → Command: npx, Args: -y graphmyanything-mcp, transport stdio."
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "query",
+        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d', token_budget: 300 }) }}"
+      },
+      "id": "mcp-query",
+      "name": "MCP query 90d",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [700, 60],
+      "credentials": {
+        "mcpClientApi": {
+          "id": "CONFIGURE_ME",
+          "name": "graphmyanything-mcp (stdio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "insight",
+        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d' }) }}"
+      },
+      "id": "mcp-insight",
+      "name": "MCP insight",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [940, 60],
+      "credentials": {
+        "mcpClientApi": {
+          "id": "CONFIGURE_ME",
+          "name": "graphmyanything-mcp (stdio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "chart",
+        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d', type: 'area', theme: 'dark' }) }}"
+      },
+      "id": "mcp-chart",
+      "name": "MCP chart SVG",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [1180, 60],
+      "credentials": {
+        "mcpClientApi": {
+          "id": "CONFIGURE_ME",
+          "name": "graphmyanything-mcp (stdio)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## GraphMyAnything validation workflow\n\n1. **Local (recommended today):** Configure MCP Client credential with `npx -y graphmyanything-mcp`, enable MCP nodes, disable HTTP placeholder.\n2. **Cloud (later):** `POST https://api.graphmyanything.com/v1/track` — documented placeholder; enable HTTP node when API launches.\n\nWaitlist: https://graphmyanything.com"
+      },
+      "id": "sticky",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-40, -220]
+    }
+  ],
+  "connections": {
+    "Every day 9am": {
+      "main": [[{ "node": "Mock Stripe MRR", "type": "main", "index": 0 }]]
+    },
+    "Mock Stripe MRR": {
+      "main": [
+        [
+          { "node": "HTTP track (cloud placeholder)", "type": "main", "index": 0 },
+          { "node": "MCP track", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "MCP track": {
+      "main": [[{ "node": "MCP query 90d", "type": "main", "index": 0 }]]
+    },
+    "MCP query 90d": {
+      "main": [[{ "node": "MCP insight", "type": "main", "index": 0 }]]
+    },
+    "MCP insight": {
+      "main": [[{ "node": "MCP chart SVG", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

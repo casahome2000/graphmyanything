@@ -1,0 +1,17 @@
+{
+  "name": "@graphmyanything/token-benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "run": "tsx run.ts",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "js-tiktoken": "^1.0.19"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
