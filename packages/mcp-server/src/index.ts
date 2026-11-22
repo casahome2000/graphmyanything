@@ -15,7 +15,7 @@ const db = openDatabase();
 
 const server = new McpServer({
   name: "graphmyanything",
-  version: "0.1.1",
+  version: "0.1.2",
 });
 
 server.registerTool(

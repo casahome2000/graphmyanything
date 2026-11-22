@@ -26,83 +26,27 @@ const THEMES: Record<
   },
 };
 
+const MS_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** Seconds in common spans — used for tick format selection. */
+const SEC_DAY = 86_400;
+const SEC_YEAR = 365 * SEC_DAY;
+
 function formatMetricLabel(metric: string): string {
   return metric.replace(/\./g, " · ");
-}
-
-export function renderSvgChart(
-  metric: string,
-  points: DataPoint[],
-  type: ChartType,
-  theme: ChartTheme,
-): string {
-  const W = 640;
-  const H = 320;
-  const pad = { t: 36, r: 24, b: 44, l: 56 };
-  const innerW = W - pad.l - pad.r;
-  const innerH = H - pad.t - pad.b;
-  const t = THEMES[theme];
-
-  if (points.length === 0) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  <rect width="100%" height="100%" fill="${t.bg}"/>
-  <text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="${t.text}" font-family="system-ui,sans-serif" font-size="14">No data for ${escapeXml(metric)}</text>
-</svg>`;
-  }
-
-  const xs = points.map((p) => p.ts);
-  const ys = points.map((p) => p.value);
-  const xMin = Math.min(...xs);
-  const xMax = Math.max(...xs);
-  const yMin = Math.min(...ys);
-  const yMax = Math.max(...ys);
-  const yPad = (yMax - yMin) * 0.08 || 1;
-  const y0 = yMin - yPad;
-  const y1 = yMax + yPad;
-
-  const scaleX = (ts: number) =>
-    pad.l + ((ts - xMin) / (xMax - xMin || 1)) * innerW;
-  const scaleY = (v: number) =>
-    pad.t + innerH - ((v - y0) / (y1 - y0 || 1)) * innerH;
-
-  const coords = points.map((p) => `${scaleX(p.ts).toFixed(2)},${scaleY(p.value).toFixed(2)}`);
-
-  let series = "";
-  if (type === "bar" && points.length <= 120) {
-    const barW = Math.max(2, innerW / points.length - 1);
-    series = points
-      .map((p) => {
-        const x = scaleX(p.ts) - barW / 2;
-        const y = scaleY(p.value);
-        const h = pad.t + innerH - y;
-        return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barW.toFixed(2)}" height="${h.toFixed(2)}" fill="${t.stroke}" opacity="0.85"/>`;
-      })
-      .join("\n  ");
-  } else if (type === "area") {
-    const line = coords.join(" ");
-    const baseY = (pad.t + innerH).toFixed(2);
-    const areaPath = `M ${coords[0]} L ${line.replace(/ /g, " L ")} L ${scaleX(points[points.length - 1].ts).toFixed(2)},${baseY} L ${scaleX(points[0].ts).toFixed(2)},${baseY} Z`;
-    series = `<path d="${areaPath}" fill="${t.fill}" stroke="none"/>
-  <polyline fill="none" stroke="${t.stroke}" stroke-width="2" stroke-linejoin="round" points="${coords.join(" ")}"/>`;
-  } else {
-    series = `<polyline fill="none" stroke="${t.stroke}" stroke-width="2" stroke-linejoin="round" points="${coords.join(" ")}"/>`;
-  }
-
-  const gridLines = 4;
-  const yGrid = Array.from({ length: gridLines + 1 }, (_, i) => {
-    const v = y0 + ((y1 - y0) * i) / gridLines;
-    const y = scaleY(v);
-    return `<line x1="${pad.l}" y1="${y.toFixed(2)}" x2="${W - pad.r}" y2="${y.toFixed(2)}" stroke="${t.grid}"/>
-  <text x="${pad.l - 8}" y="${(y + 4).toFixed(2)}" text-anchor="end" fill="${t.text}" font-size="10" font-family="ui-monospace,monospace">${formatNumber(v)}</text>`;
-  }).join("\n  ");
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  <rect width="100%" height="100%" fill="${t.bg}" rx="8"/>
-  <text x="${pad.l}" y="22" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="15" font-weight="600">${escapeXml(formatMetricLabel(metric))}</text>
-  <text x="${W - pad.r}" y="22" text-anchor="end" fill="${t.text}" font-size="11" font-family="system-ui,sans-serif">graphmyanything</text>
-  ${yGrid}
-  ${series}
-</svg>`;
 }
 
 function formatNumber(n: number): string {
@@ -117,6 +61,314 @@ function escapeXml(s: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+/** Classify time span for x-axis label formatting. */
+export function xAxisTimeGranularity(
+  spanSec: number,
+): "intraday" | "daily" | "monthly" | "yearly" {
+  if (spanSec <= 2 * SEC_DAY) return "intraday";
+  if (spanSec <= 45 * SEC_DAY) return "daily";
+  if (spanSec <= 3 * SEC_YEAR) return "monthly";
+  return "yearly";
+}
+
+/** Format a unix-seconds timestamp for an x-axis tick. */
+export function formatXAxisTick(ts: number, spanSec: number): string {
+  const g = xAxisTimeGranularity(spanSec);
+  const d = new Date(ts * 1000);
+  if (g === "yearly") return String(d.getUTCFullYear());
+  if (g === "monthly") {
+    const yr = d.getUTCFullYear();
+    const mon = MS_MONTHS[d.getUTCMonth()];
+    return spanSec > SEC_YEAR ? `${mon} '${String(yr).slice(-2)}` : `${mon} ${d.getUTCDate()}`;
+  }
+  if (g === "daily") {
+    return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
+  }
+  const h = d.getUTCHours();
+  const m = d.getUTCMinutes();
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+/** Human-readable date + value for marker tooltips. */
+export function formatMarkerTooltip(ts: number, value: number): string {
+  const d = new Date(ts * 1000);
+  const iso = d.toISOString().replace("T", " ").replace(/\.\d{3}Z$/, " UTC");
+  return `${iso} — ${formatNumber(value)}`;
+}
+
+/** Smallest “nice” step ≥ rawStep (1/2/2.5/5×10ⁿ). */
+function niceStepCeil(rawStep: number): number {
+  if (rawStep <= 0 || !Number.isFinite(rawStep)) return 1;
+  const exp = Math.floor(Math.log10(rawStep));
+  const mag = 10 ** exp;
+  const norm = rawStep / mag;
+  let mult = 10;
+  if (norm <= 1) mult = 1;
+  else if (norm <= 2) mult = 2;
+  else if (norm <= 2.5) mult = 2.5;
+  else if (norm <= 5) mult = 5;
+  return mult * mag;
+}
+
+/**
+ * Y-axis domain and tick values on 1/2/2.5/5×10ⁿ steps; data sits inside with margin.
+ */
+export function niceYAxisTicks(
+  dataMin: number,
+  dataMax: number,
+  targetTicks = 5,
+): { y0: number; y1: number; ticks: number[] } {
+  if (dataMin === dataMax) {
+    const bump = Math.abs(dataMin) * 0.08 || 1;
+    dataMin -= bump;
+    dataMax += bump;
+  }
+  const margin = (dataMax - dataMin) * 0.06 || Math.abs(dataMax) * 0.02 || 0.5;
+  const wantLo = dataMin - margin;
+  const wantHi = dataMax + margin;
+  const rawRange = wantHi - wantLo;
+  const step = niceStepCeil(rawRange / Math.max(2, targetTicks - 1));
+  let y0 = Math.floor(wantLo / step) * step;
+  let y1 = Math.ceil(wantHi / step) * step;
+  while (y0 > dataMin - margin * 0.25) y0 -= step;
+  while (y1 < dataMax + margin * 0.25) y1 += step;
+
+  const ticks: number[] = [];
+  for (let v = y0; v <= y1 + step * 1e-9; v += step) {
+    const r = Math.round(v * 1e9) / 1e9;
+    ticks.push(r);
+  }
+  return { y0, y1, ticks };
+}
+
+function pickYearlyXTicks(
+  xMin: number,
+  xMax: number,
+  innerWidthPx: number,
+): number[] {
+  const yStart = new Date(xMin * 1000).getUTCFullYear();
+  const yEnd = new Date(xMax * 1000).getUTCFullYear();
+  const yearSpan = Math.max(0, yEnd - yStart);
+  const minLabelPx = 52;
+  const maxTicks = Math.min(8, Math.max(5, Math.floor(innerWidthPx / minLabelPx)));
+  let yearStep = 1;
+  const steps = [1, 2, 5, 10, 20, 25];
+  for (const s of steps) {
+    yearStep = s;
+    const n = Math.floor(yearSpan / s) + 1;
+    if (n + 2 <= maxTicks) break;
+  }
+  const out: number[] = [xMin];
+  const firstLabeled = Math.ceil(yStart / yearStep) * yearStep;
+  for (let y = firstLabeled; y < yEnd; y += yearStep) {
+    const ts = Date.UTC(y, 0, 1) / 1000;
+    if (ts > xMin && ts < xMax) out.push(ts);
+  }
+  out.push(xMax);
+  const uniq = [...new Set(out)].sort((a, b) => a - b);
+  if (uniq.length > maxTicks) {
+    const stride = Math.ceil(uniq.length / maxTicks);
+    const thinned = uniq.filter((_, i) => i === 0 || i === uniq.length - 1 || i % stride === 0);
+    if (thinned[thinned.length - 1] !== xMax) thinned.push(xMax);
+    return thinned.slice(0, maxTicks);
+  }
+  return uniq;
+}
+
+/**
+ * Build x-axis tick timestamps. Small series (n≤12): exact point dates. Larger: span-aware, first+last always.
+ */
+export function pickXAxisTicks(
+  xMin: number,
+  xMax: number,
+  innerWidthPx: number,
+  points?: DataPoint[],
+): number[] {
+  if (points && points.length > 0 && points.length <= 12) {
+    return points.map((p) => p.ts);
+  }
+
+  const span = xMax - xMin;
+  if (span <= 0) return [xMin];
+  if (xAxisTimeGranularity(span) === "yearly") {
+    return pickYearlyXTicks(xMin, xMax, innerWidthPx);
+  }
+
+  const minLabelPx = 52;
+  const maxTicks = Math.min(8, Math.max(5, Math.floor(innerWidthPx / minLabelPx)));
+  const count = Math.max(2, maxTicks);
+
+  const ticks: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const t = xMin + (span * i) / (count - 1);
+    ticks.push(i === 0 ? xMin : i === count - 1 ? xMax : Math.round(t));
+  }
+  ticks[0] = xMin;
+  ticks[ticks.length - 1] = xMax;
+
+  const unique: number[] = [];
+  for (const t of ticks) {
+    if (unique.length === 0 || t - unique[unique.length - 1] >= Math.max(1, span / (count * 3))) {
+      unique.push(t);
+    }
+  }
+  if (unique[unique.length - 1] !== xMax) unique.push(xMax);
+  if (unique[0] !== xMin) unique.unshift(xMin);
+  return unique.slice(0, 8);
+}
+
+/** Indices that receive visible circle markers (max ~60). */
+export function markerPointIndices(n: number, maxMarkers = 60): number[] {
+  if (n <= 0) return [];
+  if (n <= maxMarkers) return Array.from({ length: n }, (_, i) => i);
+  const step = Math.ceil(n / maxMarkers);
+  const out: number[] = [];
+  for (let i = 0; i < n; i += step) out.push(i);
+  if (out[out.length - 1] !== n - 1) out.push(n - 1);
+  return out;
+}
+
+/** Point indices to annotate with value labels (first, last, min, max; all if n≤12). */
+export function valueLabelIndices(points: DataPoint[]): number[] {
+  const n = points.length;
+  if (n === 0) return [];
+  if (n <= 12) return Array.from({ length: n }, (_, i) => i);
+
+  let minI = 0;
+  let maxI = 0;
+  for (let i = 1; i < n; i++) {
+    if (points[i].value < points[minI].value) minI = i;
+    if (points[i].value > points[maxI].value) maxI = i;
+  }
+  const set = new Set([0, n - 1, minI, maxI]);
+  return [...set].sort((a, b) => a - b);
+}
+
+export function renderSvgChart(
+  metric: string,
+  points: DataPoint[],
+  type: ChartType,
+  theme: ChartTheme,
+): string {
+  const W = 640;
+  const H = 320;
+  const pad = { t: 36, r: 28, b: 56, l: 60 };
+  const innerW = W - pad.l - pad.r;
+  const innerH = H - pad.t - pad.b;
+  const t = THEMES[theme];
+  const titleFill = theme === "dark" ? "#f4f4f7" : "#1a1a1a";
+
+  if (points.length === 0) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <rect width="100%" height="100%" fill="${t.bg}"/>
+  <text x="${W / 2}" y="${H / 2}" text-anchor="middle" fill="${t.text}" font-family="system-ui,sans-serif" font-size="14">No data for ${escapeXml(metric)}</text>
+</svg>`;
+  }
+
+  const xs = points.map((p) => p.ts);
+  const ys = points.map((p) => p.value);
+  const xMin = Math.min(...xs);
+  const xMax = Math.max(...xs);
+  const yMin = Math.min(...ys);
+  const yMax = Math.max(...ys);
+  const spanSec = xMax - xMin;
+  const { y0, y1, ticks: yTicks } = niceYAxisTicks(yMin, yMax, 5);
+
+  const scaleX = (ts: number) =>
+    pad.l + ((ts - xMin) / (xMax - xMin || 1)) * innerW;
+  const scaleY = (v: number) =>
+    pad.t + innerH - ((v - y0) / (y1 - y0 || 1)) * innerH;
+
+  const coords = points.map(
+    (p) => `${scaleX(p.ts).toFixed(2)},${scaleY(p.value).toFixed(2)}`,
+  );
+
+  const baseY = pad.t + innerH;
+
+  let series = "";
+  if (type === "bar" && points.length <= 120) {
+    const barW = Math.max(2, innerW / points.length - 1);
+    series = points
+      .map((p) => {
+        const x = scaleX(p.ts) - barW / 2;
+        const y = scaleY(p.value);
+        const h = baseY - y;
+        return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barW.toFixed(2)}" height="${h.toFixed(2)}" fill="${t.stroke}" opacity="0.85"/>`;
+      })
+      .join("\n  ");
+  } else if (type === "area") {
+    const areaPath = `M ${coords[0]} L ${coords.slice(1).join(" L ")} L ${scaleX(points[points.length - 1].ts).toFixed(2)},${baseY.toFixed(2)} L ${scaleX(points[0].ts).toFixed(2)},${baseY.toFixed(2)} Z`;
+    series = `<path d="${areaPath}" fill="${t.fill}" stroke="none"/>
+  <polyline fill="none" stroke="${t.stroke}" stroke-width="2" stroke-linejoin="round" points="${coords.join(" ")}"/>`;
+  } else {
+    series = `<polyline fill="none" stroke="${t.stroke}" stroke-width="2" stroke-linejoin="round" points="${coords.join(" ")}"/>`;
+  }
+
+  const yGrid = yTicks
+    .map((v) => {
+      const y = scaleY(v);
+      return `<line x1="${pad.l}" y1="${y.toFixed(2)}" x2="${W - pad.r}" y2="${y.toFixed(2)}" stroke="${t.grid}"/>
+  <text x="${pad.l - 6}" y="${(y + 4).toFixed(2)}" text-anchor="end" fill="${t.text}" font-size="10" font-family="ui-monospace,monospace">${formatNumber(v)}</text>`;
+    })
+    .join("\n  ");
+
+  const xTicks = pickXAxisTicks(xMin, xMax, innerW, points);
+  const xAxisY = baseY.toFixed(2);
+  const xBaseline = `<line x1="${pad.l}" y1="${xAxisY}" x2="${W - pad.r}" y2="${xAxisY}" stroke="${t.grid}"/>`;
+  const xTickEls = xTicks
+    .map((tickTs, i) => {
+      const x = scaleX(tickTs);
+      const anchor =
+        i === 0 ? "start" : i === xTicks.length - 1 ? "end" : "middle";
+      const label = formatXAxisTick(tickTs, spanSec);
+      return `<line x1="${x.toFixed(2)}" y1="${xAxisY}" x2="${x.toFixed(2)}" y2="${(baseY + 5).toFixed(2)}" stroke="${t.text}" opacity="0.45"/>
+  <text x="${x.toFixed(2)}" y="${(baseY + 18).toFixed(2)}" text-anchor="${anchor}" fill="${t.text}" font-size="10" font-family="ui-monospace,monospace">${escapeXml(label)}</text>`;
+    })
+    .join("\n  ");
+
+  const markerIdx = markerPointIndices(points.length);
+  const markers = markerIdx
+    .map((i) => {
+      const p = points[i];
+      const cx = scaleX(p.ts).toFixed(2);
+      const cy = scaleY(p.value).toFixed(2);
+      const tip = escapeXml(formatMarkerTooltip(p.ts, p.value));
+      return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${t.stroke}" stroke="${t.bg}" stroke-width="1.5"><title>${tip}</title></circle>`;
+    })
+    .join("\n  ");
+
+  const labelIdx = valueLabelIndices(points);
+  const placedLabels: { x: number; y: number }[] = [];
+  const valueLabels = labelIdx
+    .map((i) => {
+      const p = points[i];
+      let x = scaleX(p.ts);
+      let y = scaleY(p.value) - 10;
+      if (i === 0) x += 4;
+      if (i === points.length - 1) x -= 4;
+      for (const prev of placedLabels) {
+        if (Math.hypot(x - prev.x, y - prev.y) < 22) y -= 14;
+      }
+      placedLabels.push({ x, y });
+      const anchor =
+        i === 0 ? "start" : i === points.length - 1 ? "end" : "middle";
+      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" text-anchor="${anchor}" fill="${titleFill}" font-size="9" font-family="ui-monospace,monospace" opacity="0.92">${formatNumber(p.value)}</text>`;
+    })
+    .join("\n  ");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <rect width="100%" height="100%" fill="${t.bg}" rx="8"/>
+  <text x="${pad.l}" y="22" fill="${titleFill}" font-family="system-ui,sans-serif" font-size="15" font-weight="600">${escapeXml(formatMetricLabel(metric))}</text>
+  <text x="${W - pad.r}" y="22" text-anchor="end" fill="${t.text}" font-size="11" font-family="system-ui,sans-serif">graphmyanything</text>
+  ${yGrid}
+  ${xBaseline}
+  ${xTickEls}
+  ${series}
+  ${markers}
+  ${valueLabels}
+</svg>`;
 }
 
 export function writeChartFile(

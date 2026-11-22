@@ -18,6 +18,7 @@ import {
   type ChartTheme,
 } from "../lib/svg-chart.js";
 import { HOSTED_CHART_URL_NOTE } from "../paths.js";
+import { estimateTokens, withTokensEstimate } from "../lib/tokens.js";
 
 function normalizeTags(tags?: Record<string, string>): Record<string, string> {
   return tags ?? {};
@@ -56,7 +57,7 @@ export function handleTrack(
   }
 
   const written = insertPoints(db, metric, toInsert);
-  return { ok: true, metric, written };
+  return withTokensEstimate({ ok: true as const, metric, written });
 }
 
 const DEFAULT_LTTB = 50;
@@ -92,20 +93,25 @@ export function handleQuery(
     tokens_estimate: number;
   };
 
-  const base: Payload = {
+  const base: Omit<Payload, "tokens_estimate"> = {
     m: metric,
     rg: args.range ?? "all",
     s: terseSummary(summary),
-    tokens_estimate: 0,
   };
 
-  let payload: Payload = { ...base };
+  let payload: Payload = { ...base, tokens_estimate: 0 };
   if (seriesPlan.mode === "lttb" && points.length > 0) {
     payload.pts = lttb(points, seriesPlan.maxPoints);
   }
 
-  let json = JSON.stringify(payload);
-  payload.tokens_estimate = Math.ceil(json.length / 4);
+  const finalize = (p: Payload): Payload => {
+    const { tokens_estimate: _drop, ...rest } = p;
+    const out = { ...rest, tokens_estimate: 0 } as Payload;
+    out.tokens_estimate = estimateTokens(out);
+    return out;
+  };
+
+  payload = finalize(payload);
 
   if (
     payload.pts &&
@@ -115,31 +121,30 @@ export function handleQuery(
     let n = payload.pts.length;
     while (n > 5) {
       n = Math.floor(n * 0.7);
-      payload = {
-        ...base,
-        pts: lttb(points, n),
-        tokens_estimate: 0,
-      };
-      json = JSON.stringify(payload);
-      payload.tokens_estimate = Math.ceil(json.length / 4);
+      payload = finalize({ ...base, pts: lttb(points, n), tokens_estimate: 0 });
       if (payload.tokens_estimate <= tokenBudget) break;
     }
   }
 
+  let json = JSON.stringify(payload);
   json = fitTokenBudget(json, tokenBudget);
-  return JSON.parse(json) as Record<string, unknown>;
+  const parsed = JSON.parse(json) as Payload;
+  if (typeof parsed.tokens_estimate !== "number" || parsed.tokens_estimate < 1) {
+    parsed.tokens_estimate = Math.max(1, estimateTokens(parsed));
+  }
+  return parsed as Record<string, unknown>;
 }
 
 export function handleInsight(
   db: GmaDatabase,
   args: { metric: string; range?: string },
-): ReturnType<typeof generateInsight> {
+): ReturnType<typeof generateInsight> & { tokens_estimate: number } {
   const metric = args.metric.trim();
   const rangeLabel = args.range ?? "all";
   const { fromTs, toTs } = parseRange(args.range);
   const rows = queryPoints(db, metric, fromTs, toTs);
   const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
-  return generateInsight(metric, points, rangeLabel);
+  return withTokensEstimate(generateInsight(metric, points, rangeLabel));
 }
 
 export function handleChart(
@@ -154,6 +159,7 @@ export function handleChart(
   path: string;
   url: null;
   hosted_url_note: string;
+  tokens_estimate: number;
 } {
   const metric = args.metric.trim();
   const type = args.type ?? "line";
@@ -161,12 +167,15 @@ export function handleChart(
   const { fromTs, toTs } = parseRange(args.range);
   const rows = queryPoints(db, metric, fromTs, toTs);
   const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
-  const display = lttb(points, Math.min(500, Math.max(50, points.length)));
+  const display =
+    points.length <= 500
+      ? points
+      : lttb(points, 500);
   const svg = renderSvgChart(metric, display, type, theme);
   const filePath = writeChartFile(metric, svg);
-  return {
+  return withTokensEstimate({
     path: filePath,
-    url: null,
+    url: null as null,
     hosted_url_note: HOSTED_CHART_URL_NOTE,
-  };
+  });
 }

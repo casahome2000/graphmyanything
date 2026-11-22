@@ -59,6 +59,11 @@ describe("handleChart", () => {
     expect(result.hosted_url_note).toBe(HOSTED_CHART_URL_NOTE);
     expect(result.path.startsWith(chartsDir)).toBe(true);
     expect(fs.existsSync(result.path)).toBe(true);
+    expect(typeof result.tokens_estimate).toBe("number");
+    expect(result.tokens_estimate > 0).toBe(true);
+    const svg = fs.readFileSync(result.path, "utf8");
+    expect(svg).toContain("<circle");
+    expect(svg).toMatch(/\d{2}:\d{2}|\/\d|<text/);
     db.close();
     fs.rmSync(base, { recursive: true, force: true });
   });

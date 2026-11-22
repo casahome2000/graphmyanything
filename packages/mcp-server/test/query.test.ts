@@ -44,6 +44,8 @@ describe("handleQuery lean", () => {
     expect(r.pts).toBeUndefined();
     expect(r.s).toBeDefined();
     expect(r.m).toBe("test.m");
+    expect(typeof r.tokens_estimate).toBe("number");
+    expect((r.tokens_estimate as number) > 0).toBe(true);
     db.close();
     fs.unlinkSync(dbPath);
   });
@@ -65,6 +67,8 @@ describe("handleQuery lean", () => {
     });
     expect(Array.isArray(r.pts)).toBe(true);
     expect((r.pts as unknown[]).length).toBeLessThanOrEqual(50);
+    expect(typeof r.tokens_estimate).toBe("number");
+    expect((r.tokens_estimate as number) > 0).toBe(true);
     db.close();
     try {
       fs.unlinkSync(dbPath);
