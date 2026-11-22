@@ -33,7 +33,7 @@ function featureTile(
         </tr>
         <tr>
           <td style="padding:16px 10px 14px;text-align:center;">
-            <img src="${iconSrc}" width="56" height="56" alt="${title} feature" style="display:block;width:56px;height:56px;margin:0 auto 10px;border:0;" />
+            <img src="${iconSrc}" width="64" height="64" alt="${title} feature" style="display:block;width:64px;height:64px;margin:0 auto 10px;border:0;" />
             <p style="margin:0 0 4px;font-family:${FONT_STACK};font-size:11px;font-weight:600;color:${EMAIL_BRAND.text};text-transform:uppercase;letter-spacing:0.08em;">${title}</p>
             <p style="margin:0;font-family:${FONT_STACK};font-size:11px;line-height:1.45;color:${EMAIL_BRAND.muted};">${desc}</p>
           </td>

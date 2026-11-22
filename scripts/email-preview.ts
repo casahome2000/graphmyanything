@@ -75,7 +75,10 @@ async function generateChart(browser: Awaited<ReturnType<typeof chromium.launch>
 }
 
 async function generateIcons(browser: Awaited<ReturnType<typeof chromium.launch>>) {
-  const page = await browser.newPage({ viewport: { width: 256, height: 256 } });
+  const page = await browser.newPage({
+    viewport: { width: 360, height: 360 },
+    deviceScaleFactor: 2,
+  });
   await page.goto(pathToFileURL(ICONS_HTML).href);
 
   for (const { id, file } of ICONS) {

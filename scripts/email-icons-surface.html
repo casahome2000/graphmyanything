@@ -5,19 +5,24 @@
 <style>
   body { margin: 0; background: transparent; }
   .tile {
-    width: 256px;
-    height: 256px;
+    width: 360px;
+    height: 360px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 40px 36px;
     background: #0c0c12;
-    border-radius: 32px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 52px;
+    border-radius: 40px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 32px;
     font-weight: 600;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    line-height: 1;
     border: 2px solid rgba(255,255,255,0.1);
     box-shadow: 0 0 48px var(--glow);
+    overflow: visible;
   }
   .track { --glow: rgba(139,92,246,0.35); border-top: 6px solid #8b5cf6; }
   .track span.gma { color: #a78bfa; }
