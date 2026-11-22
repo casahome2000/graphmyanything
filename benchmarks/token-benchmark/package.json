@@ -7,7 +7,8 @@
     "build": "tsc --noEmit"
   },
   "dependencies": {
-    "js-tiktoken": "^1.0.19"
+    "js-tiktoken": "^1.0.19",
+    "sharp": "^0.34.2"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
