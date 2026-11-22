@@ -1,62 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1020" viewBox="0 0 1200 1020">
   <defs>
-    <linearGradient id="grad-inline_python" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#fb7185"/><stop offset="100%" stop-color="#f43f5e"/>
-    </linearGradient>
-    <linearGradient id="grad-file_python" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#fcd34d"/><stop offset="100%" stop-color="#f59e0b"/>
-    </linearGradient>
-    <linearGradient id="grad-gma_query_chart" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#8b5cf6"/><stop offset="45%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#34d399"/>
-    </linearGradient>
-    <linearGradient id="title-grad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#8b5cf6"/><stop offset="50%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#34d399"/>
-    </linearGradient>
+    <linearGradient id="grad-file_e2e" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fcd34d"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient>
+    <linearGradient id="grad-inline_e2e" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fb7185"/><stop offset="100%" stop-color="#f43f5e"/></linearGradient>
+    <linearGradient id="grad-gma" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="45%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#34d399"/></linearGradient>
+    <linearGradient id="grad-best" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6b7280"/><stop offset="100%" stop-color="#9ca3af"/></linearGradient>
+    <linearGradient id="title-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="50%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#34d399"/></linearGradient>
   </defs>
   <rect width="100%" height="100%" fill="#06060a" rx="16"/>
-  <rect x="1" y="1" width="1198" height="878" rx="15" fill="none" stroke="url(#title-grad)" stroke-opacity="0.35"/>
-  <text x="24" y="42" fill="url(#title-grad)" font-family="system-ui,sans-serif" font-size="26" font-weight="700">Token benchmark · one chart question</text>
-  <text x="24" y="64" fill="#8b8b9e" font-family="system-ui,sans-serif" font-size="13">"Chart my last 90 days of MRR and tell me the trend." · js-tiktoken o200k_base · log-scaled bar width</text>
+  <rect x="1" y="1" width="1198" height="1018" rx="15" fill="none" stroke="url(#title-grad)" stroke-opacity="0.35"/>
+  <text x="24" y="40" fill="url(#title-grad)" font-family="system-ui,sans-serif" font-size="24" font-weight="700">End-to-end agent tokens · one chart question</text>
+  <text x="24" y="62" fill="#8b8b9e" font-family="system-ui,sans-serif" font-size="12">o200k_base · log-scaled · discovery → script → env → run → answer</text>
   
-  <g transform="translate(24, 78)">
-    <rect width="230" height="28" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
-    <circle cx="18" cy="14" r="6" fill="url(#grad-inline_python)"/>
-    <text x="34" y="18" fill="#f4f4f7" font-size="12" font-family="system-ui,sans-serif">Inline JSON</text>
+  <g transform="translate(24, 96)">
+    <rect width="172" height="26" rx="13" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
+    <circle cx="16" cy="13" r="5" fill="url(#grad-file_e2e)"/>
+    <text x="30" y="17" fill="#f4f4f7" font-size="11" font-family="system-ui,sans-serif">Python E2E</text>
   </g>
-  <g transform="translate(274, 78)">
-    <rect width="230" height="28" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
-    <circle cx="18" cy="14" r="6" fill="url(#grad-file_python)"/>
-    <text x="34" y="18" fill="#f4f4f7" font-size="12" font-family="system-ui,sans-serif">File Python</text>
+  <g transform="translate(210, 96)">
+    <rect width="172" height="26" rx="13" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
+    <circle cx="16" cy="13" r="5" fill="url(#grad-inline_e2e)"/>
+    <text x="30" y="17" fill="#f4f4f7" font-size="11" font-family="system-ui,sans-serif">Inline E2E</text>
   </g>
-  <g transform="translate(524, 78)">
-    <rect width="230" height="28" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
-    <circle cx="18" cy="14" r="6" fill="url(#grad-gma_query_chart)"/>
-    <text x="34" y="18" fill="#f4f4f7" font-size="12" font-family="system-ui,sans-serif">GMA query+chart</text>
+  <g transform="translate(396, 96)">
+    <rect width="172" height="26" rx="13" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
+    <circle cx="16" cy="13" r="5" fill="url(#grad-gma)"/>
+    <text x="30" y="17" fill="#f4f4f7" font-size="11" font-family="system-ui,sans-serif">GMA</text>
   </g>
-  <text x="24" y="108" fill="#f4f4f7" font-size="16" font-weight="600" font-family="system-ui,sans-serif">Single session (90 daily points)</text>
-  <line x1="left" y1="350" x2="1176" y2="350" stroke="rgba(255,255,255,0.08)"/>
+  <g transform="translate(582, 96)">
+    <rect width="172" height="26" rx="13" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)"/>
+    <circle cx="16" cy="13" r="5" fill="url(#grad-best)"/>
+    <text x="30" y="17" fill="#f4f4f7" font-size="11" font-family="system-ui,sans-serif">Best-case Python</text>
+  </g>
+  <text x="24" y="148" fill="#f4f4f7" font-size="15" font-weight="600" font-family="system-ui,sans-serif">Single question (90 points)</text>
   
-  <text x="20" y="154" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="14" font-weight="500">Inline JSON + matplotlib</text>
-  <rect x="280" y="120" width="611.3" height="52" rx="8" fill="url(#grad-inline_python)" stroke="#f43f5e" stroke-opacity="0.35"/>
-  <text x="903.3" y="154" fill="#f4f4f7" font-family="ui-monospace,monospace" font-size="15" font-weight="600">2,290</text>
-  <text x="20" y="224" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="14" font-weight="500">File-based Python (data off-context)</text>
-  <rect x="280" y="190" width="419.8" height="52" rx="8" fill="url(#grad-file_python)" stroke="#d97706" stroke-opacity="0.35"/>
-  <text x="711.8" y="224" fill="#f4f4f7" font-family="ui-monospace,monospace" font-size="15" font-weight="600">203</text>
-  <text x="20" y="294" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="14" font-weight="500">GMA query + chart</text>
-  <rect x="280" y="260" width="528.1" height="52" rx="8" fill="url(#grad-gma_query_chart)" stroke="#10b981" stroke-opacity="0.35"/>
-  <text x="820.1" y="294" fill="#f4f4f7" font-family="ui-monospace,monospace" font-size="15" font-weight="600">799</text>
-  <text x="280" y="326" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">−65.1% vs inline · +293.6% more vs file Python</text>
-  <text x="24" y="400" fill="#f4f4f7" font-size="16" font-weight="600" font-family="system-ui,sans-serif">30 sessions (same question daily; GMA data persists)</text>
-  <text x="24" y="418" fill="#8b8b9e" font-size="12" font-family="system-ui,sans-serif">Inline Python re-loads full JSON each time; file Python re-runs script; GMA re-queries memory (n8n ingestion = 0 tokens/session)</text>
+  <text x="16" y="207" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python file E2E · cold</text>
+  <rect x="300" y="176" width="500.9" height="48" rx="8" fill="url(#grad-file_e2e)" />
+  <text x="790.9" y="207" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">723</text>
+  <text x="300" y="238" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">6.6 turns · 8.9 tool calls</text>
+  <text x="16" y="289" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python file E2E · warm (re-discovery)</text>
+  <rect x="300" y="258" width="484.0" height="48" rx="8" fill="url(#grad-file_e2e)" />
+  <text x="774.0" y="289" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">579</text>
+  <text x="300" y="320" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">5.6 turns · 5.9 tool calls</text>
+  <text x="16" y="371" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python inline JSON E2E · cold</text>
+  <rect x="300" y="340" width="594.4" height="48" rx="8" fill="url(#grad-inline_e2e)" />
+  <text x="884.4" y="371" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">2,471</text>
+  <text x="300" y="402" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">4.6 turns · series in context</text>
+  <text x="16" y="453" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">GMA query + chart (n8n ingest)</text>
+  <rect x="300" y="422" width="505.9" height="48" rx="8" fill="url(#grad-gma)" />
+  <text x="795.9" y="453" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">772</text>
+  <text x="300" y="484" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">6.8% more vs file E2E cold</text>
+  <text x="16" y="535" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Best-case file Python (script turn only)</text>
+  <rect x="300" y="504" width="372.7" height="48" rx="8" fill="url(#grad-best)" stroke-dasharray="6 4" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+  <text x="662.7" y="535" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">134</text>
+  <text x="300" y="566" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">Lower bound — omits discovery/env/retries</text>
+  <text x="24" y="610" fill="#f4f4f7" font-size="15" font-weight="600" font-family="system-ui,sans-serif">30 warm repeats (re-discovery / re-query each session)</text>
   
-  <text x="20" y="470" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="14" font-weight="500">Inline JSON + matplotlib</text>
-  <rect x="280" y="436" width="880.0" height="52" rx="8" fill="url(#grad-inline_python)" stroke="#f43f5e" stroke-opacity="0.35"/>
-  <text x="1172.0" y="470" fill="#f4f4f7" font-family="ui-monospace,monospace" font-size="15" font-weight="600">68,700</text>
-  <text x="20" y="540" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="14" font-weight="500">File-based Python</text>
-  <rect x="280" y="506" width="688.5" height="52" rx="8" fill="url(#grad-file_python)" stroke="#d97706" stroke-opacity="0.35"/>
-  <text x="980.5" y="540" fill="#f4f4f7" font-family="ui-monospace,monospace" font-size="15" font-weight="600">6,090</text>
-  <text x="20" y="610" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="14" font-weight="500">GMA query + chart</text>
-  <rect x="280" y="576" width="796.8" height="52" rx="8" fill="url(#grad-gma_query_chart)" stroke="#10b981" stroke-opacity="0.35"/>
-  <text x="1088.8" y="610" fill="#f4f4f7" font-family="ui-monospace,monospace" font-size="15" font-weight="600">23,970</text>
-  <text x="24" y="856" fill="#8b8b9e" font-size="11" font-family="system-ui,sans-serif">Generated 2026-11-22 · graphmyanything.com · reproducible: npm run run</text>
+  <text x="16" y="669" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python file E2E warm × 30</text>
+  <rect x="300" y="638" width="742.8" height="48" rx="8" fill="url(#grad-file_e2e)" />
+  <text x="1032.8" y="669" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">17,370</text>
+  
+  <text x="16" y="733" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">Python inline E2E warm × 30</text>
+  <rect x="300" y="702" width="852.0" height="48" rx="8" fill="url(#grad-inline_e2e)" />
+  <text x="1142.0" y="733" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">72,960</text>
+  
+  <text x="16" y="797" fill="#f4f4f7" font-family="system-ui,sans-serif" font-size="13" font-weight="500">GMA query + chart × 30</text>
+  <rect x="300" y="766" width="764.7" height="48" rx="8" fill="url(#grad-gma)" />
+  <text x="1054.7" y="797" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">23,160</text>
+  <text x="300" y="828" fill="#22d3ee" font-family="ui-monospace,monospace" font-size="11">33.3% more vs file E2E warm</text>
+  <text x="24" y="998" fill="#8b8b9e" font-size="11" font-family="system-ui,sans-serif">graphmyanything.com · npm run run · 2026-11-22</text>
 </svg>
