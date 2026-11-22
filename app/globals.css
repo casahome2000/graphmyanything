@@ -140,6 +140,94 @@ body {
     );
 }
 
+@keyframes how-story-caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.how-story-caret {
+  animation: how-story-caret 1s ease-in-out infinite;
+}
+
+.how-works-section-mesh {
+  background-image:
+    radial-gradient(
+      ellipse 70% 55% at 20% 40%,
+      rgba(139, 92, 246, 0.16),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 80% 30%,
+      rgba(34, 211, 238, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 50% 90%,
+      rgba(52, 211, 153, 0.08),
+      transparent 55%
+    );
+  animation: how-works-mesh-shift 18s ease-in-out infinite alternate;
+}
+
+@keyframes how-works-mesh-shift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate3d(2%, -1.5%, 0) scale(1.04);
+    opacity: 0.95;
+  }
+}
+
+@keyframes how-story-ring-spin {
+  to {
+    --how-ring-angle: 360deg;
+  }
+}
+
+@property --how-ring-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.how-story-card {
+  isolation: isolate;
+}
+
+.how-story-card[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--how-ring-angle),
+    rgba(139, 92, 246, 0.95),
+    rgba(34, 211, 238, 0.9),
+    rgba(52, 211, 153, 0.85),
+    rgba(139, 92, 246, 0.95)
+  );
+  animation: how-story-ring-spin 2.8s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.85;
+  filter: blur(0.2px);
+}
+
 .how-chart-line {
   animation: chart-spark 3s ease-in-out infinite;
 }
@@ -188,6 +276,21 @@ body {
 
   .how-it-works-motion {
     display: none;
+  }
+
+  .how-story-caret {
+    animation: none;
+    opacity: 0.85;
+  }
+
+  .how-works-section-mesh {
+    animation: none;
+    opacity: 0.7;
+  }
+
+  .how-story-card[data-active="true"]::before {
+    animation: none;
+    opacity: 0.4;
   }
 
   .how-chart-line {

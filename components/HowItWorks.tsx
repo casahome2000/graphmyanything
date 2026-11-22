@@ -1,16 +1,20 @@
 "use client";
 
-import { FlowCanvas } from "./how-it-works/FlowCanvas";
 import { HowItWorksStatic } from "./how-it-works/HowItWorksStatic";
+import { HowItWorksStory } from "./how-it-works/HowItWorksStory";
 
 export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="scroll-mt-20 border-y border-white/[0.06] py-16 sm:py-20"
+      className="relative scroll-mt-20 overflow-hidden border-y border-white/[0.06] py-16 sm:py-20"
       aria-labelledby="how-it-works-heading"
     >
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div
+        className="how-works-section-mesh pointer-events-none absolute inset-0 opacity-70"
+        aria-hidden
+      />
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/90">
           How it works
         </p>
@@ -30,7 +34,7 @@ export function HowItWorks() {
           permanent chart URL.
         </p>
 
-        <FlowCanvas />
+        <HowItWorksStory />
         <HowItWorksStatic />
       </div>
     </section>
