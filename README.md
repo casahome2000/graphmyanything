@@ -32,9 +32,9 @@ npm run lint
 |----------|----------|-------------|
 | `SUPABASE_URL` | No | Supabase project URL. When set with the service role key, waitlist emails are stored in Postgres. |
 | `SUPABASE_SERVICE_ROLE_KEY` | No | Service role key for server-side `waitlist` inserts. **Never expose to the client.** |
-| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog project API key. Analytics no-op when unset. |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog ingest host (default: `https://us.i.posthog.com`). |
 | `NEXT_PUBLIC_PREORDER_URL` | No | Checkout URL for founding member preorder. Button shows **Coming soon** when unset. |
+
+Vercel Web Analytics is enabled via `@vercel/analytics` in the root layout (automatic on Vercel deploys).
 
 ### Waitlist storage
 
@@ -44,10 +44,10 @@ npm run lint
 
 Without Supabase, the route logs signups and returns `{ "ok": true }`—useful for preview deploys.
 
-### PostHog events
+### Custom analytics events
 
-- `waitlist_submit` — successful waitlist signup (client)
-- `preorder_click` — founding member button click (client)
+- `waitlist_submit` — successful waitlist signup (`track()` from `@vercel/analytics`)
+- `preorder_click` — founding member button click
 
 ## Vercel
 
