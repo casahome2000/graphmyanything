@@ -169,9 +169,21 @@ body {
   opacity: 1;
 }
 
+.how-works-static {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .how-works-anim {
+    display: none !important;
+  }
+
+  .how-works-static {
+    display: block !important;
   }
 
   .how-it-works-motion {
