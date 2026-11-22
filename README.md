@@ -102,7 +102,7 @@ Scheduled **track → query → insight → chart** template: [`integrations/n8n
 
 ## Why tokens matter (one chart question)
 
-Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchmark/) — run `npm run benchmark:tokens` from a full repo checkout.
+Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchmark/) — from the repo root, run `npm run benchmark:tokens` (after `npm ci` in that directory).
 
 **End-to-end agent tokens** (single “show me the chart + trend” flow, **single question, end-to-end (cold)**):
 
@@ -133,8 +133,6 @@ The `chart` tool writes SVG files locally today. Public URLs at **graphmyanythin
 | [`packages/mcp-server/`](packages/mcp-server/) | npm package, tests, `server.json` |
 | [`integrations/n8n/`](integrations/n8n/) | Workflow template |
 | [`benchmarks/token-benchmark/`](benchmarks/token-benchmark/) | Token comparison + chart |
-| [`docs/DEVELOPING.md`](docs/DEVELOPING.md) | Landing-site developer notes |
-| [`legacy/`](legacy/) | 2016 Flask archive |
 
 ## Develop the MCP server
 

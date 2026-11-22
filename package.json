@@ -1,36 +1,12 @@
 {
   "name": "graphmyanything",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
+  "description": "Workspace root for graphmyanything-mcp and local validation scripts",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "email:preview": "tsx scripts/email-preview.ts",
     "build:mcp": "npm run build --prefix packages/mcp-server",
     "test:mcp": "npm test --prefix packages/mcp-server",
     "benchmark:tokens": "npm run run --prefix benchmarks/token-benchmark",
     "validation": "npm run build:mcp && npm run test:mcp && npm run benchmark:tokens"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.49.1",
-    "@vercel/analytics": "^2.0.1",
-    "next": "^15.5.7",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.1.4",
-    "@types/node": "^22.15.3",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "eslint": "^9.25.0",
-    "eslint-config-next": "^15.5.7",
-    "playwright": "^1.49.1",
-    "tailwindcss": "^4.1.4",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
   }
 }
