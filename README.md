@@ -112,13 +112,15 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 | Python file off-context (E2E) | **658** |
 | **GMA lean** (`query` + `chart`, `points=auto`, `also_chart`) | **284** (**56.8% fewer** than file E2E) |
 
-**file E2E warm × 30** **21,390** vs **GMA lean** **8,520** (**60.2% fewer**).
+**30 warm sessions (per-session GMA lean 284):** file E2E warm cumulative **21,390** vs **GMA lean** **8,520** (**60.2% fewer**).
+
+**Cost per 1,000 identical questions** (GPT-5.2 at $1.75/M input · $14/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **$6.00** vs GMA lean **$1.65**. Dollar lines scale linearly if your model’s per-token pricing differs.
 
 **Caveats (read before citing):**
 
-- Synthetic MRR series and simulated tool turns — not a live agent trace.
-- MCP **tool schema overhead** ~342 tokens vs ~248 for a minimal Python harness (see benchmark tables).
-- **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — optimistic floor, not typical agent E2E.
+- Modeled flows from [`e2e-flows.ts`](benchmarks/token-benchmark/e2e-flows.ts), not live agent traces — counts are reproducible via `npm run benchmark:tokens`.
+- MCP **tool schema overhead** **349** tokens vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
+- **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — deliberate lower bound; citing without full E2E is misleading.
 
 A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
 

@@ -25,10 +25,25 @@ On the imported workflow:
 - Attach your credential to **MCP track**, **MCP query 90d**, **MCP insight**, and **MCP chart SVG**.
 - Replace **Mock Stripe MRR** with a Stripe node or your billing HTTP source when ready.
 
+## Creator template notes
+
+The imported workflow includes an **overview sticky** (How it works, Set up steps, Requirements, Customize) plus **section stickies** for the schedule, data source, track path, query, insight, and chart nodes. Use them when publishing to the n8n template library.
+
 ## Flow
 
 1. Schedule (daily 9:00).
 2. Read MRR (mock code node in template).
 3. `track` → `query` (90d, token_budget 300) → `insight` → `chart` (area, dark).
 
+Pin **`graphmyanything-mcp@0.1.1`** and **Node 22.13+** on any worker that runs MCP stdio.
+
 Chart files land on the n8n host under `~/.graphmyanything/charts/` (or `charts/` beside `GRAPHMYANYTHING_DB_PATH`). The `chart` tool returns a local `path` only (`url` is null until hosted charts ship).
+
+## CLI import (optional)
+
+```bash
+# CLI expects a JSON array of workflows (UI import accepts the single-object file as-is):
+jq -s . integrations/n8n/track-stripe-mrr-daily.json | n8n import:workflow --input=/dev/stdin
+```
+
+Credentials are not bundled; assign MCP Client credentials after import.
