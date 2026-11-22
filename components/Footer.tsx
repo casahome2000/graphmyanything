@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const COPYRIGHT_YEAR = 2026;
+
 export function Footer() {
   return (
     <footer className="border-t border-white/[0.06] py-12">
@@ -12,7 +14,10 @@ export function Footer() {
             Metric memory for AI agents
           </p>
         </div>
-        <nav className="flex flex-wrap gap-6 text-sm text-[#8b8b9e]" aria-label="Footer">
+        <nav
+          className="flex flex-wrap gap-6 text-sm text-[#8b8b9e]"
+          aria-label="Footer"
+        >
           <a href="#waitlist" className="hover:text-[#f4f4f7]">
             Waitlist
           </a>
@@ -30,7 +35,7 @@ export function Footer() {
           </Link>
         </nav>
         <p className="text-xs text-[#8b8b9e]">
-          © {new Date().getFullYear()} GraphMyAnything
+          © {COPYRIGHT_YEAR} GraphMyAnything
         </p>
       </div>
     </footer>
