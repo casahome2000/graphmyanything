@@ -19,10 +19,39 @@ function typewriterLength(progress: number, text: string, start = 0.08, end = 0.
   return Math.floor(t * text.length);
 }
 
-function beatOpacity(activeBeat: StoryBeat, cardBeat: StoryBeat) {
-  if (activeBeat === cardBeat) return 1;
-  if (activeBeat > cardBeat) return 0.62;
-  return 0.38;
+type BeatPhase = "ghost" | "active" | "complete";
+
+function getBeatPhase(activeBeat: StoryBeat, cardBeat: StoryBeat): BeatPhase {
+  if (activeBeat > cardBeat) return "complete";
+  if (activeBeat === cardBeat) return "active";
+  return "ghost";
+}
+
+function beatCardOpacity(phase: BeatPhase) {
+  if (phase === "active") return 1;
+  if (phase === "complete") return 0.78;
+  return 0.9;
+}
+
+function BeatContent({
+  phase,
+  children,
+}: {
+  phase: BeatPhase;
+  children: React.ReactNode;
+}) {
+  const ghost = phase === "ghost";
+  return (
+    <div
+      className="flex flex-col"
+      style={{
+        opacity: ghost ? 0.45 : 1,
+        transition: `opacity 0.55s ${EASE}`,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
 type GmaVariant = "track" | "query";
@@ -81,96 +110,114 @@ function SyntaxGmaLine({
 function BeatConnector({
   active,
   cometOn,
-  vertical,
   gradId,
 }: {
   active: boolean;
   cometOn: boolean;
-  vertical: boolean;
   gradId: string;
 }) {
-  if (vertical) {
-    return (
+  const lineOpacity = active ? 1 : 0.72;
+
+  return (
+    <>
       <div
-        className="how-story-connector flex justify-center py-1 sm:py-2 lg:hidden"
+        className="how-story-connector flex h-6 items-center justify-center lg:hidden"
         aria-hidden
       >
-        <svg width={2} height={40} className="overflow-visible">
+        <svg width={20} height={24} viewBox="0 0 20 24" className="overflow-visible">
           <defs>
             <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity={active ? 0.9 : 0.35} />
-              <stop offset="50%" stopColor="#22d3ee" stopOpacity={active ? 0.85 : 0.3} />
-              <stop offset="100%" stopColor="#34d399" stopOpacity={active ? 0.8 : 0.28} />
+              <stop offset="0%" stopColor="#8b5cf6" stopOpacity={lineOpacity} />
+              <stop offset="50%" stopColor="#22d3ee" stopOpacity={lineOpacity} />
+              <stop offset="100%" stopColor="#34d399" stopOpacity={lineOpacity} />
             </linearGradient>
             <filter id={`${gradId}-glow`}>
-              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feGaussianBlur stdDeviation="3" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
           </defs>
-          <line x1={1} y1={0} x2={1} y2={40} stroke={`url(#${gradId})`} strokeWidth={1} />
+          <circle cx={10} cy={2} r={2.5} fill="#8b5cf6" opacity={lineOpacity} />
+          <line
+            x1={10}
+            y1={3}
+            x2={10}
+            y2={19}
+            stroke={`url(#${gradId})`}
+            strokeWidth={2}
+            strokeLinecap="round"
+          />
+          <polygon
+            points="10,22 6,18 14,18"
+            fill="#34d399"
+            opacity={lineOpacity}
+          />
           {cometOn ? (
-            <circle
-              key={cometOn ? "comet-on" : "comet-off"}
-              className="how-story-comet-v"
-              r={3}
-              fill="#22d3ee"
-              filter={`url(#${gradId}-glow)`}
-            >
-              <animateMotion
-                dur="0.65s"
-                repeatCount="1"
-                keyPoints="0;1"
-                keyTimes="0;1"
-                calcMode="spline"
-                keySplines="0.22 1 0.36 1"
-              >
-                <mpath href={`#${gradId}-path-v`} />
-              </animateMotion>
-            </circle>
+            <g key="comet-v" filter={`url(#${gradId}-glow)`}>
+              <circle r={5} fill="#22d3ee" opacity={0.35} />
+              <circle r={3.5} fill="#ecfafe">
+                <animateMotion
+                  dur="0.72s"
+                  repeatCount="1"
+                  path="M 10,4 L 10,20"
+                  calcMode="spline"
+                  keyTimes="0;1"
+                  keySplines="0.22 1 0.36 1"
+                />
+              </circle>
+            </g>
           ) : null}
-          <path id={`${gradId}-path-v`} d="M 1,0 L 1,40" fill="none" />
         </svg>
       </div>
-    );
-  }
-
-  return (
-    <div
-      className="how-story-connector hidden min-w-[28px] flex-1 items-center lg:flex"
-      aria-hidden
-    >
+      <div
+        className="how-story-connector hidden w-8 shrink-0 items-center justify-self-center lg:flex"
+        aria-hidden
+      >
       <svg
-        width="100%"
-        height={12}
-        viewBox="0 0 120 12"
-        preserveAspectRatio="none"
+        width={32}
+        height={20}
+        viewBox="0 0 32 20"
         className="overflow-visible"
       >
         <defs>
           <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8b5cf6" stopOpacity={active ? 0.95 : 0.35} />
-            <stop offset="50%" stopColor="#22d3ee" stopOpacity={active ? 0.9 : 0.32} />
-            <stop offset="100%" stopColor="#34d399" stopOpacity={active ? 0.85 : 0.3} />
+            <stop offset="0%" stopColor="#8b5cf6" stopOpacity={lineOpacity} />
+            <stop offset="50%" stopColor="#22d3ee" stopOpacity={lineOpacity} />
+            <stop offset="100%" stopColor="#34d399" stopOpacity={lineOpacity} />
           </linearGradient>
-          <filter id="comet-glow">
-            <feGaussianBlur stdDeviation="2" result="blur" />
+          <filter id={`${gradId}-glow`}>
+            <feGaussianBlur stdDeviation="3" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
-        <line x1={0} y1={6} x2={120} y2={6} stroke={`url(#${gradId})`} strokeWidth={1} />
+        <circle cx={2} cy={10} r={2.5} fill="#8b5cf6" opacity={lineOpacity} />
+        <line
+          x1={3}
+          y1={10}
+          x2={26}
+          y2={10}
+          stroke={`url(#${gradId})`}
+          strokeWidth={2}
+          strokeLinecap="round"
+        />
+        <polygon
+          points="30,10 24,6.5 24,13.5"
+          fill="#34d399"
+          opacity={lineOpacity}
+        />
         {cometOn ? (
-          <g className="how-story-comet-h">
-            <circle key={cometOn ? "comet-on" : "comet-off"} r={3.5} fill="#a5f3fc">
+          <g key="comet-h" filter={`url(#${gradId}-glow)`}>
+            <circle r={6} fill="#22d3ee" opacity={0.28} />
+            <circle r={4} fill="#e0f2fe">
               <animateMotion
-                dur="0.7s"
+                dur="0.75s"
                 repeatCount="1"
-                path="M 0,6 L 120,6"
+                path="M 4,10 L 26,10"
                 calcMode="spline"
                 keyTimes="0;1"
                 keySplines="0.22 1 0.36 1"
@@ -180,50 +227,61 @@ function BeatConnector({
         ) : null}
       </svg>
     </div>
+    </>
   );
 }
 
 function StoryCard({
   title,
-  beat,
-  activeBeat,
+  phase,
   children,
 }: {
   title: string;
-  beat: StoryBeat;
-  activeBeat: StoryBeat;
+  phase: BeatPhase;
   children: React.ReactNode;
 }) {
-  const lit = activeBeat === beat;
-  const opacity = beatOpacity(activeBeat, beat);
+  const lit = phase === "active";
+  const opacity = beatCardOpacity(phase);
   return (
     <article
-      className="how-story-card relative flex min-h-[200px] flex-1 flex-col rounded-2xl border border-white/[0.08] bg-[rgba(10,10,16,0.88)] p-3.5 shadow-lg backdrop-blur-md sm:min-h-[220px] sm:p-4 lg:min-w-0"
+      className="how-story-card relative flex min-h-0 flex-col rounded-2xl border border-white/[0.1] bg-[rgba(10,10,16,0.92)] p-3.5 shadow-lg backdrop-blur-md sm:p-4 lg:min-h-[280px]"
       data-active={lit ? "true" : "false"}
       style={{
         opacity,
-        transform: lit ? "scale(1)" : "scale(0.985)",
+        transform: lit ? "scale(1)" : "scale(0.99)",
         transition: `opacity 0.55s ${EASE}, transform 0.55s ${EASE}, box-shadow 0.55s ${EASE}, border-color 0.55s ${EASE}`,
         boxShadow: lit
-          ? "0 0 0 1px rgba(139,92,246,0.22), 0 12px 40px -12px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.06)"
-          : "inset 0 1px 0 rgba(255,255,255,0.04)",
-        borderColor: lit ? "rgba(139,92,246,0.35)" : "rgba(255,255,255,0.08)",
+          ? "0 0 0 1px rgba(139,92,246,0.28), 0 16px 48px -16px rgba(139,92,246,0.45), inset 0 1px 0 rgba(255,255,255,0.08)"
+          : "inset 0 1px 0 rgba(255,255,255,0.05)",
+        borderColor: lit ? "rgba(139,92,246,0.4)" : "rgba(255,255,255,0.1)",
       }}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8b8b9e]">
         {title}
       </p>
-      <div className="mt-2.5 flex flex-1 flex-col">{children}</div>
+      <div className="mt-2.5">{children}</div>
     </article>
   );
 }
 
-function AgentBeat({ progress }: { progress: number }) {
-  const len = typewriterLength(progress, AGENT_LINE);
-  const showChip = progress > 0.78;
+function AgentBeat({
+  phase,
+  progress,
+}: {
+  phase: BeatPhase;
+  progress: number;
+}) {
+  const isGhost = phase === "ghost";
+  const isComplete = phase === "complete";
+  const len =
+    isGhost || isComplete
+      ? AGENT_LINE.length
+      : typewriterLength(progress, AGENT_LINE);
+  const showChip =
+    isGhost || isComplete || progress > 0.78;
 
   return (
-    <>
+    <BeatContent phase={phase}>
       <MotionTerminal>
         <SyntaxGmaLine
           visibleLen={len}
@@ -237,51 +295,91 @@ function AgentBeat({ progress }: { progress: number }) {
       >
         sent ✓ 42 tokens
       </MotionChip>
-    </>
+    </BeatContent>
   );
 }
 
-function MemoryBeat({ progress, cycle }: { progress: number; cycle: number }) {
-  const bars = 6;
-  const compact = progress > 0.62;
-  const showTag = progress > 0.58 && progress < 0.92;
+function MemoryBeat({
+  phase,
+  progress,
+  cycle,
+}: {
+  phase: BeatPhase;
+  progress: number;
+  cycle: number;
+}) {
+  const bars = 10;
+  const isGhost = phase === "ghost";
+  const isComplete = phase === "complete";
+  const compactPhase = progress > 0.58 && progress < 0.88;
+  const compacted = progress >= 0.88 || isComplete;
+  const showTag =
+    isGhost || compactPhase || compacted || isComplete;
+
+  const heights = useMemo(
+    () =>
+      Array.from({ length: bars }, (_, i) => {
+        const base = 18 + (i % 4) * 7 + Math.sin(i * 1.35) * 5;
+        return Math.round(base);
+      }),
+    [],
+  );
 
   return (
-    <>
+    <BeatContent phase={phase}>
       <p className="font-mono text-xs text-violet-300/90">stripe.mrr</p>
-      <MotionRow label="Short-term" className="mt-3">
-        <div className="flex h-9 items-end gap-1 overflow-hidden" key={`stm-${cycle}`}>
-          {Array.from({ length: bars }).map((_, i) => {
-            const delay = i * 0.08;
-            const inView = progress > 0.12 + delay;
-            const h = 30 + (i % 3) * 8 + Math.sin(i * 1.2) * 4;
+      <MotionRow label="Short-term" className="mt-2">
+        <div
+          className="flex h-14 items-end gap-[3px] overflow-hidden rounded-md border border-white/[0.05] bg-black/25 px-1.5 py-1.5"
+          key={`stm-${cycle}`}
+        >
+          {heights.map((h, i) => {
+            const delay = i * 0.06;
+            const inView = isGhost || isComplete || progress > 0.1 + delay;
+            const squeezing = !isGhost && compactPhase;
+            const squeezed = compacted && !isGhost;
             return (
               <div
                 key={i}
-                className="w-2 rounded-sm bg-gradient-to-t from-violet-600/80 to-cyan-400/90"
+                className="min-w-[6px] flex-1 rounded-[3px] bg-gradient-to-t from-violet-600/90 to-cyan-400/95 shadow-[0_0_8px_rgba(34,211,238,0.25)]"
                 style={{
-                  height: compact ? 4 : inView ? h : 0,
-                  opacity: compact ? 0.35 : inView ? 1 : 0,
-                  transform: inView && !compact ? "translateX(0)" : "translateX(12px)",
-                  transition: `height 0.55s ${EASE}, opacity 0.45s ${EASE}, transform 0.5s ${EASE}`,
-                  transitionDelay: `${delay * 0.5}s`,
+                  height: squeezed
+                    ? 3
+                    : squeezing
+                      ? Math.max(4, h * (1 - (progress - 0.58) * 2.2))
+                      : inView
+                        ? `${h}px`
+                        : 0,
+                  opacity: inView ? (squeezed ? 0.4 : 1) : 0,
+                  transform:
+                    squeezing || squeezed
+                      ? `translateX(${squeezed ? 18 - i * 1.2 : (progress - 0.58) * 14}px) scaleY(${squeezed ? 0.15 : 1})`
+                      : inView
+                        ? "translateX(0)"
+                        : "translateX(10px)",
+                  transformOrigin: "bottom center",
+                  transition: `height 0.5s ${EASE}, opacity 0.45s ${EASE}, transform 0.55s ${EASE}`,
+                  transitionDelay: isGhost ? "0s" : `${delay * 0.35}s`,
                 }}
               />
             );
           })}
         </div>
       </MotionRow>
-      <MotionRow label="Long-term" className="mt-2.5">
-        <MemorySparkline pulse={compact} />
+      <MotionRow label="Long-term" className="mt-2">
+        <MemorySparkline pulse={compactPhase || compacted || isGhost} boost={compacted} />
       </MotionRow>
-      <MotionChip show={showTag} className="mt-2 border-cyan-500/20 bg-cyan-500/10 text-cyan-200/90">
+      <MotionChip
+        show={showTag}
+        className="mt-2 border-cyan-500/25 bg-cyan-500/12 text-cyan-100"
+      >
         LTTB compact
       </MotionChip>
-    </>
+    </BeatContent>
   );
 }
 
-function MemorySparkline({ pulse }: { pulse: boolean }) {
+function MemorySparkline({ pulse, boost }: { pulse: boolean; boost?: boolean }) {
   const uid = useId().replace(/:/g, "");
   const gradId = `mem-spark-${uid}`;
   const path = useMemo(() => {
@@ -300,7 +398,7 @@ function MemorySparkline({ pulse }: { pulse: boolean }) {
   }, []);
 
   return (
-    <svg viewBox="0 0 200 36" className="h-9 w-full" aria-hidden>
+    <svg viewBox="0 0 200 36" className="h-10 w-full" aria-hidden>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8b5cf6" />
@@ -311,27 +409,50 @@ function MemorySparkline({ pulse }: { pulse: boolean }) {
         d={path}
         fill="none"
         stroke={`url(#${gradId})`}
-        strokeWidth={1.5}
+        strokeWidth={1.75}
         strokeLinecap="round"
         style={{
-          opacity: pulse ? 1 : 0.85,
-          filter: pulse ? "drop-shadow(0 0 6px rgba(34,211,238,0.45))" : undefined,
-          transition: `opacity 0.4s ${EASE}`,
+          opacity: boost ? 1 : pulse ? 0.95 : 0.8,
+          filter: boost
+            ? "drop-shadow(0 0 10px rgba(52,211,153,0.55))"
+            : pulse
+              ? "drop-shadow(0 0 6px rgba(34,211,238,0.45))"
+              : undefined,
+          transition: `opacity 0.45s ${EASE}, filter 0.5s ${EASE}`,
         }}
       />
     </svg>
   );
 }
 
-function QueryBeat({ progress }: { progress: number }) {
-  const len = typewriterLength(progress, QUERY_LINE, 0.06, 0.55);
-  const showJson = progress > 0.52;
-  const showInsight = progress > 0.72;
-  const insightPop = showInsight ? Math.min(1, (progress - 0.72) / 0.2) : 0;
-  const spring = 1 + Math.sin(insightPop * Math.PI) * 0.06 * (1 - insightPop);
+function QueryBeat({
+  phase,
+  progress,
+}: {
+  phase: BeatPhase;
+  progress: number;
+}) {
+  const isGhost = phase === "ghost";
+  const isComplete = phase === "complete";
+  const len =
+    isGhost || isComplete
+      ? QUERY_LINE.length
+      : typewriterLength(progress, QUERY_LINE, 0.06, 0.55);
+  const showJson = isGhost || isComplete || progress > 0.52;
+  const showInsight = isGhost || isComplete || progress > 0.72;
+  const insightPop =
+    isGhost || isComplete
+      ? 0.85
+      : showInsight
+        ? Math.min(1, (progress - 0.72) / 0.2)
+        : 0;
+  const spring =
+    isGhost || isComplete
+      ? 1
+      : 1 + Math.sin(insightPop * Math.PI) * 0.06 * (1 - insightPop);
 
   return (
-    <>
+    <BeatContent phase={phase}>
       <MotionTerminal>
         <SyntaxGmaLine
           visibleLen={len}
@@ -340,10 +461,10 @@ function QueryBeat({ progress }: { progress: number }) {
         />
       </MotionTerminal>
       <pre
-        className="mt-2.5 overflow-hidden rounded-lg border border-white/[0.06] bg-black/30 px-2.5 py-2 font-mono text-[10px] leading-relaxed text-white/70 sm:text-[11px]"
+        className="mt-2 overflow-hidden rounded-lg border border-white/[0.06] bg-black/30 px-2.5 py-2 font-mono text-[10px] leading-relaxed text-white/70 sm:text-xs"
         style={{
           opacity: showJson ? 1 : 0,
-          maxHeight: showJson ? 80 : 0,
+          maxHeight: showJson ? 88 : 0,
           transition: `opacity 0.45s ${EASE}, max-height 0.5s ${EASE}`,
         }}
       >
@@ -370,16 +491,18 @@ function QueryBeat({ progress }: { progress: number }) {
       >
         MRR up 18% WoW
       </MotionChip>
-    </>
+    </BeatContent>
   );
 }
 
 function ChartBeat({
+  phase,
   progress,
   cycle,
   areaGradId,
   lineGradId,
 }: {
+  phase: BeatPhase;
   progress: number;
   cycle: number;
   areaGradId: string;
@@ -387,10 +510,13 @@ function ChartBeat({
 }) {
   const [copied, setCopied] = useState(false);
   const series = useMemo(() => buildMrrSeries(48), []);
-  const { linePath, areaPath, lastPoint, ticks } = useMemo(() => {
-    const w = 280;
-    const h = 100;
-    const pad = 8;
+  const isGhost = phase === "ghost";
+  const isComplete = phase === "complete";
+
+  const { linePath, areaPath, lastPoint, ticks, w, h, pad } = useMemo(() => {
+    const w = 400;
+    const h = 142;
+    const pad = 10;
     const min = Math.min(...series);
     const max = Math.max(...series);
     const points = series.map((v, i) => ({
@@ -406,15 +532,18 @@ function ChartBeat({
     const tickYs = [0.25, 0.5, 0.75].map(
       (t) => h - pad - t * (h - pad * 2),
     );
-    return { linePath, areaPath, lastPoint: last, ticks: tickYs };
+    return { linePath, areaPath, lastPoint: last, ticks: tickYs, w, h, pad };
   }, [series]);
 
-  const drawT = Math.min(1, Math.max(0, (progress - 0.05) / 0.55));
-  const showBadge = progress > 0.42;
-  const pulse = progress > 0.58 && progress < 0.78;
-  const showUrl = progress > 0.72;
+  const drawT =
+    isGhost || isComplete
+      ? 1
+      : Math.min(1, Math.max(0, (progress - 0.05) / 0.55));
+  const showBadge = isGhost || isComplete || progress > 0.42;
+  const pulse = !isGhost && progress > 0.58 && progress < 0.78;
+  const showUrl = isGhost || isComplete || progress > 0.72;
 
-  const pathLen = 520;
+  const pathLen = 860;
 
   async function copyUrl() {
     try {
@@ -427,15 +556,17 @@ function ChartBeat({
   }
 
   return (
-    <>
+    <BeatContent phase={phase}>
       <MotionRow label="Live chart">
-        <svg
-          key={`chart-${cycle}`}
-          viewBox="0 0 280 100"
-          className="h-[100px] w-full"
-          role="img"
-          aria-label="Stripe MRR chart rising 18 percent week over week"
-        >
+        <div className="relative w-full">
+          <svg
+            key={`chart-${cycle}`}
+            viewBox={`0 0 ${w} ${h}`}
+            className="h-[142px] w-full"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label="Stripe MRR chart rising 18 percent week over week"
+          >
           <defs>
             <linearGradient id={lineGradId} x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#8b5cf6" />
@@ -450,11 +581,11 @@ function ChartBeat({
           {ticks.map((y, i) => (
             <line
               key={i}
-              x1={8}
+              x1={pad}
               y1={y}
-              x2={272}
+              x2={w - pad}
               y2={y}
-              stroke="rgba(255,255,255,0.06)"
+              stroke="rgba(255,255,255,0.08)"
               strokeWidth={1}
             />
           ))}
@@ -470,60 +601,61 @@ function ChartBeat({
             d={linePath}
             fill="none"
             stroke={`url(#${lineGradId})`}
-            strokeWidth={2}
+            strokeWidth={2.25}
             strokeLinecap="round"
             strokeDasharray={pathLen}
             strokeDashoffset={pathLen * (1 - drawT)}
             style={{ transition: `stroke-dashoffset 0.05s linear` }}
           />
-          {drawT > 0.85 ? (
+          {drawT > 0.82 ? (
             <circle
               cx={lastPoint.x}
               cy={lastPoint.y}
-              r={pulse ? 5.5 : 3.5}
+              r={pulse ? 6.5 : 4}
               fill="#34d399"
               style={{
                 transition: `r 0.35s ${EASE}`,
                 filter: pulse
-                  ? "drop-shadow(0 0 8px rgba(52,211,153,0.75))"
-                  : undefined,
+                  ? "drop-shadow(0 0 10px rgba(52,211,153,0.85))"
+                  : "drop-shadow(0 0 4px rgba(52,211,153,0.45))",
               }}
             />
           ) : null}
-        </svg>
+          </svg>
+          <div
+            className="absolute right-1 top-1 rounded-md border border-white/10 bg-black/50 px-2 py-0.5 font-mono text-[10px] text-emerald-300/95 backdrop-blur-sm sm:text-[11px]"
+            style={{
+              opacity: showBadge ? 1 : 0,
+              transform: showBadge ? "translateY(0)" : "translateY(4px)",
+              transition: `opacity 0.45s ${EASE}, transform 0.45s ${EASE}`,
+            }}
+          >
+            $12.4k <span className="text-white/50">↑</span>18%
+          </div>
+        </div>
       </MotionRow>
       <div
-        className="mt-1 flex items-center justify-between gap-2"
-        style={{
-          opacity: showBadge ? 1 : 0,
-          transform: showBadge ? "translateY(0)" : "translateY(4px)",
-          transition: `opacity 0.45s ${EASE}, transform 0.45s ${EASE}`,
-        }}
+        className={`mt-2 flex w-full items-start gap-2 rounded-xl border border-white/10 bg-black/30 px-2.5 py-2 transition-opacity duration-500 ${showUrl ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        style={{ transitionTimingFunction: EASE }}
       >
-        <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[11px] text-emerald-300/95">
-          $12.4k <span className="text-white/50">↑</span>18%
+        <span className="min-w-0 flex-1 break-all font-mono text-[9px] leading-snug text-cyan-300/95 sm:text-[10px]">
+          {CHART_URL_DISPLAY}
         </span>
-      </div>
-      <MotionChip
-        show={showUrl}
-        className="mt-2 flex w-full flex-wrap items-center justify-between gap-2 border-white/10 bg-black/25 text-[10px] sm:text-[11px]"
-      >
-        <span className="truncate font-mono text-cyan-300/90">{CHART_URL_DISPLAY}</span>
         <button
           type="button"
           onClick={() => void copyUrl()}
-          className="shrink-0 rounded-md border border-white/15 bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-white/90 transition hover:bg-white/10"
+          className="shrink-0 rounded-md border border-white/15 bg-white/[0.08] px-2.5 py-1 text-[10px] font-medium text-white/95 transition hover:bg-white/12"
         >
           {copied ? "Copied" : "Copy"}
         </button>
-      </MotionChip>
-    </>
+      </div>
+    </BeatContent>
   );
 }
 
 function MotionTerminal({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-white/[0.07] bg-black/40 px-2.5 py-2 font-mono text-[10px] leading-relaxed sm:text-[11px]">
+    <div className="rounded-lg border border-white/[0.08] bg-black/45 px-2.5 py-2.5 font-mono text-[11px] leading-relaxed sm:text-[13px]">
       {children}
     </div>
   );
@@ -590,7 +722,7 @@ function MotionChip({
 
 function Caret() {
   return (
-    <span className="how-story-caret ml-0.5 inline-block h-3.5 w-px animate-pulse bg-cyan-400/80" />
+    <span className="how-story-caret ml-0.5 inline-block h-4 w-[2px] bg-cyan-300" />
   );
 }
 
@@ -609,62 +741,49 @@ export function HowItWorksStory() {
     <div
       id="how-it-works-story"
       ref={rootRef}
-      className="how-works-anim how-it-works-motion gradient-border mt-8 overflow-hidden rounded-2xl bg-[#07070c]/80 p-3 sm:p-4"
+      className="how-works-anim how-it-works-motion gradient-border relative mt-8 overflow-hidden rounded-2xl bg-[#07070c]/85 p-3 sm:p-4 lg:p-5"
       aria-live="off"
       data-playing={playing ? "true" : "false"}
       data-beat={beat}
     >
-      <div className="flex flex-col gap-0 lg:flex-row lg:items-stretch">
-        <StoryCard title="1 · Agent" beat={0} activeBeat={beat}>
-          <AgentBeat progress={beat === 0 ? beatProgress : beat > 0 ? 1 : 0} />
+      <div className="grid grid-cols-1 gap-y-0 lg:grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)_2rem_minmax(0,1fr)_2rem_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-0">
+        <StoryCard title="1 · Agent" phase={getBeatPhase(beat, 0)}>
+          <AgentBeat
+            phase={getBeatPhase(beat, 0)}
+            progress={beat === 0 ? beatProgress : 0}
+          />
         </StoryCard>
         <BeatConnector
           active={beat >= 1}
           cometOn={cometWindow(0)}
-          vertical={false}
           gradId={`${uid}-c0`}
         />
-        <BeatConnector
-          active={beat >= 1}
-          cometOn={cometWindow(0)}
-          vertical
-          gradId={`${uid}-c0v`}
-        />
-        <StoryCard title="2 · Memory" beat={1} activeBeat={beat}>
+        <StoryCard title="2 · Memory" phase={getBeatPhase(beat, 1)}>
           <MemoryBeat
-            progress={beat === 1 ? beatProgress : beat > 1 ? 1 : 0}
+            phase={getBeatPhase(beat, 1)}
+            progress={beat === 1 ? beatProgress : 0}
             cycle={cycle}
           />
         </StoryCard>
         <BeatConnector
           active={beat >= 2}
           cometOn={cometWindow(1)}
-          vertical={false}
           gradId={`${uid}-c1`}
         />
-        <BeatConnector
-          active={beat >= 2}
-          cometOn={cometWindow(1)}
-          vertical
-          gradId={`${uid}-c1v`}
-        />
-        <StoryCard title="3 · Query" beat={2} activeBeat={beat}>
-          <QueryBeat progress={beat === 2 ? beatProgress : beat > 2 ? 1 : 0} />
+        <StoryCard title="3 · Query" phase={getBeatPhase(beat, 2)}>
+          <QueryBeat
+            phase={getBeatPhase(beat, 2)}
+            progress={beat === 2 ? beatProgress : 0}
+          />
         </StoryCard>
         <BeatConnector
           active={beat >= 3}
           cometOn={cometWindow(2)}
-          vertical={false}
           gradId={`${uid}-c2`}
         />
-        <BeatConnector
-          active={beat >= 3}
-          cometOn={cometWindow(2)}
-          vertical
-          gradId={`${uid}-c2v`}
-        />
-        <StoryCard title="4 · Chart" beat={3} activeBeat={beat}>
+        <StoryCard title="4 · Chart" phase={getBeatPhase(beat, 3)}>
           <ChartBeat
+            phase={getBeatPhase(beat, 3)}
             progress={beat === 3 ? beatProgress : 0}
             cycle={cycle}
             areaGradId={areaGradId}

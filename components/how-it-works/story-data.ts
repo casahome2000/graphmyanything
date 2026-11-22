@@ -4,7 +4,12 @@ export function buildMrrSeries(count = 48): number[] {
   for (let i = 0; i < count; i++) {
     const trend = 8.2 + i * 0.22;
     const season = Math.sin(i / 5.5) * 0.35;
-    const noise = (Math.sin(i * 1.7) + Math.cos(i * 0.9)) * 0.18;
+    const noise =
+      (Math.sin(i * 2.31) +
+        Math.cos(i * 0.97) +
+        Math.sin(i * 4.2) * 0.55 +
+        Math.cos(i * 7.1) * 0.25) *
+      0.32;
     values.push(trend + season + noise);
   }
   return values;
