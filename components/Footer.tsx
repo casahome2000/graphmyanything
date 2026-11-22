@@ -36,6 +36,9 @@ export function Footer() {
           <Link href="/terms" className="hover:text-[#f4f4f7]">
             Terms
           </Link>
+          <Link href="/docs" className="hover:text-[#f4f4f7]">
+            Docs
+          </Link>
         </nav>
         <p className="text-xs text-[#8b8b9e]">
           © {COPYRIGHT_YEAR} GraphMyAnything

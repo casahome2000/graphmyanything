@@ -1,7 +1,13 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import type { AttributionPayload } from "@/lib/attribution";
 
 export const WAITLIST_SERVER_ERROR =
   "Something went wrong, please try again.";
+
+export type WaitlistSignupInput = {
+  email: string;
+  source?: string;
+} & Partial<AttributionPayload>;
 
 export type WaitlistResult =
   | { ok: true; stored: "supabase" | "log"; isNew: boolean }
@@ -29,11 +35,33 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
+function rowFromSignup(input: WaitlistSignupInput): Record<string, string> {
+  const normalized = input.email.trim().toLowerCase();
+  const row: Record<string, string> = {
+    email: normalized,
+    source: input.source ?? "landing",
+  };
+  const optional: (keyof AttributionPayload)[] = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_content",
+    "referrer",
+    "landing_path",
+  ];
+  for (const key of optional) {
+    const value = input[key];
+    if (typeof value === "string" && value.trim()) {
+      row[key] = value.trim().slice(0, 512);
+    }
+  }
+  return row;
+}
+
 export async function storeWaitlistEmail(
-  email: string,
-  source?: string,
+  input: WaitlistSignupInput,
 ): Promise<WaitlistResult> {
-  const normalized = email.trim().toLowerCase();
+  const normalized = input.email.trim().toLowerCase();
   if (!isValidEmail(normalized)) {
     return {
       ok: false,
@@ -54,17 +82,13 @@ export async function storeWaitlistEmail(
       };
     }
     console.info("[waitlist] log-only signup:", {
-      email: normalized,
-      source: source ?? "landing",
+      ...rowFromSignup({ ...input, email: normalized }),
       at: new Date().toISOString(),
     });
     return { ok: true, stored: "log", isNew: true };
   }
 
-  const { error } = await client.from("waitlist").insert({
-    email: normalized,
-    source: source ?? "landing",
-  });
+  const { error } = await client.from("waitlist").insert(rowFromSignup(input));
 
   if (error) {
     if (error.code === "23505") {

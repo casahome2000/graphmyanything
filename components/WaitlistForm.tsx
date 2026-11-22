@@ -1,9 +1,16 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { track } from "@vercel/analytics";
+import { attributionForApi, readAttributionFromSession } from "@/lib/attribution";
+import {
+  trackGrowthEvent,
+  trackWaitlistError,
+} from "@/lib/analytics/growth-events";
+import { PreorderButton } from "./PreorderButton";
 
 type Status = "idle" | "loading" | "success" | "error";
+
+const FORM_SOURCE = "landing-hero";
 
 export function WaitlistForm({ id }: { id?: string }) {
   const [email, setEmail] = useState("");
@@ -14,25 +21,45 @@ export function WaitlistForm({ id }: { id?: string }) {
     e.preventDefault();
     setStatus("loading");
     setMessage("");
+    const snap = readAttributionFromSession();
+    const body = attributionForApi(snap, FORM_SOURCE);
+
     try {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "landing-hero" }),
+        body: JSON.stringify({
+          email,
+          ...body,
+        }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        isNew?: boolean;
+      };
       if (!res.ok || !data.ok) {
         setStatus("error");
         setMessage(data.error ?? "Something went wrong.");
+        trackWaitlistError(data.error ?? `http_${res.status}`, {
+          source: FORM_SOURCE,
+        });
         return;
       }
-      track("waitlist_submit", { source: "landing-hero" });
+      if (data.isNew) {
+        trackGrowthEvent("waitlist_submit", { source: FORM_SOURCE });
+      }
       setStatus("success");
-      setMessage("You're on the list. We'll be in touch.");
+      setMessage(
+        data.isNew
+          ? "You're on the list. We'll be in touch."
+          : "You're already on the list — thanks for checking in.",
+      );
       setEmail("");
     } catch {
       setStatus("error");
       setMessage("Network error. Please try again.");
+      trackWaitlistError("network", { source: FORM_SOURCE });
     }
   }
 
@@ -73,6 +100,11 @@ export function WaitlistForm({ id }: { id?: string }) {
         >
           {message}
         </p>
+      ) : null}
+      {status === "success" ? (
+        <div className="mt-4">
+          <PreorderButton placement="waitlist-success" />
+        </div>
       ) : null}
     </div>
   );

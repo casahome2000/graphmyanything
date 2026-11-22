@@ -43,16 +43,17 @@ Vercel Web Analytics is enabled via `@vercel/analytics` in the root layout (auto
 
 ### Waitlist storage
 
-1. Run the migration in [`supabase/migrations/20251122000000_waitlist.sql`](supabase/migrations/20251122000000_waitlist.sql) on your Supabase project (SQL editor or CLI).
+1. Run migrations in [`supabase/migrations/`](supabase/migrations/) on your Supabase project (SQL editor or CLI), including attribution columns.
 2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in Vercel (or `.env.local` for dev).
-3. `POST /api/waitlist` accepts `{ "email": "...", "source"?: "..." }`.
+3. `POST /api/waitlist` accepts email, `source`, and optional UTM / referrer / `landing_path` fields.
 
 In **production** (`VERCEL_ENV=production`), the API requires working storage; otherwise it returns `500`. Local/preview may log signups without storage. New signups trigger a Resend confirmation when `RESEND_API_KEY` and `WAITLIST_FROM_EMAIL` are set; email failures do not fail the signup.
 
 ### Custom analytics events
 
-- `waitlist_submit` — successful waitlist signup (`track()` from `@vercel/analytics`)
-- `preorder_click` — founding member button click
+- `waitlist_submit` — new waitlist row persisted (not duplicate resubmits)
+- `waitlist_error` — signup failed (validation, network, or server)
+- `preorder_click` — founding member CTA (includes `placement`; 350ms flush before navigation)
 
 ## Vercel
 

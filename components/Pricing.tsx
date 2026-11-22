@@ -1,3 +1,5 @@
+import { PreorderButton } from "./PreorderButton";
+
 const tiers = [
   {
     name: "Free",
@@ -85,6 +87,17 @@ export function Pricing() {
               </ul>
             </div>
           ))}
+        </div>
+        <div className="mt-12 flex flex-col items-start gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-[#f4f4f7]">
+              Founding preorder
+            </p>
+            <p className="mt-1 text-sm text-[#8b8b9e]">
+              One-time $49, fully refundable until launch—lock in early pricing.
+            </p>
+          </div>
+          <PreorderButton placement="pricing" />
         </div>
       </div>
     </section>

@@ -1,30 +1,62 @@
 "use client";
 
-import { track } from "@vercel/analytics";
+import {
+  appendAttributionToPreorderUrl,
+  readAttributionFromSession,
+} from "@/lib/attribution";
+import { trackPreorderClick } from "@/lib/analytics/growth-events";
 
-export function PreorderButton() {
-  const url = process.env.NEXT_PUBLIC_PREORDER_URL;
-  const isReady = Boolean(url && url.length > 0);
+export type PreorderPlacement =
+  | "hero"
+  | "pricing"
+  | "waitlist-success";
+
+type PreorderButtonProps = {
+  placement: PreorderPlacement;
+  className?: string;
+};
+
+export function PreorderButton({ placement, className = "" }: PreorderButtonProps) {
+  const baseUrl = process.env.NEXT_PUBLIC_PREORDER_URL?.trim() ?? "";
+  const isReady = baseUrl.length > 0;
 
   function handleClick() {
-    track("preorder_click", { available: isReady });
-    if (!isReady) return;
-    window.open(url, "_blank", "noopener,noreferrer");
+    const navigate = () => {
+      if (!isReady) {
+        document.getElementById("waitlist")?.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+      const url = appendAttributionToPreorderUrl(
+        baseUrl,
+        readAttributionFromSession(),
+      );
+      window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    trackPreorderClick(
+      {
+        placement,
+        available: isReady,
+      },
+      navigate,
+    );
   }
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={!isReady}
-      className="group flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.03] px-5 text-sm font-medium text-[#f4f4f7] transition hover:border-white/[0.2] hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+      className={
+        className ||
+        "group flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/[0.12] bg-white/[0.03] px-5 text-sm font-medium text-[#f4f4f7] transition hover:border-white/[0.2] hover:bg-white/[0.06] sm:w-auto"
+      }
       aria-label={
         isReady
           ? "Founding member preorder for one-time $49"
-          : "Founding member preorder coming soon"
+          : "Founding member preorder — join waitlist until checkout is live"
       }
     >
-      <span className="text-[#8b8b9e] group-hover:text-[#f4f4f7] transition-colors">
+      <span className="text-[#8b8b9e] transition-colors group-hover:text-[#f4f4f7]">
         Founding member
       </span>
       <span className="text-violet-300">$49 once</span>
