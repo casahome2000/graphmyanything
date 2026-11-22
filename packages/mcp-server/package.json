@@ -1,15 +1,35 @@
 {
   "name": "graphmyanything-mcp",
   "version": "0.1.0",
-  "description": "Chart & metric memory for AI agents — one MCP call instead of throwaway Python",
+  "description": "Metric memory for AI agents: track, query, chart via MCP — one call vs throwaway Python",
+  "homepage": "https://graphmyanything.com",
   "license": "MIT",
   "type": "module",
+  "mcpName": "io.github.casahome2000/graphmyanything-mcp",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "metrics",
+    "charts",
+    "ai-agents",
+    "time-series"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casahome2000/graphmyanything.git",
+    "directory": "packages/mcp-server"
+  },
+  "bugs": {
+    "url": "https://github.com/casahome2000/graphmyanything/issues"
+  },
   "bin": {
     "graphmyanything-mcp": "./dist/index.js"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "server.json"
   ],
   "scripts": {
     "build": "tsc",

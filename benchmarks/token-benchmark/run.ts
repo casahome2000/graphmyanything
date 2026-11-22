@@ -167,27 +167,28 @@ function escapeXml(s: string): string {
 
 function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   const W = 1200;
-  const H = 1020;
+  const H = 920;
   const bg = "#06060a";
   const muted = "#8b8b9e";
   const fg = "#f4f4f7";
   const left = 300;
   const innerW = W - left - 48;
   const barH = 48;
-  const gap = 16;
-  const legendY = 88;
-  const panel1TitleY = 132;
-  let y = panel1TitleY + 28;
+  const gap = 14;
+  const legendY = 76;
+  const legendRowH = 36;
+  const panel1TitleY = legendY + legendRowH + 28;
+  let y = panel1TitleY + 26;
 
-  const maxVal = Math.max(...[...primary, ...secondary].map((b) => b.total), 10);
-  const maxLog = Math.log10(maxVal);
+  const maxPrimary = Math.max(...primary.map((b) => b.total), 10);
+  const maxSecondary = Math.max(...secondary.map((b) => b.total), 10);
 
-  function logW(value: number): number {
-    return (Math.log10(Math.max(1, value)) / maxLog) * innerW;
+  function linearW(value: number, panelMax: number): number {
+    return (value / panelMax) * innerW;
   }
 
-  function barBlock(bar: ChartBar, yPos: number): string {
-    const w = logW(bar.total);
+  function barBlock(bar: ChartBar, yPos: number, panelMax: number): string {
+    const w = linearW(bar.total, panelMax);
     const end = left + w;
     const labelInside = end > left + 90;
     const labelRight = end + 88 > W - 8;
@@ -229,7 +230,7 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
 
   const bars1: string[] = [];
   for (const bar of primary) {
-    bars1.push(barBlock(bar, y));
+    bars1.push(barBlock(bar, y, maxPrimary));
     y += barH + gap + (bar.callout ? 18 : 0);
   }
 
@@ -237,7 +238,7 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   y = panel2Y + 28;
   const bars2: string[] = [];
   for (const bar of secondary) {
-    bars2.push(barBlock(bar, y));
+    bars2.push(barBlock(bar, y, maxSecondary));
     y += barH + gap + (bar.callout ? 18 : 0);
   }
 
@@ -252,7 +253,8 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   <rect width="100%" height="100%" fill="${bg}" rx="16"/>
   <rect x="1" y="1" width="${W - 2}" height="${H - 2}" rx="15" fill="none" stroke="url(#title-grad)" stroke-opacity="0.35"/>
   <text x="24" y="40" fill="url(#title-grad)" font-family="system-ui,sans-serif" font-size="24" font-weight="700">End-to-end agent tokens · one chart question</text>
-  <text x="24" y="62" fill="${muted}" font-family="system-ui,sans-serif" font-size="12">o200k_base · excludes tool schemas (see results.md) · identical final answer step</text>
+  <text x="24" y="62" fill="${muted}" font-family="system-ui,sans-serif" font-size="12">o200k_base · linear scale · excl. tool defs · graphmyanything.com</text>
+  <rect x="20" y="${legendY - 14}" width="${W - 40}" height="${legendRowH}" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
   ${chips}
   <text x="24" y="${panel1TitleY}" fill="${fg}" font-size="15" font-weight="600" font-family="system-ui,sans-serif">Single question (90 points)</text>
   ${bars1.join("")}
@@ -282,73 +284,54 @@ const gmaDefTokens = countTokens(gmaToolDefsJson());
 const pyDefTokens = countTokens(PYTHON_HARNESS_TOOLS_JSON);
 const fileColdDefs = toolDefOverhead(fileCold, pyDefTokens);
 const gmaLeanDefs = toolDefOverhead(gmaLean, gmaDefTokens);
-const gmaCallout = `${pctDeltaLabel(fileCold.total, gmaLean.total)} excl. defs · +${formatNum(gmaLeanDefs.perTurn - gmaLean.total)} GMA defs×turns`;
-
-const primaryBars: ChartBar[] = [
-  {
-    id: "python_file_e2e_cold",
-    label: "Python file E2E · cold",
-    total: fileCold.total,
-    gradientId: "file_e2e",
-    callout: `${fileCold.turns} turns · +${formatNum(fileColdDefs.perTurn - fileCold.total)} w/ harness defs×turns`,
-  },
-  {
-    id: "python_file_e2e_warm",
-    label: "Python file E2E · warm (re-discovery)",
-    total: fileWarm.total,
-    gradientId: "file_e2e",
-    callout: `${fileWarm.turns} turns · ${fileWarm.toolCalls} tool calls`,
-  },
+const primaryBarsSocial: ChartBar[] = [
   {
     id: "python_inline_e2e_cold",
-    label: "Python inline JSON E2E · cold",
+    label: "Inline JSON E2E",
     total: inlineCold.total,
     gradientId: "inline_e2e",
-    callout: `${inlineCold.turns} turns · series in context`,
+  },
+  {
+    id: "python_file_e2e_cold",
+    label: "Python file E2E",
+    total: fileCold.total,
+    gradientId: "file_e2e",
   },
   {
     id: "gma_lean",
-    label: "GMA lean (auto pts + also_chart)",
+    label: "GMA lean",
     total: gmaLean.total,
     gradientId: "gma",
-    callout: gmaCallout,
-  },
-  {
-    id: "gma_full",
-    label: "GMA full query (pts=50)",
-    total: gmaFull.total,
-    gradientId: "gma",
-    callout: `query JSON ${payloads.fullQuery.length} chars`,
+    callout: `${pctDeltaLabel(fileCold.total, gmaLean.total)} vs file E2E`,
   },
   {
     id: "file_best",
-    label: "Best-case file Python (script turn only)",
+    label: "Best-case Python (lower bound)",
     total: bestCase.total,
     gradientId: "best",
     dashed: true,
-    callout: "Lower bound — omits discovery/env/retries",
   },
 ];
 
-const secondaryBars: ChartBar[] = [
-  {
-    id: "multi_file_warm",
-    label: "Python file E2E warm × 30",
-    total: fileWarm.total * SESSIONS,
-    gradientId: "file_e2e",
-  },
+const secondaryBarsSocial: ChartBar[] = [
   {
     id: "multi_inline_warm",
-    label: "Python inline E2E warm × 30",
+    label: "Inline E2E × 30",
     total: inlineWarm.total * SESSIONS,
     gradientId: "inline_e2e",
+  },
+  {
+    id: "multi_file_cold",
+    label: "Python file E2E × 30",
+    total: fileCold.total * SESSIONS,
+    gradientId: "file_e2e",
   },
   {
     id: "multi_gma",
     label: "GMA lean × 30",
     total: gmaLean.total * SESSIONS,
     gradientId: "gma",
-    callout: `${pctDeltaLabel(fileWarm.total * SESSIONS, gmaLean.total * SESSIONS)} vs file E2E warm`,
+    callout: `${pctDeltaLabel(fileCold.total * SESSIONS, gmaLean.total * SESSIONS)} vs file ×30`,
   },
 ];
 
@@ -503,7 +486,7 @@ From repo root: \`npm run benchmark:tokens\`
 `;
 
 const outDir = __dirname;
-const svg = renderChart(primaryBars, secondaryBars);
+const svg = renderChart(primaryBarsSocial, secondaryBarsSocial);
 fs.writeFileSync(path.join(outDir, "token-benchmark.svg"), svg, "utf8");
 fs.writeFileSync(path.join(outDir, "results.md"), md, "utf8");
 await sharp(Buffer.from(svg)).resize(2400).png().toFile(path.join(outDir, "token-benchmark.png"));
