@@ -14,6 +14,26 @@ export const EMAIL_BRAND = {
 export const DEFAULT_SITE_URL = "https://graphmyanything.com";
 
 export const WAITLIST_CHART_IMAGE_PATH = "/email/waitlist-sparkline.png";
+export const EMAIL_ICON_TRACK = "/email/icon-track.png";
+export const EMAIL_ICON_QUERY = "/email/icon-query.png";
+export const EMAIL_ICON_CHART = "/email/icon-chart.png";
+
+export type EmailAssetUrls = {
+  chart: string;
+  iconTrack: string;
+  iconQuery: string;
+  iconChart: string;
+};
+
+export function productionEmailAssetUrls(): EmailAssetUrls {
+  const base = siteUrl();
+  return {
+    chart: `${base}${WAITLIST_CHART_IMAGE_PATH}`,
+    iconTrack: `${base}${EMAIL_ICON_TRACK}`,
+    iconQuery: `${base}${EMAIL_ICON_QUERY}`,
+    iconChart: `${base}${EMAIL_ICON_CHART}`,
+  };
+}
 
 export function siteUrl(): string {
   const fromEnv =
@@ -26,5 +46,5 @@ export function siteUrl(): string {
 }
 
 export function waitlistChartImageUrl(): string {
-  return `${siteUrl()}${WAITLIST_CHART_IMAGE_PATH}`;
+  return productionEmailAssetUrls().chart;
 }

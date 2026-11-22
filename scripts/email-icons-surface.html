@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  body { margin: 0; background: transparent; }
+  .tile {
+    width: 256px;
+    height: 256px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0c0c12;
+    border-radius: 32px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 52px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 48px var(--glow);
+  }
+  .track { --glow: rgba(139,92,246,0.35); border-top: 6px solid #8b5cf6; }
+  .track span.gma { color: #a78bfa; }
+  .track span.fn { color: #22d3ee; }
+  .query { --glow: rgba(34,211,238,0.35); border-top: 6px solid #22d3ee; }
+  .query span.gma { color: #a78bfa; }
+  .query span.fn { color: #22d3ee; }
+  .chart { --glow: rgba(52,211,153,0.35); border-top: 6px solid #34d399; }
+  .chart span.gma { color: #a78bfa; }
+  .chart span.fn { color: #34d399; }
+  span.paren { color: rgba(255,255,255,0.35); font-weight: 400; }
+</style>
+</head>
+<body>
+<div id="track" class="tile track"><span class="gma">gma</span><span class="paren">.</span><span class="fn">track</span><span class="paren">()</span></div>
+<div id="query" class="tile query" style="display:none"><span class="gma">gma</span><span class="paren">.</span><span class="fn">query</span><span class="paren">()</span></div>
+<div id="chart" class="tile chart" style="display:none"><span class="gma">gma</span><span class="paren">.</span><span class="fn">chart</span><span class="paren">()</span></div>
+</body>
+</html>

@@ -37,7 +37,7 @@ export function renderEmailLayout(options: EmailLayoutOptions): string {
 
   const header = `
     <tr>
-      <td align="center" style="padding:36px 32px 12px;">
+      <td align="center" style="padding:28px 32px 12px;background:radial-gradient(ellipse 70% 120% at 50% 0%, rgba(139,92,246,0.22) 0%, rgba(34,211,238,0.08) 45%, transparent 70%);">
         <a href="${home}" style="text-decoration:none;">
           <span style="font-family:${FONT_STACK};font-size:22px;font-weight:700;letter-spacing:-0.03em;color:${EMAIL_BRAND.text};">Graph</span><!--[if mso]><span style="color:#8b5cf6;">MyAnything</span><![endif]-->
           <!--[if !mso]><!-->
@@ -93,6 +93,17 @@ export function renderEmailLayout(options: EmailLayoutOptions): string {
     <tr>
       <td align="center" style="padding:24px 16px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="email-card" style="max-width:600px;width:100%;background-color:${EMAIL_BRAND.surface};border:1px solid ${EMAIL_BRAND.border};border-radius:16px;overflow:hidden;">
+          <tr>
+            <td style="padding:0;height:4px;line-height:4px;font-size:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="33%" height="4" style="height:4px;background:${EMAIL_BRAND.violet};font-size:0;line-height:0;">&nbsp;</td>
+                  <td width="34%" height="4" style="height:4px;background:${EMAIL_BRAND.cyan};font-size:0;line-height:0;">&nbsp;</td>
+                  <td width="33%" height="4" style="height:4px;background:${EMAIL_BRAND.emerald};font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
           ${header}
           ${options.bodyRows}
           ${footer}
