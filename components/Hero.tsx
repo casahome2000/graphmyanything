@@ -1,6 +1,9 @@
 import { WaitlistForm } from "./WaitlistForm";
 import { PreorderButton } from "./PreorderButton";
 import { MetricChartVisual } from "./MetricChartVisual";
+import { tokenReductionPercent } from "@/lib/pricing/llm-token-pricing";
+
+const TOKEN_REDUCTION_PCT = tokenReductionPercent();
 
 export function Hero() {
   return (
@@ -23,7 +26,15 @@ export function Hero() {
               The place agents keep their{" "}
               <span className="gradient-text">numbers</span>.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#8b8b9e] sm:text-xl">
+            <p className="mt-5 max-w-2xl text-sm font-medium text-cyan-300/90">
+              ~{TOKEN_REDUCTION_PCT}% fewer tokens per chart vs throwaway
+              Python
+              <span className="font-normal text-[#8b8b9e]">
+                {" "}
+                · estimate, benchmark pending
+              </span>
+            </p>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[#8b8b9e] sm:text-xl">
               One call instead of throwaway Python—and your data gets smarter.
               Each metric lives in its own namespace with short-term memory
               (recent readings) and long-term memory (years of history). Agents

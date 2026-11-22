@@ -54,23 +54,25 @@ export const LLM_MODELS: LlmModelPricing[] = [
   },
   {
     provider: "Google",
-    modelId: "gemini-2.5-pro",
-    label: "Gemini 2.5 Pro",
+    modelId: "gemini-4-carbon",
+    label: "Gemini 4 Carbon",
     tier: "flagship",
-    inputPerMillion: 1.25,
+    inputPerMillion: 2.0,
     outputPerMillion: 10.0,
     sourceUrl: "https://ai.google.dev/gemini-api/docs/pricing",
-    notes: "Paid tier, prompts ≤200k tokens. Model deprecated in AI Studio; pricing still published.",
+    notes:
+      "Paid standard tier. List price $2/$10 per 1M tokens through Nov 30, 2026 on Google's pricing page.",
   },
   {
     provider: "Google",
-    modelId: "gemini-2.5-flash",
-    label: "Gemini 2.5 Flash",
+    modelId: "gemini-3.8-flash",
+    label: "Gemini 3.8 Flash",
     tier: "economy",
-    inputPerMillion: 0.3,
-    outputPerMillion: 2.5,
+    inputPerMillion: 0.75,
+    outputPerMillion: 3.75,
     sourceUrl: "https://ai.google.dev/gemini-api/docs/pricing",
-    notes: "Text/image/video input rate; deprecated in AI Studio; pricing still published.",
+    notes:
+      "Paid standard tier. List price $0.75/$3.75 per 1M tokens through Dec 31, 2026 on Google's pricing page.",
   },
 ];
 
@@ -93,6 +95,13 @@ export const TOKEN_ASSUMPTIONS = {
   defaultCallsPerSession: 20,
   defaultSessionsPerMonth: 22,
 } as const;
+
+/** Rounded % fewer tokens vs throwaway Python (estimate). */
+export function tokenReductionPercent(): number {
+  const py = TOKEN_ASSUMPTIONS.throwawayPython.totalTokens;
+  const gma = TOKEN_ASSUMPTIONS.graphMyAnything.totalTokens;
+  return Math.round((1 - gma / py) * 100);
+}
 
 export const PRICING_SOURCES = [
   {

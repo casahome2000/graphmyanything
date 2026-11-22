@@ -6,6 +6,7 @@ import {
   PRICING_CHECKED_AT,
   PRICING_SOURCES,
   TOKEN_ASSUMPTIONS,
+  tokenReductionPercent,
 } from "@/lib/pricing/llm-token-pricing";
 import {
   formatUsd,
@@ -15,6 +16,7 @@ import {
 
 const FLAGSHIP_BY_PROVIDER = LLM_MODELS.filter((m) => m.tier === "flagship");
 const ECONOMY_BY_PROVIDER = LLM_MODELS.filter((m) => m.tier === "economy");
+const TOKEN_REDUCTION_PCT = tokenReductionPercent();
 
 export function TokenComparison() {
   const [callsPerSession, setCallsPerSession] = useState<number>(
@@ -47,56 +49,60 @@ export function TokenComparison() {
   return (
     <section id="savings" className="scroll-mt-20 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Token cost—and real dollars saved
-        </h2>
-        <p className="mt-2 max-w-3xl text-sm text-[#8b8b9e]">
-          Token counts are{" "}
-          <span className="text-[#f4f4f7]">estimates</span> until our published
-          benchmark. Dollar math uses each provider&apos;s{" "}
-          <span className="text-[#f4f4f7]">official list prices</span>{" "}
-          (checked {PRICING_CHECKED_AT}).
-        </p>
+        <div className="gradient-border overflow-hidden rounded-3xl p-8 sm:p-10 lg:p-12">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/90">
+            Token efficiency estimate
+          </p>
+          <p className="mt-4 font-mono text-5xl font-bold tracking-tight text-[#f4f4f7] sm:text-6xl md:text-7xl">
+            <span className="gradient-text">{TOKEN_REDUCTION_PCT}%</span>
+            <span className="block text-3xl font-semibold text-[#f4f4f7] sm:mt-2 sm:text-4xl md:text-5xl">
+              fewer tokens per chart
+            </span>
+          </p>
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-[#8b8b9e] sm:text-base">
+            {TOKEN_ASSUMPTIONS.throwawayPython.totalTokens.toLocaleString()}{" "}
+            estimated tokens with throwaway Python vs{" "}
+            {TOKEN_ASSUMPTIONS.graphMyAnything.totalTokens} with one{" "}
+            <span className="font-mono text-cyan-300/90">query</span> call.
+            Published benchmark pending.
+          </p>
 
-        <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/[0.06] p-6">
-            <h3 className="text-sm font-medium text-rose-200">
-              {TOKEN_ASSUMPTIONS.throwawayPython.label}
-            </h3>
-            <p className="mt-3 font-mono text-3xl font-semibold text-rose-300">
-              {TOKEN_ASSUMPTIONS.throwawayPython.totalTokens.toLocaleString()}
-            </p>
-            <p className="mt-1 text-sm text-[#8b8b9e]">
-              tokens/chart ({pyIn.toLocaleString()} in ·{" "}
-              {pyOut.toLocaleString()} out)
-            </p>
-          </div>
-          <div className="gradient-border rounded-2xl p-6">
-            <h3 className="text-sm font-medium text-emerald-200">
-              {TOKEN_ASSUMPTIONS.graphMyAnything.label}
-            </h3>
-            <p className="mt-3 font-mono text-3xl font-semibold gradient-text">
-              {TOKEN_ASSUMPTIONS.graphMyAnything.totalTokens}
-            </p>
-            <p className="mt-1 text-sm text-[#8b8b9e]">
-              tokens/chart ({gmaIn} in · {gmaOut} out)
-            </p>
+          <div className="mt-8 grid gap-3 border-t border-white/[0.08] pt-8 sm:grid-cols-2">
+            <TokenStatCard
+              tone="rose"
+              label={TOKEN_ASSUMPTIONS.throwawayPython.label}
+              total={TOKEN_ASSUMPTIONS.throwawayPython.totalTokens}
+              detail={`${pyIn.toLocaleString()} in · ${pyOut.toLocaleString()} out`}
+            />
+            <TokenStatCard
+              tone="emerald"
+              label={TOKEN_ASSUMPTIONS.graphMyAnything.label}
+              total={TOKEN_ASSUMPTIONS.graphMyAnything.totalTokens}
+              detail={`${gmaIn} in · ${gmaOut} out`}
+            />
           </div>
         </div>
 
-        <div className="glass mt-8 rounded-2xl p-6">
-          <h3 className="text-sm font-semibold text-[#f4f4f7]">
-            Cost per chart (API list price)
+        <div className="mt-10">
+          <h3 className="text-lg font-semibold text-[#f4f4f7]">
+            What that saves in API spend
           </h3>
-          <div className="mt-4 overflow-x-auto">
+          <p className="mt-2 text-sm text-[#8b8b9e]">
+            Dollar figures use official list prices (checked {PRICING_CHECKED_AT}
+            ). Same token assumptions as above.
+          </p>
+        </div>
+
+        <div className="glass mt-6 rounded-2xl p-6">
+          <div className="mt-1 overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead>
                 <tr className="border-b border-white/[0.08] text-xs text-[#8b8b9e]">
                   <th className="pb-3 pr-4 font-medium">Model</th>
                   <th className="pb-3 pr-4 font-medium">Throwaway</th>
                   <th className="pb-3 pr-4 font-medium">GMA query</th>
-                  <th className="pb-3 pr-4 font-medium">Saved</th>
-                  <th className="pb-3 font-medium">%</th>
+                  <th className="pb-3 pr-4 font-medium">$ saved</th>
+                  <th className="pb-3 font-medium">$ off</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,9 +137,11 @@ export function TokenComparison() {
         </div>
 
         <div className="gradient-border mt-8 rounded-2xl p-6 sm:p-8">
-          <h3 className="text-lg font-semibold">Session & month estimate</h3>
+          <h3 className="text-base font-semibold text-[#f4f4f7]">
+            Session & month (dollars)
+          </h3>
           <p className="mt-1 text-sm text-[#8b8b9e]">
-            Adjust how many chart queries your agent runs per session.
+            Chart calls per session × sessions per month, at list price.
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
             <label className="block">
@@ -165,7 +173,7 @@ export function TokenComparison() {
             </label>
             <label className="block">
               <span className="text-sm text-[#8b8b9e]">
-                Sessions per month (optional)
+                Sessions per month
               </span>
               <input
                 type="number"
@@ -197,12 +205,15 @@ export function TokenComparison() {
                   <p className="text-xs font-medium text-violet-300">
                     {flagship.provider}
                   </p>
-                  <p className="mt-2 text-sm text-[#8b8b9e]">
-                    {flagship.label} flagship
+                  <p className="mt-2 text-xs text-[#8b8b9e]">
+                    {flagship.label} · flagship
                   </p>
-                  <p className="font-mono text-xl text-[#f4f4f7]">
+                  <p className="font-mono text-lg text-[#f4f4f7]">
                     {formatUsd(f.session.perMonth, 2)}
-                    <span className="text-sm text-emerald-400"> saved/mo</span>
+                    <span className="text-sm font-normal text-emerald-400">
+                      {" "}
+                      /mo
+                    </span>
                   </p>
                   {e && economy ? (
                     <p className="mt-2 text-xs text-[#8b8b9e]">
@@ -212,8 +223,8 @@ export function TokenComparison() {
                       </span>
                     </p>
                   ) : null}
-                  <p className="mt-2 text-xs text-[#8b8b9e]">
-                    {formatUsd(f.session.perSession, 3)} saved / session
+                  <p className="mt-2 text-[11px] text-[#8b8b9e]">
+                    {formatUsd(f.session.perSession, 3)} per session
                   </p>
                 </div>
               );
@@ -222,7 +233,7 @@ export function TokenComparison() {
         </div>
 
         <p className="mt-6 text-xs leading-relaxed text-[#8b8b9e]">
-          Assumptions: {TOKEN_ASSUMPTIONS.throwawayPython.note}{" "}
+          {TOKEN_ASSUMPTIONS.throwawayPython.note}{" "}
           {TOKEN_ASSUMPTIONS.graphMyAnything.note} Prices from{" "}
           {PRICING_SOURCES.map((s, i) => (
             <span key={s.url}>
@@ -235,10 +246,45 @@ export function TokenComparison() {
               </a>
             </span>
           ))}{" "}
-          (checked {PRICING_CHECKED_AT}). Gemini 2.5 Pro/Flash pricing remains on
-          Google&apos;s page with deprecation notices.
+          (checked {PRICING_CHECKED_AT}). Google: Gemini 4 Carbon and Gemini 3.8
+          Flash per current Gemini API pricing (2.5 Pro/Flash deprecated on that
+          page).
         </p>
       </div>
     </section>
+  );
+}
+
+function TokenStatCard({
+  tone,
+  label,
+  total,
+  detail,
+}: {
+  tone: "rose" | "emerald";
+  label: string;
+  total: number;
+  detail: string;
+}) {
+  const box =
+    tone === "rose"
+      ? "border-rose-500/15 bg-rose-500/[0.05]"
+      : "border-emerald-500/15 bg-emerald-500/[0.05]";
+  const valueClass =
+    tone === "rose"
+      ? "text-rose-300/90 text-xl font-mono font-semibold"
+      : "text-xl font-mono font-semibold gradient-text";
+
+  return (
+    <div className={`rounded-xl border px-4 py-3 ${box}`}>
+      <p className="text-xs text-[#8b8b9e]">{label}</p>
+      <p className={`mt-1 ${valueClass}`}>
+        {typeof total === "number" && total > 999
+          ? total.toLocaleString()
+          : total}{" "}
+        <span className="text-sm font-normal text-[#8b8b9e]">tokens</span>
+      </p>
+      <p className="mt-1 text-[11px] text-[#8b8b9e]">{detail}</p>
+    </div>
   );
 }
