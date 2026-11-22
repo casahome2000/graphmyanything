@@ -1,4 +1,5 @@
 import { ASSUMPTIONS, type E2EFlow, type FlowStep } from "./e2e-assumptions.js";
+import type { GmaPayloadSet } from "./gma-payloads.js";
 
 const Q = ASSUMPTIONS.userQuestion;
 
@@ -20,274 +21,341 @@ out = Path("/tmp/mrr_90d.png")
 fig.savefig(out, dpi=120, bbox_inches="tight")
 print("min", min(ys), "max", max(ys), "mean", round(sum(ys)/len(ys), 2))
 print("pct_change", round((ys[-1]-ys[0])/ys[0]*100, 2))
-print("saved", out)
-# noqa: E402 — quick one-off chart for operator review`;
+print("saved", out)`;
 
-function searchForDataSource(): FlowStep {
+function searchTurnA(): FlowStep {
   return {
-    name: "Search / API hunt",
-    description: "codebase_search + rg before knowing export path",
+    name: "Plan + search tools",
+    description: "Model emits codebase_search and rg calls",
     toolCalls: 2,
-    inputText: [
-      `User: ${Q}`,
-      'Tool codebase_search "stripe MRR export path":',
-      '{"matches":[{"path":"docs/billing.md","snippet":"nightly job writes stripe_mrr_daily.json"},{"path":"cron/etl_stripe.py","snippet":"OUT=/data/exports"}]}',
-      'Tool rg "mrr" /data:',
-      "Found references to /data/exports/stripe_mrr_daily.json",
+    contextInput: `User: ${Q}`,
+    modelOutput: [
+      "I'll find where nightly Stripe MRR lands before plotting.",
+      'tool_call codebase_search query="stripe MRR export path"',
+      'tool_call rg pattern="mrr" path="/data"',
     ].join("\n"),
-    outputText: [
-      "Billing docs point to /data/exports/stripe_mrr_daily.json from nightly ETL.",
-      "I'll verify the file exists and preview schema before writing matplotlib code.",
-    ].join(" "),
   };
 }
 
-function discoveryListDir(): FlowStep {
+function searchTurnB(): FlowStep {
   return {
-    name: "Locate data source",
-    description: "list_dir + glob for exports/*.json",
+    name: "Search results",
+    description: "Tool results return to context",
+    toolCalls: 0,
+    contextInput: [
+      "tool_result codebase_search:",
+      '{"matches":[{"path":"docs/billing.md","snippet":"writes stripe_mrr_daily.json"},{"path":"cron/etl_stripe.py","snippet":"OUT=/data/exports"}]}',
+      "tool_result rg:",
+      "/data/exports/stripe_mrr_daily.json",
+    ].join("\n"),
+    modelOutput:
+      "Export likely at /data/exports/stripe_mrr_daily.json — listing directory next.",
+  };
+}
+
+function listDirTurnA(): FlowStep {
+  return {
+    name: "list_dir + glob",
+    description: "Model calls filesystem tools",
     toolCalls: 2,
-    inputText: [
-      `User: ${Q}`,
-      "Tool list_dir /data/exports:",
-      '{"files":["stripe_mrr_daily.json","customers.csv","README.txt"],"dirs":[]}',
-      "Tool glob **/mrr*.json:",
+    contextInput: "Prior: export path hypothesis from search.",
+    modelOutput: [
+      'tool_call list_dir path="/data/exports"',
+      'tool_call glob pattern="**/mrr*.json"',
+    ].join("\n"),
+  };
+}
+
+function listDirTurnB(): FlowStep {
+  return {
+    name: "Listing results",
+    description: "Directory listings in context",
+    toolCalls: 0,
+    contextInput: [
+      'tool_result list_dir:',
+      '{"files":["stripe_mrr_daily.json","customers.csv","README.txt"]}',
+      "tool_result glob:",
       '["/data/exports/stripe_mrr_daily.json"]',
     ].join("\n"),
-    outputText: [
-      "Found stripe_mrr_daily.json under /data/exports. I'll inspect schema before plotting.",
-    ].join("\n"),
+    modelOutput: 'tool_call read_file path="/data/exports/stripe_mrr_daily.json" limit=3',
   };
 }
 
-function discoveryReadHead(inlinePreview?: string): FlowStep {
+function readHeadTurn(): FlowStep {
   return {
-    name: "Schema / head preview",
-    description: "read first 3 JSON rows (not full series in chat for file path)",
-    toolCalls: 1,
-    inputText: [
-      "Tool read_file /data/exports/stripe_mrr_daily.json limit=3:",
-      inlinePreview ??
-        '[{"ts":1730000000,"value":65000},{"ts":1730086400,"value":65095},{"ts":1730172800,"value":65190}]',
-      `(... ${ASSUMPTIONS.pointCount} total rows on disk)`,
-    ].join("\n"),
-    outputText:
-      "Schema is ts + value daily points. I'll use matplotlib reading full file locally.",
-  };
-}
-
-function writeScript(): FlowStep {
-  return {
-    name: "Write matplotlib script",
-    description: "~30 lines, read file on disk, save PNG",
+    name: "Schema preview",
+    description: "Head rows tool result in context",
     toolCalls: 0,
-    inputText: "User wants chart + trend summary.",
-    outputText: [
-      "I'll write a self-contained script that reads the export from disk and saves a PNG.",
+    contextInput: [
+      "tool_result read_file limit=3:",
+      '[{"ts":1730000000,"value":65000},{"ts":1730086400,"value":65095},{"ts":1730172800,"value":65190}]',
+      `(... ${ASSUMPTIONS.pointCount} rows on disk, not loaded)`,
+    ].join("\n"),
+    modelOutput: [
+      "Schema is ts + value. Writing matplotlib that reads full file locally.",
       "```python",
       MATPLOTLIB_SCRIPT,
       "```",
-      "Run locally after matplotlib is available.",
     ].join("\n"),
   };
 }
 
-function envSetup(cold: boolean): FlowStep {
+function pipColdTurnA(): FlowStep {
   return {
-    name: "Environment setup",
-    description: cold
-      ? "pip install matplotlib + venv check"
-      : "pip show matplotlib only (venv assumed)",
-    toolCalls: cold ? 2 : 1,
-    inputText: cold
-      ? [
-          "Tool run: python -c \"import matplotlib\"",
-          "stderr: ModuleNotFoundError: No module named 'matplotlib'",
-          "Tool run: pip install matplotlib",
-          "stdout: Successfully installed matplotlib-3.9.2",
-        ].join("\n")
-      : [
-          "Tool run: pip show matplotlib",
-          "stdout: Name: matplotlib Version: 3.9.2",
-        ].join("\n"),
-    outputText: cold
-      ? "Installed matplotlib in the sandbox venv."
-      : "matplotlib already present.",
-  };
-}
-
-function runScript(success: boolean): FlowStep {
-  return {
-    name: success ? "Execute script" : "Execute script (failed)",
-    description: success ? "python chart script" : "stderr then fix",
+    name: "pip / import check",
+    description: "Model runs env tools",
     toolCalls: 1,
-    inputText: success
-      ? [
-          "Tool run: python /tmp/plot_mrr.py",
-          "stdout:",
-          "min 65000 max 73550 mean 69275",
-          "pct_change 13.15",
-          "saved /tmp/mrr_90d.png",
-        ].join("\n")
-      : [
-          "Tool run: python /tmp/plot_mrr.py",
-          "stderr: FileNotFoundError: /data/exports/stripe_mrr_daily.json",
-        ].join("\n"),
-    outputText: success
-      ? [
-          "MRR trend is up ~13% over the window (pct_change in stdout).",
-          "Latest daily MRR is above the start of the 90d window.",
-          "Chart saved at /tmp/mrr_90d.png — open locally; not embedding binary in chat.",
-        ].join(" ")
-      : "Fixing DATA path (typo vs. actual export location) and re-running script.",
+    contextInput: "Script saved to /tmp/plot_mrr.py",
+    modelOutput: 'tool_call run cmd="python -c \\"import matplotlib\\""',
   };
 }
 
-function fixRetry(): FlowStep {
+function pipColdTurnB(): FlowStep {
   return {
-    name: "Error fix + re-run",
-    description: `Assumed in ${ASSUMPTIONS.errorRetryRate * 100}% of cold/warm flows`,
-    toolCalls: 2,
-    inputText: [
-      "Tool run: python /tmp/plot_mrr.py",
-      "stdout: min 65000 max 73550 mean 69275 pct_change 13.15 saved /tmp/mrr_90d.png",
-    ].join("\n"),
-    outputText: [
-      "Corrected DATA path. Re-run succeeded; trend up 13.15%.",
-    ].join("\n"),
-  };
-}
-
-function warmRedisovery(): FlowStep {
-  return {
-    name: "Re-discovery (no script memory)",
-    description: "Agent re-lists workspace; does not recall prior script path",
-    toolCalls: 2,
-    inputText: [
-      `User: ${Q}`,
-      "Tool list_dir /tmp:",
-      '{"files":["session.log"],"dirs":[]}',
-      "Tool grep -r plot_mrr workspace:",
-      "No matches (prior script not in persistent workspace).",
-      "Tool list_dir /data/exports:",
-      '{"files":["stripe_mrr_daily.json"]}',
-    ].join("\n"),
-    outputText:
-      "No remembered script from last session. Re-located stripe_mrr_daily.json export.",
-  };
-}
-
-function inlineDiscovery(dataJson: string): FlowStep {
-  return {
-    name: "Locate + attach data",
-    description: "User upload / search + paste series into prompt",
+    name: "pip install results",
+    description: "stderr/stdout from tools in context",
     toolCalls: 1,
-    inputText: [
-      `User: ${Q}`,
-      "Tool search_drive query=MRR export:",
-      '{"path":"downloads/stripe_mrr_90d.json"}',
-      `Attached file contents (${ASSUMPTIONS.pointCount} rows):`,
-      dataJson,
+    contextInput: [
+      "tool_result run:",
+      "ModuleNotFoundError: No module named 'matplotlib'",
+      "tool_result pip install matplotlib:",
+      "Successfully installed matplotlib-3.9.2",
     ].join("\n"),
-    outputText: "Loaded Stripe MRR export into context for analysis.",
+    modelOutput: 'tool_call run cmd="python /tmp/plot_mrr.py"',
   };
 }
 
-function gmaQueryOutput(): string {
-  return JSON.stringify({
-    metric: "stripe.mrr",
-    range: "90d",
-    summary: {
-      latest: 73550,
-      min: 65000,
-      max: 73550,
-      mean: 69275,
-      trend: "up",
-      pct_change: 13.15,
-      count: 90,
-    },
-    series: Array.from({ length: 50 }, (_, i) => ({
-      ts: 1730000000 + i * 172800,
-      value: 65000 + i * 170,
-    })),
-  });
+function pipWarmTurn(): FlowStep {
+  return {
+    name: "pip show",
+    description: "Warm: matplotlib already present",
+    toolCalls: 1,
+    contextInput: "tool_result pip show matplotlib: Version 3.9.2",
+    modelOutput: 'tool_call run cmd="python /tmp/plot_mrr.py"',
+  };
 }
 
-function gmaInsightOutput(): string {
-  return JSON.stringify({
-    trend: "Upward trend over 90d: latest 73550, 13.15% vs start.",
-    anomalies: [],
-    forecast: { next_values: [73680, 73810, 73940] },
-  });
+function runSuccessTurn(): FlowStep {
+  return {
+    name: "Run stdout + answer",
+    description: "stdout tool result + model summary",
+    toolCalls: 0,
+    contextInput: [
+      "tool_result run:",
+      "min 65000 max 73550 mean 69275",
+      "pct_change 13.15",
+      "saved /tmp/mrr_90d.png",
+    ].join("\n"),
+    modelOutput:
+      "MRR trend up 13.15% over 90d. Chart at /tmp/mrr_90d.png (not inlining image).",
+  };
 }
 
-function buildGmaFlow(includeInsight: boolean): E2EFlow {
+function runFailTurn(): FlowStep {
+  return {
+    name: "Run failure (stderr)",
+    description: `${ASSUMPTIONS.errorRetryRate * 100}% weighted`,
+    toolCalls: 0,
+    contextInput:
+      "tool_result run stderr: FileNotFoundError: /data/exports/stripe_mrr_daily.json",
+    modelOutput: "Patching DATA path in script and re-running.",
+    weight: ASSUMPTIONS.errorRetryRate,
+  };
+}
+
+function fixRetryTurn(): FlowStep {
+  return {
+    name: "Fix + re-run stdout",
+    description: "Weighted retry path",
+    toolCalls: 1,
+    contextInput:
+      "tool_result run: min 65000 max 73550 pct_change 13.15 saved /tmp/mrr_90d.png",
+    modelOutput: "Fixed path; trend up 13.15%.",
+    weight: ASSUMPTIONS.errorRetryRate,
+  };
+}
+
+function warmRediscoveryTurnA(): FlowStep {
+  return {
+    name: "Re-discovery tools",
+    description: "No script memory from prior session",
+    toolCalls: 2,
+    contextInput: `User: ${Q}`,
+    modelOutput: [
+      'tool_call list_dir path="/tmp"',
+      'tool_call grep pattern="plot_mrr"',
+    ].join("\n"),
+  };
+}
+
+function warmRediscoveryTurnB(): FlowStep {
+  return {
+    name: "Re-discovery results",
+    description: "Prior script not found",
+    toolCalls: 1,
+    contextInput: [
+      'tool_result list_dir /tmp: {"files":["session.log"]}',
+      "tool_result grep: no matches",
+      'tool_result list_dir /data/exports: {"files":["stripe_mrr_daily.json"]}',
+    ].join("\n"),
+    modelOutput:
+      "Re-located export; rewriting matplotlib script for this session.",
+  };
+}
+
+function warmRewriteScriptTurn(): FlowStep {
+  return {
+    name: "Rewrite script",
+    description: "Model emits script again",
+    toolCalls: 0,
+    contextInput: "Head preview not cached in agent memory.",
+    modelOutput: ["```python", MATPLOTLIB_SCRIPT, "```"].join("\n"),
+  };
+}
+
+function inlineAttachTurn(dataJson: string, warm: boolean): FlowStep {
+  return {
+    name: warm ? "Re-attach series" : "Search + attach JSON",
+    description: "Full series enters context (input)",
+    toolCalls: warm ? 1 : 1,
+    contextInput: warm
+      ? [`User: ${Q}`, "tool_result read_file:", dataJson].join("\n")
+      : [
+          `User: ${Q}`,
+          "tool_result search_drive:",
+          '{"path":"downloads/stripe_mrr_90d.json"}',
+          `tool_result read_file (${ASSUMPTIONS.pointCount} rows):`,
+          dataJson,
+        ].join("\n"),
+    modelOutput: warm
+      ? "Re-loaded full MRR JSON into context."
+      : "Pulled export into context for matplotlib.",
+  };
+}
+
+function inlineScriptTurn(dataJson: string): FlowStep {
+  return {
+    name: "Inline matplotlib script",
+    description: "Script references embedded data",
+    toolCalls: 0,
+    contextInput: "User wants chart + trend.",
+    modelOutput: [
+      "```python",
+      "import json, matplotlib.pyplot as plt",
+      `rows = json.loads("""${dataJson}""")`,
+      "ys=[r['value'] for r in rows]",
+      "plt.plot(ys); plt.savefig('/tmp/mrr_90d.png')",
+      "print('pct_change', (ys[-1]-ys[0])/ys[0]*100)",
+      "```",
+    ].join("\n"),
+  };
+}
+
+function buildGmaFlow(
+  payloads: GmaPayloadSet,
+  opts: { id: string; label: string; queryJson: string; withInsight?: boolean },
+): E2EFlow {
   const steps: FlowStep[] = [
     {
-      name: "query tool",
-      description: "Pre-tracked via n8n/cron; no discovery",
+      name: "query call",
+      description: "Model emits query tool args (output)",
       toolCalls: 1,
-      inputText: [`User: ${Q}`, 'Tool call query({ metric: "stripe.mrr", range: "90d", token_budget: 250 })'].join(
-        "\n",
-      ),
-      outputText: gmaQueryOutput(),
-    },
-    {
-      name: "chart tool",
-      description: "SVG path returned, not inlined",
-      toolCalls: 1,
-      inputText: 'Tool call chart({ metric: "stripe.mrr", range: "90d", type: "area" })',
-      outputText: JSON.stringify({
-        path: "/home/user/.graphmyanything/charts/stripe.mrr.svg",
-        format: "svg",
-        points: 90,
+      contextInput: `User: ${Q}`,
+      modelOutput: JSON.stringify({
+        tool: "query",
+        args: {
+          metric: "stripe.mrr",
+          range: "90d",
+          token_budget: 250,
+          points: opts.id.includes("full") ? 50 : "auto",
+          also_chart: !opts.id.includes("full"),
+        },
       }),
     },
-  ];
-  if (includeInsight) {
-    steps.push({
-      name: "insight tool (optional)",
-      description: "Anomalies + forecast in one call",
+    {
+      name: "query tool result → chart call",
+      description: "Query JSON in context; model emits chart args",
       toolCalls: 1,
-      inputText: 'Tool call insight({ metric: "stripe.mrr", range: "90d" })',
-      outputText: gmaInsightOutput(),
+      contextInput: opts.queryJson,
+      modelOutput: JSON.stringify({
+        tool: "chart",
+        args: {
+          metric: "stripe.mrr",
+          range: "90d",
+          type: "area",
+        },
+      }),
+    },
+    {
+      name: "chart tool result",
+      description: "Short path+url JSON → context",
+      toolCalls: 0,
+      contextInput: payloads.chart,
+      modelOutput:
+        "Trend up; see query summary fields (s.pct). Chart path/url in tool result.",
+    },
+  ];
+  if (opts.withInsight) {
+    steps.splice(2, 0, {
+      name: "insight call",
+      description: "Optional third tool",
+      toolCalls: 1,
+      contextInput: opts.queryJson,
+      modelOutput: JSON.stringify({
+        tool: "insight",
+        args: { metric: "stripe.mrr", range: "90d" },
+      }),
+    });
+    steps.splice(3, 0, {
+      name: "insight result",
+      description: "Insight prose in context",
+      toolCalls: 0,
+      contextInput: JSON.stringify({
+        trend: "Upward trend over 90d.",
+        anomalies: [],
+      }),
+      modelOutput: JSON.stringify({
+        tool: "chart",
+        args: { metric: "stripe.mrr", range: "90d", type: "area" },
+      }),
     });
   }
-  steps.push({
-    name: "Answer user",
-    description: "Summarize trend from summary fields",
-    toolCalls: 0,
-    inputText: "Synthesize tool results.",
-    outputText:
-      "MRR trend is up 13.15% over 90d. Chart saved at local path; see summary fields.",
-  });
-
   return {
-    id: includeInsight ? "gma_insight" : "gma_standard",
-    label: includeInsight ? "GMA query + chart + insight" : "GMA query + chart (n8n ingest)",
+    id: opts.id,
+    label: opts.label,
     phase: "warm",
     steps,
     wallTurns: steps.length,
     wallToolCalls: steps.reduce((n, s) => n + s.toolCalls, 0),
-    notes: "Ingestion via n8n/cron track — 0 tokens in question flow.",
+    notes: ASSUMPTIONS.tokenRule,
   };
 }
 
 export function buildPythonFileE2E(phase: "cold" | "warm"): E2EFlow {
-  const steps: FlowStep[] = [];
-  if (phase === "warm") {
-    steps.push(warmRedisovery());
-    steps.push(discoveryReadHead());
-  } else {
-    steps.push(searchForDataSource());
-    steps.push(discoveryListDir());
-    steps.push(discoveryReadHead());
-  }
-  steps.push(writeScript());
-  steps.push(envSetup(phase === "cold"));
-  steps.push(runScript(true));
-  steps.push({ ...runScript(false), weight: ASSUMPTIONS.errorRetryRate });
-  steps.push({ ...fixRetry(), weight: ASSUMPTIONS.errorRetryRate });
+  const steps: FlowStep[] =
+    phase === "cold"
+      ? [
+          searchTurnA(),
+          searchTurnB(),
+          listDirTurnA(),
+          listDirTurnB(),
+          readHeadTurn(),
+          pipColdTurnA(),
+          pipColdTurnB(),
+          runSuccessTurn(),
+          runFailTurn(),
+          fixRetryTurn(),
+        ]
+      : [
+          warmRediscoveryTurnA(),
+          warmRediscoveryTurnB(),
+          warmRewriteScriptTurn(),
+          readHeadTurn(),
+          pipWarmTurn(),
+          runSuccessTurn(),
+          runFailTurn(),
+          fixRetryTurn(),
+        ];
   return {
     id: phase === "cold" ? "python_file_e2e_cold" : "python_file_e2e_warm",
     label:
@@ -298,43 +366,23 @@ export function buildPythonFileE2E(phase: "cold" | "warm"): E2EFlow {
     steps,
     wallTurns: steps.length,
     wallToolCalls: steps.reduce((n, s) => n + s.toolCalls, 0),
-    notes: `Error+fix steps weighted at ${ASSUMPTIONS.errorRetryRate * 100}% (expected value).`,
+    notes: ASSUMPTIONS.tokenRule,
   };
 }
 
-export function buildPythonInlineE2E(phase: "cold" | "warm", dataJson: string): E2EFlow {
-  const steps: FlowStep[] = [];
-  if (phase === "warm") {
-    steps.push({
-      name: "Re-attach full series",
-      description: "No memory; user re-uploads or agent re-fetches export into chat",
-      toolCalls: 1,
-      inputText: [
-        `User: ${Q}`,
-        "Tool read_file downloads/stripe_mrr_90d.json:",
-        dataJson,
-      ].join("\n"),
-      outputText: "Re-loaded full MRR JSON into context (90 rows).",
-    });
-  } else {
-    steps.push(inlineDiscovery(dataJson));
-  }
-  steps.push({
-    ...writeScript(),
-    outputText: [
-      "```python",
-      "import json, matplotlib.pyplot as plt",
-      `rows = json.loads("""${dataJson.slice(0, Math.min(dataJson.length, 8000))}""")`,
-      "ys = [r['value'] for r in rows]",
-      "plt.plot(ys); plt.savefig('/tmp/mrr_90d.png')",
-      "print('pct_change', (ys[-1]-ys[0])/ys[0]*100)",
-      "```",
-    ].join("\n"),
-  });
-  steps.push(envSetup(phase === "cold"));
-  steps.push(runScript(true));
-  steps.push({ ...runScript(false), weight: ASSUMPTIONS.errorRetryRate });
-  steps.push({ ...fixRetry(), weight: ASSUMPTIONS.errorRetryRate });
+export function buildPythonInlineE2E(
+  phase: "cold" | "warm",
+  dataJson: string,
+): E2EFlow {
+  const steps: FlowStep[] = [
+    inlineAttachTurn(dataJson, phase === "warm"),
+    inlineScriptTurn(dataJson),
+    phase === "cold" ? pipColdTurnA() : pipWarmTurn(),
+    ...(phase === "cold" ? [pipColdTurnB()] : []),
+    runSuccessTurn(),
+    runFailTurn(),
+    fixRetryTurn(),
+  ];
   return {
     id: phase === "cold" ? "python_inline_e2e_cold" : "python_inline_e2e_warm",
     label:
@@ -345,17 +393,28 @@ export function buildPythonInlineE2E(phase: "cold" | "warm", dataJson: string): 
     steps,
     wallTurns: steps.length,
     wallToolCalls: steps.reduce((n, s) => n + s.toolCalls, 0),
-    notes: "Full series in context on discovery/re-attach steps.",
+    notes: ASSUMPTIONS.tokenRule,
   };
 }
 
-export function buildAllE2EFlows(dataJson: string): E2EFlow[] {
+export function buildAllE2EFlows(
+  dataJson: string,
+  payloads: GmaPayloadSet,
+): E2EFlow[] {
   return [
     buildPythonFileE2E("cold"),
     buildPythonFileE2E("warm"),
     buildPythonInlineE2E("cold", dataJson),
     buildPythonInlineE2E("warm", dataJson),
-    buildGmaFlow(false),
-    buildGmaFlow(true),
+    buildGmaFlow(payloads, {
+      id: "gma_lean",
+      label: "GMA query+chart lean (auto pts, also_chart)",
+      queryJson: payloads.leanQuery,
+    }),
+    buildGmaFlow(payloads, {
+      id: "gma_full",
+      label: "GMA query+chart full (pts=50)",
+      queryJson: payloads.fullQuery,
+    }),
   ];
 }

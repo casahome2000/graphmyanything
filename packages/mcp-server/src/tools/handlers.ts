@@ -8,6 +8,11 @@ import {
   parseRange,
 } from "../lib/summary.js";
 import {
+  resolveIncludeSeries,
+  terseSummary,
+  type PointsArg,
+} from "../lib/terse-summary.js";
+import {
   renderSvgChart,
   writeChartFile,
   type ChartType,
@@ -62,6 +67,9 @@ export function handleQuery(
     metric: string;
     range?: string;
     token_budget?: number;
+    points?: PointsArg;
+    /** Hint that a chart tool call follows — used by points=auto. */
+    also_chart?: boolean;
   },
 ): Record<string, unknown> {
   const metric = args.metric.trim();
@@ -70,28 +78,46 @@ export function handleQuery(
   const rows = queryPoints(db, metric, fromTs, toTs);
   const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
   const summary = computeSummary(points);
-  const series = lttb(points, DEFAULT_LTTB);
+  const seriesPlan = resolveIncludeSeries(
+    args.points,
+    tokenBudget,
+    args.also_chart,
+  );
 
-  let payload = {
-    metric,
-    range: args.range ?? "all",
-    summary,
-    series,
+  type Payload = {
+    m: string;
+    rg: string;
+    s: Record<string, number | string | null>;
+    pts?: DataPoint[];
+    tokens_estimate: number;
+  };
+
+  const base: Payload = {
+    m: metric,
+    rg: args.range ?? "all",
+    s: terseSummary(summary),
     tokens_estimate: 0,
   };
+
+  let payload: Payload = { ...base };
+  if (seriesPlan.mode === "lttb" && points.length > 0) {
+    payload.pts = lttb(points, seriesPlan.maxPoints);
+  }
+
   let json = JSON.stringify(payload);
   payload.tokens_estimate = Math.ceil(json.length / 4);
 
-  if (payload.tokens_estimate > tokenBudget && series.length > 10) {
-    let n = series.length;
+  if (
+    payload.pts &&
+    payload.pts.length > 10 &&
+    payload.tokens_estimate > tokenBudget
+  ) {
+    let n = payload.pts.length;
     while (n > 5) {
       n = Math.floor(n * 0.7);
-      const smaller = lttb(points, n);
       payload = {
-        metric,
-        range: args.range ?? "all",
-        summary,
-        series: smaller,
+        ...base,
+        pts: lttb(points, n),
         tokens_estimate: 0,
       };
       json = JSON.stringify(payload);
@@ -126,10 +152,7 @@ export function handleChart(
   },
 ): {
   path: string;
-  format: "svg";
-  metric: string;
-  points: number;
-  note: string;
+  url: string;
 } {
   const metric = args.metric.trim();
   const type = args.type ?? "line";
@@ -140,12 +163,9 @@ export function handleChart(
   const display = lttb(points, Math.min(500, Math.max(50, points.length)));
   const svg = renderSvgChart(metric, display, type, theme);
   const filePath = writeChartFile(metric, svg);
+  const slug = encodeURIComponent(metric);
   return {
     path: filePath,
-    format: "svg",
-    metric,
-    points: points.length,
-    note:
-      "Permanent live chart URLs at https://graphmyanything.com/c/<metric> are coming for founding members — join the waitlist at https://graphmyanything.com",
+    url: `https://graphmyanything.com/c/${slug}`,
   };
 }

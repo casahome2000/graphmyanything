@@ -52,7 +52,7 @@ server.registerTool(
   {
     title: "Query metric",
     description:
-      "Compact summary (latest, min, max, mean, trend, % change) plus LTTB-downsampled series within token_budget.",
+      "Terse summary (l/mn/mx/mu/tr/pct/n). points=0 or auto (default) omits series when also_chart or small token_budget; set points>0 for LTTB series.",
     inputSchema: {
       metric: z.string(),
       range: z
@@ -63,6 +63,14 @@ server.registerTool(
         .number()
         .optional()
         .describe("Target max tokens for JSON response (default 500)"),
+      points: z
+        .union([z.number(), z.literal("auto")])
+        .optional()
+        .describe("0 = summary only; auto (default) = smart omit; N>0 = LTTB N points"),
+      also_chart: z
+        .boolean()
+        .optional()
+        .describe("Hint: chart call follows — auto mode drops pts"),
     },
   },
   async (args) => {

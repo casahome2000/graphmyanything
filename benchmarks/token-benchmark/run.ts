@@ -7,6 +7,7 @@ import { computeSummary } from "../../packages/mcp-server/src/lib/summary.js";
 import { generateInsight } from "../../packages/mcp-server/src/lib/insight.js";
 import { ASSUMPTIONS } from "./e2e-assumptions.js";
 import { buildAllE2EFlows } from "./e2e-flows.js";
+import { buildGmaPayloads } from "./gma-payloads.js";
 import type { E2EFlow } from "./e2e-assumptions.js";
 
 const enc = getEncoding("o200k_base");
@@ -38,26 +39,52 @@ function countTokens(text: string): number {
   return enc.encode(text).length;
 }
 
-function measureFlow(flow: E2EFlow) {
-  let inTokens = 0;
-  let outTokens = 0;
-  let toolCalls = 0;
-  let turns = 0;
-  for (const step of flow.steps) {
+type MeasuredStep = E2EFlow["steps"][number] & {
+  inTokens: number;
+  outTokens: number;
+  total: number;
+};
+
+type MeasuredFlow = {
+  flow: E2EFlow;
+  steps: MeasuredStep[];
+  inTokens: number;
+  outTokens: number;
+  total: number;
+  turns: number;
+  toolCalls: number;
+};
+
+function measureFlow(flow: E2EFlow): MeasuredFlow {
+  const steps: MeasuredStep[] = flow.steps.map((step) => {
     const w = step.weight ?? 1;
-    inTokens += countTokens(step.inputText) * w;
-    outTokens += countTokens(step.outputText) * w;
-    toolCalls += step.toolCalls * w;
-    turns += w;
-  }
+    const inTokens = Math.round(countTokens(step.contextInput) * w);
+    const outTokens = Math.round(countTokens(step.modelOutput) * w);
+    return { ...step, inTokens, outTokens, total: inTokens + outTokens };
+  });
+  const inTokens = steps.reduce((a, s) => a + s.inTokens, 0);
+  const outTokens = steps.reduce((a, s) => a + s.outTokens, 0);
+  const toolCalls = steps.reduce((a, s) => a + s.toolCalls * (s.weight ?? 1), 0);
+  const turns = steps.reduce((a, s) => a + (s.weight ?? 1), 0);
   return {
     flow,
-    inTokens: Math.round(inTokens),
-    outTokens: Math.round(outTokens),
-    total: Math.round(inTokens + outTokens),
+    steps,
+    inTokens,
+    outTokens,
+    total: inTokens + outTokens,
     turns: Math.round(turns * 10) / 10,
     toolCalls: Math.round(toolCalls * 10) / 10,
   };
+}
+
+function breakdownSection(m: MeasuredFlow): string {
+  const rows = m.steps
+    .map(
+      (s) =>
+        `| ${s.name} | ${formatNum(s.inTokens)} | ${formatNum(s.outTokens)} | ${formatNum(s.total)} |`,
+    )
+    .join("\n");
+  return `### ${m.flow.label}\n\n| Step | In (context) | Out (model) | Total |\n|------|----------------|-------------|-------|\n${rows}\n| **Sum** | **${formatNum(m.inTokens)}** | **${formatNum(m.outTokens)}** | **${formatNum(m.total)}** |`;
 }
 
 function costUsd(inTokens: number, outTokens: number): number {
@@ -132,8 +159,8 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   const innerW = W - left - 48;
   const barH = 48;
   const gap = 16;
-  const legendY = 96;
-  const panel1TitleY = 148;
+  const legendY = 88;
+  const panel1TitleY = 132;
   let y = panel1TitleY + 28;
 
   const maxVal = Math.max(...[...primary, ...secondary].map((b) => b.total), 10);
@@ -146,10 +173,13 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   function barBlock(bar: ChartBar, yPos: number): string {
     const w = logW(bar.total);
     const end = left + w;
-    const labelInside = end > left + 100;
+    const labelInside = end > left + 90;
+    const labelRight = end + 88 > W - 8;
     const label = labelInside
       ? `<text x="${(end - 10).toFixed(1)}" y="${yPos + 31}" text-anchor="end" fill="#06060a" font-family="ui-monospace,monospace" font-size="13" font-weight="700">${formatNum(bar.total)}</text>`
-      : `<text x="${Math.min(end + 10, W - 16).toFixed(1)}" y="${yPos + 31}" fill="${fg}" font-family="ui-monospace,monospace" font-size="13" font-weight="600">${formatNum(bar.total)}</text>`;
+      : labelRight
+        ? `<text x="${(W - 12).toFixed(1)}" y="${yPos + 31}" text-anchor="end" fill="${fg}" font-family="ui-monospace,monospace" font-size="12" font-weight="600">${formatNum(bar.total)}</text>`
+        : `<text x="${(end + 10).toFixed(1)}" y="${yPos + 31}" fill="${fg}" font-family="ui-monospace,monospace" font-size="13" font-weight="600">${formatNum(bar.total)}</text>`;
     const dash = bar.dashed
       ? 'stroke-dasharray="6 4" stroke="rgba(255,255,255,0.35)" stroke-width="1"'
       : "";
@@ -219,7 +249,8 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
 // --- Data ---
 const series = generateMrrSeries(POINT_COUNT);
 const dataJson = JSON.stringify(series);
-const e2eFlows = buildAllE2EFlows(dataJson);
+const payloads = buildGmaPayloads(series);
+const e2eFlows = buildAllE2EFlows(dataJson, payloads);
 const measured = e2eFlows.map(measureFlow);
 
 const byId = (id: string) => measured.find((m) => m.flow.id === id)!;
@@ -227,11 +258,11 @@ const fileCold = byId("python_file_e2e_cold");
 const fileWarm = byId("python_file_e2e_warm");
 const inlineCold = byId("python_inline_e2e_cold");
 const inlineWarm = byId("python_inline_e2e_warm");
-const gma = byId("gma_standard");
-const gmaInsight = byId("gma_insight");
+const gmaLean = byId("gma_lean");
+const gmaFull = byId("gma_full");
 const bestCase = buildFilePythonBestCase(POINT_COUNT);
 
-const gmaCallout = `${pctDeltaLabel(fileCold.total, gma.total)} vs file E2E cold`;
+const gmaCallout = `${pctDeltaLabel(fileCold.total, gmaLean.total)} vs file E2E cold`;
 
 const primaryBars: ChartBar[] = [
   {
@@ -256,11 +287,18 @@ const primaryBars: ChartBar[] = [
     callout: `${inlineCold.turns} turns · series in context`,
   },
   {
-    id: "gma_standard",
-    label: "GMA query + chart (n8n ingest)",
-    total: gma.total,
+    id: "gma_lean",
+    label: "GMA lean (auto pts + also_chart)",
+    total: gmaLean.total,
     gradientId: "gma",
     callout: gmaCallout,
+  },
+  {
+    id: "gma_full",
+    label: "GMA full query (pts=50)",
+    total: gmaFull.total,
+    gradientId: "gma",
+    callout: `query JSON ${payloads.fullQuery.length} chars`,
   },
   {
     id: "file_best",
@@ -287,10 +325,10 @@ const secondaryBars: ChartBar[] = [
   },
   {
     id: "multi_gma",
-    label: "GMA query + chart × 30",
-    total: gma.total * SESSIONS,
+    label: "GMA lean × 30",
+    total: gmaLean.total * SESSIONS,
     gradientId: "gma",
-    callout: `${pctDeltaLabel(fileWarm.total * SESSIONS, gma.total * SESSIONS)} vs file E2E warm`,
+    callout: `${pctDeltaLabel(fileWarm.total * SESSIONS, gmaLean.total * SESSIONS)} vs file E2E warm`,
   },
 ];
 
@@ -298,6 +336,9 @@ const assumptionsRows = [
   ["User prompt", `"${USER_QUESTION}"`],
   ["Data size", `${POINT_COUNT} daily MRR points (synthetic)`],
   ["Tokenizer", "`js-tiktoken` / `o200k_base`"],
+  ["Token rule", ASSUMPTIONS.tokenRule],
+  ["GMA lean query", "`points=auto` + `also_chart=true` → summary only (`s.*` terse keys)"],
+  ["GMA full query", "`points=50` — LTTB series in `pts`"],
   ["Error+fix retry", `${ASSUMPTIONS.errorRetryRate * 100}% of flows; fail+fix steps weighted in totals`],
   ["Warm session", "Agent has **no memory** of prior script; re-lists / re-attaches data"],
   ["GMA ingestion", "**n8n/cron `track`** — 0 tokens inside question flow"],
@@ -315,10 +356,13 @@ const e2eTable = measured
 const costPer1k = (inT: number, outT: number) =>
   costUsd(inT * 1000, outT * 1000);
 
+const breakdownMd = measured.map(breakdownSection).join("\n\n");
+
 const costRows = [
   ["Python file E2E cold", fileCold, fileCold.total],
   ["Python file E2E warm", fileWarm, fileWarm.total],
-  ["GMA query + chart", gma, gma.total],
+  ["GMA lean", gmaLean, gmaLean.total],
+  ["GMA full pts=50", gmaFull, gmaFull.total],
   ["Best-case file Python", bestCase, bestCase.total],
 ]
   .map(([label, m, total]) => {
@@ -337,13 +381,13 @@ const md = `# Token benchmark (end-to-end)
 
 **Best-case file Python (~${formatNum(bestCase.total)} tokens) is ~${Math.round(fileCold.total / bestCase.total)}× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → answer): **${formatNum(fileCold.total)}** tokens (${fileCold.turns} turns, ${fileCold.toolCalls} tool calls).
 
-**vs GMA (\`query\`+\`chart\`, n8n ingest):** ${vsPhrase(fileCold.total, gma.total)}. GMA’s clearest win vs **inline JSON E2E** (${vsPhrase(inlineCold.total, gma.total)}).
+**GMA lean (\`points=auto\`, \`also_chart\`):** **${formatNum(gmaLean.inTokens)}** in · **${formatNum(gmaLean.outTokens)}** out · **${formatNum(gmaLean.total)}** total — ${pctDeltaLabel(fileCold.total, gmaLean.total)} than file E2E cold (${formatNum(fileCold.total)}). **GMA full (\`points=50\`):** **${formatNum(gmaFull.total)}** (${formatNum(gmaFull.inTokens)} in · ${formatNum(gmaFull.outTokens)} out).
 
-**${SESSIONS} warm sessions (re-discovery, no script memory):** inline ${formatNum(inlineWarm.total * SESSIONS)} · file E2E ${formatNum(fileWarm.total * SESSIONS)} · GMA ${formatNum(gma.total * SESSIONS)} (GMA ${pctDeltaLabel(inlineWarm.total * SESSIONS, gma.total * SESSIONS)} vs inline).
+**vs inline JSON E2E:** lean ${vsPhrase(inlineCold.total, gmaLean.total)}.
 
-**Optional:** GMA \`insight\` adds anomalies in one tool (**${formatNum(gmaInsight.total)}** tokens total with query+chart+insight).
+**${SESSIONS} warm sessions:** file E2E ${formatNum(fileWarm.total * SESSIONS)} · GMA lean ${formatNum(gmaLean.total * SESSIONS)} · inline ${formatNum(inlineWarm.total * SESSIONS)}.
 
-**Cost (@ 1,000 questions, ${ASSUMPTIONS.costModel.label}):** file E2E cold **$${costPer1k(fileCold.inTokens, fileCold.outTokens).toFixed(2)}** vs GMA **$${costPer1k(gma.inTokens, gma.outTokens).toFixed(2)}** (input $${ASSUMPTIONS.costModel.inputPerMillion}/1M · output $${ASSUMPTIONS.costModel.outputPerMillion}/1M).
+**Cost @ 1,000 Q (${ASSUMPTIONS.costModel.label}, in $${ASSUMPTIONS.costModel.inputPerMillion}/M · out $${ASSUMPTIONS.costModel.outputPerMillion}/M):** file E2E cold **$${costPer1k(fileCold.inTokens, fileCold.outTokens).toFixed(2)}** · GMA lean **$${costPer1k(gmaLean.inTokens, gmaLean.outTokens).toFixed(2)}** · GMA full **$${costPer1k(gmaFull.inTokens, gmaFull.outTokens).toFixed(2)}**.
 
 ## Assumptions (transparent)
 
@@ -362,10 +406,14 @@ ${fileCold.flow.steps
 
 ## End-to-end token totals
 
-| Flow | Input | Output | **Total** | Turns | Tool calls |
-|------|-------|--------|-----------|-------|------------|
+| Flow | Input (context) | Output (model) | **Total** | Turns | Tool calls |
+|------|-----------------|----------------|-----------|-------|------------|
 ${e2eTable}
 | Best-case file Python (1 turn) | ${formatNum(bestCase.inTokens)} | ${formatNum(bestCase.outTokens)} | **${formatNum(bestCase.total)}** | ${bestCase.turns} | ${bestCase.toolCalls} |
+
+## Per-step breakdown (auditable)
+
+${breakdownMd}
 
 ## $ cost per 1,000 identical questions
 
@@ -381,7 +429,7 @@ Pricing: [${ASSUMPTIONS.costModel.label}](${ASSUMPTIONS.costModel.source}).
 |------|-------------|-------------|
 | Python file E2E warm | ${formatNum(fileWarm.total)} | **${formatNum(fileWarm.total * SESSIONS)}** |
 | Python inline E2E warm | ${formatNum(inlineWarm.total)} | **${formatNum(inlineWarm.total * SESSIONS)}** |
-| GMA query + chart | ${formatNum(gma.total)} | **${formatNum(gma.total * SESSIONS)}** |
+| GMA lean | ${formatNum(gmaLean.total)} | **${formatNum(gmaLean.total * SESSIONS)}** |
 
 ## Answer quality (same prompt)
 
@@ -419,5 +467,8 @@ fs.writeFileSync(path.join(outDir, "results.md"), md, "utf8");
 await sharp(Buffer.from(svg)).resize(2400).png().toFile(path.join(outDir, "token-benchmark.png"));
 
 console.log("Wrote results.md, token-benchmark.svg, token-benchmark.png");
-console.log(`E2E cold file=${fileCold.total} gma=${gma.total} (${pctDeltaLabel(fileCold.total, gma.total)})`);
+console.log(
+  `E2E cold file=${fileCold.total} gmaLean=${gmaLean.total} (${pctDeltaLabel(fileCold.total, gmaLean.total)}) gmaFull=${gmaFull.total}`,
+);
+console.log(`Lean query payload: ${payloads.leanQuery.length} chars, full: ${payloads.fullQuery.length} chars`);
 console.log(`Best case=${bestCase.total}`);

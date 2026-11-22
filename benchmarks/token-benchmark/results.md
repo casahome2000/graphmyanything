@@ -2,15 +2,15 @@
 
 ## Headline (defensible)
 
-**Best-case file Python (~134 tokens) is ~5× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → answer): **723** tokens (6.6 turns, 8.9 tool calls).
+**Best-case file Python (~134 tokens) is ~5× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → answer): **648** tokens (8.6 turns, 6.3 tool calls).
 
-**vs GMA (`query`+`chart`, n8n ingest):** 772 vs 723 (6.8% more). GMA’s clearest win vs **inline JSON E2E** (772 vs 2,471 (68.8% fewer)).
+**GMA lean (`points=auto`, `also_chart`):** 115 in / 73 out = **188** vs file E2E cold (188 vs 648 (71% fewer)). **GMA full (`points=50`):** **792** (719 in · 73 out).
 
-**30 warm sessions (re-discovery, no script memory):** inline 72,960 · file E2E 17,370 · GMA 23,160 (GMA 68.3% fewer vs inline).
+**vs inline JSON E2E:** lean 188 vs 2,437 (92.3% fewer).
 
-**Optional:** GMA `insight` adds anomalies in one tool (**834** tokens total with query+chart+insight).
+**30 warm sessions:** file E2E 21,090 · GMA lean 5,640 · inline 71,310.
 
-**Cost (@ 1,000 questions, GPT-5.2):** file E2E cold **$6.06** vs GMA **$9.97** (input $1.75/1M · output $14/1M).
+**Cost @ 1,000 Q (GPT-5.2, in $1.75/M · out $14/M):** file E2E cold **$5.86** · GMA lean **$1.22** · GMA full **$2.28**.
 
 ## Assumptions (transparent)
 
@@ -19,6 +19,9 @@
 | User prompt | "Chart my last 90 days of MRR and tell me the trend." |
 | Data size | 90 daily MRR points (synthetic) |
 | Tokenizer | `js-tiktoken` / `o200k_base` |
+| Token rule | Tool results enter context (input). Assistant text and tool-call args are output. |
+| GMA lean query | `points=auto` + `also_chart=true` → summary only (`s.*` terse keys) |
+| GMA full query | `points=50` — LTTB series in `pts` |
 | Error+fix retry | 30% of flows; fail+fix steps weighted in totals |
 | Warm session | Agent has **no memory** of prior script; re-lists / re-attaches data |
 | GMA ingestion | **n8n/cron `track`** — 0 tokens inside question flow |
@@ -27,34 +30,112 @@
 
 ### E2E step model (Python file cold)
 
-- **Search / API hunt** — codebase_search + rg before knowing export path (2 tool calls)
-- **Locate data source** — list_dir + glob for exports/*.json (2 tool calls)
-- **Schema / head preview** — read first 3 JSON rows (not full series in chat for file path) (1 tool calls)
-- **Write matplotlib script** — ~30 lines, read file on disk, save PNG (0 tool calls)
-- **Environment setup** — pip install matplotlib + venv check (2 tool calls)
-- **Execute script** — python chart script (1 tool calls)
-- **Execute script (failed)** — stderr then fix (1 tool calls, weight 0.3)
-- **Error fix + re-run** — Assumed in 30% of cold/warm flows (2 tool calls, weight 0.3)
+- **Plan + search tools** — Model emits codebase_search and rg calls (2 tool calls)
+- **Search results** — Tool results return to context (0 tool calls)
+- **list_dir + glob** — Model calls filesystem tools (2 tool calls)
+- **Listing results** — Directory listings in context (0 tool calls)
+- **Schema preview** — Head rows tool result in context (0 tool calls)
+- **pip / import check** — Model runs env tools (1 tool calls)
+- **pip install results** — stderr/stdout from tools in context (1 tool calls)
+- **Run stdout + answer** — stdout tool result + model summary (0 tool calls)
+- **Run failure (stderr)** — 30% weighted (0 tool calls, weight 0.3)
+- **Fix + re-run stdout** — Weighted retry path (1 tool calls, weight 0.3)
 
 ## End-to-end token totals
 
-| Flow | Input | Output | **Total** | Turns | Tool calls |
-|------|-------|--------|-----------|-------|------------|
-| Python file E2E (cold start) | 332 | 391 | **723** | 6.6 | 8.9 |
-| Python file E2E (warm, re-discovery) | 224 | 355 | **579** | 5.6 | 5.9 |
-| Python inline JSON E2E (cold) | 1,241 | 1,230 | **2,471** | 4.6 | 4.9 |
-| Python inline JSON E2E (warm) | 1,203 | 1,229 | **2,432** | 4.6 | 3.9 |
-| GMA query + chart (n8n ingest) | 68 | 704 | **772** | 3 | 2 |
-| GMA query + chart + insight | 86 | 748 | **834** | 4 | 3 |
+| Flow | Input (context) | Output (model) | **Total** | Turns | Tool calls |
+|------|-----------------|----------------|-----------|-------|------------|
+| Python file E2E (cold start) | 262 | 386 | **648** | 8.6 | 6.3 |
+| Python file E2E (warm, re-discovery) | 180 | 523 | **703** | 6.6 | 4.3 |
+| Python inline JSON E2E (cold) | 1,219 | 1,218 | **2,437** | 5.6 | 3.3 |
+| Python inline JSON E2E (warm) | 1,170 | 1,207 | **2,377** | 4.6 | 2.3 |
+| GMA query+chart lean (auto pts, also_chart) | 115 | 73 | **188** | 3 | 2 |
+| GMA query+chart full (pts=50) | 719 | 73 | **792** | 3 | 2 |
 | Best-case file Python (1 turn) | 56 | 78 | **134** | 1 | 0 |
+
+## Per-step breakdown (auditable)
+
+### Python file E2E (cold start)
+
+| Step | In (context) | Out (model) | Total |
+|------|----------------|-------------|-------|
+| Plan + search tools | 17 | 36 | 53 |
+| Search results | 57 | 18 | 75 |
+| list_dir + glob | 8 | 22 | 30 |
+| Listing results | 36 | 19 | 55 |
+| Schema preview | 56 | 229 | 285 |
+| pip / import check | 10 | 12 | 22 |
+| pip install results | 31 | 14 | 45 |
+| Run stdout + answer | 33 | 30 | 63 |
+| Run failure (stderr) | 6 | 3 | 9 |
+| Fix + re-run stdout | 8 | 3 | 11 |
+| **Sum** | **262** | **386** | **648** |
+
+### Python file E2E (warm, re-discovery)
+
+| Step | In (context) | Out (model) | Total |
+|------|----------------|-------------|-------|
+| Re-discovery tools | 17 | 17 | 34 |
+| Re-discovery results | 39 | 12 | 51 |
+| Rewrite script | 8 | 215 | 223 |
+| Schema preview | 56 | 229 | 285 |
+| pip show | 13 | 14 | 27 |
+| Run stdout + answer | 33 | 30 | 63 |
+| Run failure (stderr) | 6 | 3 | 9 |
+| Fix + re-run stdout | 8 | 3 | 11 |
+| **Sum** | **180** | **523** | **703** |
+
+### Python inline JSON E2E (cold)
+
+| Step | In (context) | Out (model) | Total |
+|------|----------------|-------------|-------|
+| Search + attach JSON | 1,125 | 8 | 1,133 |
+| Inline matplotlib script | 6 | 1,148 | 1,154 |
+| pip / import check | 10 | 12 | 22 |
+| pip install results | 31 | 14 | 45 |
+| Run stdout + answer | 33 | 30 | 63 |
+| Run failure (stderr) | 6 | 3 | 9 |
+| Fix + re-run stdout | 8 | 3 | 11 |
+| **Sum** | **1,219** | **1,218** | **2,437** |
+
+### Python inline JSON E2E (warm)
+
+| Step | In (context) | Out (model) | Total |
+|------|----------------|-------------|-------|
+| Re-attach series | 1,104 | 9 | 1,113 |
+| Inline matplotlib script | 6 | 1,148 | 1,154 |
+| pip show | 13 | 14 | 27 |
+| Run stdout + answer | 33 | 30 | 63 |
+| Run failure (stderr) | 6 | 3 | 9 |
+| Fix + re-run stdout | 8 | 3 | 11 |
+| **Sum** | **1,170** | **1,207** | **2,377** |
+
+### GMA query+chart lean (auto pts, also_chart)
+
+| Step | In (context) | Out (model) | Total |
+|------|----------------|-------------|-------|
+| query call | 17 | 32 | 49 |
+| query tool result → chart call | 59 | 22 | 81 |
+| chart tool result | 39 | 19 | 58 |
+| **Sum** | **115** | **73** | **188** |
+
+### GMA query+chart full (pts=50)
+
+| Step | In (context) | Out (model) | Total |
+|------|----------------|-------------|-------|
+| query call | 17 | 32 | 49 |
+| query tool result → chart call | 663 | 22 | 685 |
+| chart tool result | 39 | 19 | 58 |
+| **Sum** | **719** | **73** | **792** |
 
 ## $ cost per 1,000 identical questions
 
 | Flow | Tokens / question | Est. API cost |
 |------|-------------------|---------------|
-| Python file E2E cold | 723 | $6.06 |
-| Python file E2E warm | 579 | $5.36 |
-| GMA query + chart | 772 | $9.97 |
+| Python file E2E cold | 648 | $5.86 |
+| Python file E2E warm | 703 | $7.64 |
+| GMA lean | 188 | $1.22 |
+| GMA full pts=50 | 792 | $2.28 |
 | Best-case file Python | 134 | $1.19 |
 
 Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
@@ -63,9 +144,9 @@ Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
 
 | Flow | Per session | × 30 |
 |------|-------------|-------------|
-| Python file E2E warm | 579 | **17,370** |
-| Python inline E2E warm | 2,432 | **72,960** |
-| GMA query + chart | 772 | **23,160** |
+| Python file E2E warm | 703 | **21,090** |
+| Python inline E2E warm | 2,377 | **71,310** |
+| GMA lean | 188 | **5,640** |
 
 ## Answer quality (same prompt)
 
