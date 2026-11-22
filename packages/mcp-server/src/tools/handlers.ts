@@ -17,6 +17,7 @@ import {
   type ChartType,
   type ChartTheme,
 } from "../lib/svg-chart.js";
+import { HOSTED_CHART_URL_NOTE } from "../paths.js";
 
 function normalizeTags(tags?: Record<string, string>): Record<string, string> {
   return tags ?? {};
@@ -151,7 +152,8 @@ export function handleChart(
   },
 ): {
   path: string;
-  url: string;
+  url: null;
+  hosted_url_note: string;
 } {
   const metric = args.metric.trim();
   const type = args.type ?? "line";
@@ -162,9 +164,9 @@ export function handleChart(
   const display = lttb(points, Math.min(500, Math.max(50, points.length)));
   const svg = renderSvgChart(metric, display, type, theme);
   const filePath = writeChartFile(metric, svg);
-  const slug = encodeURIComponent(metric);
   return {
     path: filePath,
-    url: `https://graphmyanything.com/c/${slug}`,
+    url: null,
+    hosted_url_note: HOSTED_CHART_URL_NOTE,
   };
 }

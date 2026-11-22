@@ -31,4 +31,4 @@ On the imported workflow:
 2. Read MRR (mock code node in template).
 3. `track` → `query` (90d, token_budget 300) → `insight` → `chart` (area, dark).
 
-Chart files land on the n8n host under `~/.graphmyanything/charts/`. Permanent live URLs at https://graphmyanything.com/c/&lt;metric&gt; are planned for founding members.
+Chart files land on the n8n host under `~/.graphmyanything/charts/` (or `charts/` beside `GRAPHMYANYTHING_DB_PATH`). The `chart` tool returns a local `path` only (`url` is null until hosted charts ship).

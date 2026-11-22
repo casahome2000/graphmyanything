@@ -1,0 +1,31 @@
+name: Publish graphmyanything-mcp
+
+on:
+  push:
+    tags:
+      - mcp-v*
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/mcp-server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+      - name: Require npm for OIDC provenance
+        run: |
+          npm install -g "npm@>=11.5.1"
+          npm --version
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm publish --access public --provenance
