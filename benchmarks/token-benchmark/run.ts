@@ -165,6 +165,13 @@ function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 }
 
+const LEGEND_BY_GRADIENT: Record<string, string> = {
+  inline_e2e: "Inline",
+  file_e2e: "Python file",
+  gma: "GMA",
+  best: "Best-case",
+};
+
 function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   const W = 1200;
   const H = 920;
@@ -210,12 +217,10 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   ${callout}`;
   }
 
-  const legends = [
-    { id: "file_e2e", label: "Python E2E" },
-    { id: "inline_e2e", label: "Inline E2E" },
-    { id: "gma", label: "GMA" },
-    { id: "best", label: "Best-case Python" },
-  ];
+  const legends = primary.map((bar) => ({
+    id: bar.gradientId,
+    label: LEGEND_BY_GRADIENT[bar.gradientId] ?? bar.label,
+  }));
 
   const chips = legends
     .map(
@@ -260,7 +265,7 @@ function renderChart(primary: ChartBar[], secondary: ChartBar[]): string {
   ${bars1.join("")}
   <text x="24" y="${panel2Y}" fill="${fg}" font-size="15" font-weight="600" font-family="system-ui,sans-serif">${SESSIONS} warm repeats (re-discovery / re-query each session)</text>
   ${bars2.join("")}
-  <text x="24" y="${H - 22}" fill="${muted}" font-size="11" font-family="system-ui,sans-serif">graphmyanything.com · npm run run · ${new Date().toISOString().slice(0, 10)}</text>
+  <text x="24" y="${H - 22}" fill="${muted}" font-size="11" font-family="system-ui,sans-serif">graphmyanything.com · npm run benchmark:tokens · ${new Date().toISOString().slice(0, 10)}</text>
 </svg>`;
 }
 
@@ -284,6 +289,15 @@ const gmaDefTokens = countTokens(gmaToolDefsJson());
 const pyDefTokens = countTokens(PYTHON_HARNESS_TOOLS_JSON);
 const fileColdDefs = toolDefOverhead(fileCold, pyDefTokens);
 const gmaLeanDefs = toolDefOverhead(gmaLean, gmaDefTokens);
+
+/** Single source for chart + results.md session totals (no drift). */
+const cumulative30 = {
+  inlineWarm: inlineWarm.total * SESSIONS,
+  fileWarm: fileWarm.total * SESSIONS,
+  gmaLean: gmaLean.total * SESSIONS,
+};
+const gmaVsFileWarm30 = pctDeltaLabel(cumulative30.fileWarm, cumulative30.gmaLean);
+
 const primaryBarsSocial: ChartBar[] = [
   {
     id: "python_inline_e2e_cold",
@@ -316,22 +330,22 @@ const primaryBarsSocial: ChartBar[] = [
 const secondaryBarsSocial: ChartBar[] = [
   {
     id: "multi_inline_warm",
-    label: "Inline E2E × 30",
-    total: inlineWarm.total * SESSIONS,
+    label: "Inline E2E warm × 30",
+    total: cumulative30.inlineWarm,
     gradientId: "inline_e2e",
   },
   {
-    id: "multi_file_cold",
-    label: "Python file E2E × 30",
-    total: fileCold.total * SESSIONS,
+    id: "multi_file_warm",
+    label: "Python file E2E warm × 30",
+    total: cumulative30.fileWarm,
     gradientId: "file_e2e",
   },
   {
     id: "multi_gma",
     label: "GMA lean × 30",
-    total: gmaLean.total * SESSIONS,
+    total: cumulative30.gmaLean,
     gradientId: "gma",
-    callout: `${pctDeltaLabel(fileCold.total * SESSIONS, gmaLean.total * SESSIONS)} vs file ×30`,
+    callout: `${gmaVsFileWarm30} vs file warm ×30`,
   },
 ];
 
@@ -404,7 +418,7 @@ const md = `# Token benchmark (end-to-end)
 
 **vs inline JSON E2E:** lean ${vsPhrase(inlineCold.total, gmaLean.total)}.
 
-**${SESSIONS} warm sessions:** file E2E ${formatNum(fileWarm.total * SESSIONS)} · GMA lean ${formatNum(gmaLean.total * SESSIONS)} · inline ${formatNum(inlineWarm.total * SESSIONS)}.
+**${SESSIONS} warm sessions:** file E2E warm ${formatNum(cumulative30.fileWarm)} · GMA lean ${formatNum(cumulative30.gmaLean)} (${gmaVsFileWarm30} vs file warm) · inline ${formatNum(cumulative30.inlineWarm)}.
 
 **Cost @ 1,000 Q (${ASSUMPTIONS.costModel.label}, in $${ASSUMPTIONS.costModel.inputPerMillion}/M · out $${ASSUMPTIONS.costModel.outputPerMillion}/M):** file E2E cold **$${costPer1k(fileCold.inTokens, fileCold.outTokens).toFixed(2)}** · GMA lean **$${costPer1k(gmaLean.inTokens, gmaLean.outTokens).toFixed(2)}** · GMA full **$${costPer1k(gmaFull.inTokens, gmaFull.outTokens).toFixed(2)}**.
 
@@ -450,9 +464,9 @@ Pricing: [${ASSUMPTIONS.costModel.label}](${ASSUMPTIONS.costModel.source}).
 
 | Flow | Per session | × ${SESSIONS} |
 |------|-------------|-------------|
-| Python file E2E warm | ${formatNum(fileWarm.total)} | **${formatNum(fileWarm.total * SESSIONS)}** |
-| Python inline E2E warm | ${formatNum(inlineWarm.total)} | **${formatNum(inlineWarm.total * SESSIONS)}** |
-| GMA lean | ${formatNum(gmaLean.total)} | **${formatNum(gmaLean.total * SESSIONS)}** |
+| Python file E2E warm | ${formatNum(fileWarm.total)} | **${formatNum(cumulative30.fileWarm)}** |
+| Python inline E2E warm | ${formatNum(inlineWarm.total)} | **${formatNum(cumulative30.inlineWarm)}** |
+| GMA lean | ${formatNum(gmaLean.total)} | **${formatNum(cumulative30.gmaLean)}** |
 
 ## Answer quality (same prompt)
 

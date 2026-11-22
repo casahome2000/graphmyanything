@@ -10,7 +10,7 @@
 
 **vs inline JSON E2E:** lean 276 vs 2,447 (88.7% fewer).
 
-**30 warm sessions:** file E2E 21,390 · GMA lean 8,280 · inline 71,610.
+**30 warm sessions:** file E2E warm 21,390 · GMA lean 8,280 (61.3% fewer vs file warm) · inline 71,610.
 
 **Cost @ 1,000 Q (GPT-5.2, in $1.75/M · out $14/M):** file E2E cold **$6.00** · GMA lean **$1.63** · GMA full **$3.75**.
 
