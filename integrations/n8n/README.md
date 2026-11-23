@@ -2,14 +2,21 @@
 
 Import [`track-stripe-mrr-daily.json`](./track-stripe-mrr-daily.json) in n8n (**Workflows → Import from File**).
 
+Full setup for the Stripe connector (restricted keys, metric names, backfill): **[`docs/stripe-mrr.md`](../../docs/stripe-mrr.md)**.
+
 ## Which integration path?
 
 | Path | When to use |
 |------|-------------|
-| **MCP Client Tool** (nodes in this workflow) | **Today.** n8n 1.76+ ships MCP Client credentials with **stdio** transport — same as Cursor/Claude Desktop. |
-| **HTTP Request** (`POST https://api.graphmyanything.com/v1/track`) | **Later.** Documented cloud placeholder; node is set to `neverError` until the API exists. |
+| **`graphmyanything-stripe sync` + MCP** (this workflow) | **Self-hosted n8n** with Node 22+, MCP stdio, and a Stripe **restricted** key (`rk_…`). |
+| **HTTP Request** (`POST https://api.graphmyanything.com/v1/track`) | **Later.** Disabled placeholder until the cloud track API ships. |
 
-We chose **MCP Client** as the primary path because n8n supports stdio MCP servers natively (no throwaway shell scripts). The HTTP node documents the future one-line cloud track endpoint for teams that do not run MCP on the n8n host.
+## Stripe credential
+
+1. **Credentials → New → Stripe API**.
+2. Name: `Stripe restricted read key`.
+3. Secret: your **`rk_test_…`** or **`rk_live_…`** key (read-only). **Do not** use `sk_…`.
+4. Attach to **Stripe sync (CLI)**.
 
 ## MCP credential setup
 
@@ -17,35 +24,22 @@ We chose **MCP Client** as the primary path because n8n supports stdio MCP serve
 2. Transport: **stdio**.
 3. Command: `npx`
 4. Arguments: `-y`, `graphmyanything-mcp@latest`
-5. Ensure **Node 22.13+** on the n8n worker (built-in `node:sqlite`).
+5. Ensure **Node 22.13+** on the n8n worker.
 
-**Pin a version (optional):** use `graphmyanything-mcp@0.1.3` instead of `@latest`.
+Attach MCP credential to **MCP query 90d**, **MCP insight**, and **MCP chart SVG**.
 
-On the imported workflow:
-
-- Disable **HTTP track (cloud placeholder)**.
-- Attach your credential to **MCP track**, **MCP query 90d**, **MCP insight**, and **MCP chart SVG**.
-- Replace **Mock Stripe MRR** with a Stripe node or your billing HTTP source when ready.
-
-## Creator template notes
-
-The imported workflow includes an **overview sticky** (How it works, Set up steps, Requirements, Customize) plus **section stickies** for the schedule, data source, track path, query, insight, and chart nodes. Use them when publishing to the n8n template library.
+Install the Stripe CLI package on the worker (`graphmyanything-stripe` from this monorepo or `npx` once published).
 
 ## Flow
 
 1. Schedule (daily 9:00).
-2. Read MRR (mock code node in template).
-3. `track` → `query` (90d, token_budget 300) → `insight` → `chart` (area, dark).
+2. **Stripe sync (CLI)** → writes metrics to SQLite (same path as MCP).
+3. `query` → `insight` → `chart` on `stripe.mrr.usd` (90d).
 
-Use **`graphmyanything-mcp@latest`** (optional pin **`0.1.3`**) and **Node 22.13+** on any worker that runs MCP stdio.
-
-Chart files land on the n8n host under `~/.graphmyanything/charts/` (or `charts/` beside `GRAPHMYANYTHING_DB_PATH`). The `chart` tool returns a local `path` only (`url` is null until hosted charts ship).
+Chart files land on the n8n host under `~/.graphmyanything/charts/` (or beside `GRAPHMYANYTHING_DB_PATH`).
 
 ## CLI import (optional)
 
 ```bash
-# CLI expects a JSON array of workflows (UI import accepts the single-object file as-is):
 jq -s . integrations/n8n/track-stripe-mrr-daily.json | n8n import:workflow --input=/dev/stdin
 ```
-
-Credentials are not bundled; assign MCP Client credentials after import.

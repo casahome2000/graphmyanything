@@ -19,13 +19,21 @@
     },
     {
       "parameters": {
-        "jsCode": "// Demo: replace with Stripe node or HTTP to billing API.\nconst base = 78000;\nconst day = Math.floor(Date.now() / 86400000);\nconst mrr = Math.round(base + (day % 90) * 120 + Math.sin(day / 7) * 400);\nreturn [{ json: { metric: 'stripe.mrr', value: mrr, tags: { source: 'stripe', currency: 'usd' } } }];"
+        "jsCode": "const { execFileSync } = require('child_process');\n\nconst key = $credentials.stripeApi.secretKey;\nif (!key || !key.startsWith('rk_')) {\n  throw new Error('Use a Stripe restricted read key (rk_test_ or rk_live_) in this credential — not sk_.');\n}\n\nconst stdout = execFileSync('npx', ['-y', 'graphmyanything-stripe', 'sync'], {\n  env: { ...process.env, STRIPE_RESTRICTED_KEY: key },\n  encoding: 'utf8',\n  maxBuffer: 16 * 1024 * 1024,\n});\n\nconst result = JSON.parse(stdout.trim());\nreturn [{ json: result }];"
       },
-      "id": "mock-stripe",
-      "name": "Mock Stripe MRR",
+      "id": "stripe-sync-cli",
+      "name": "Stripe sync (CLI)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 0]
+      "position": [220, 0],
+      "credentials": {
+        "stripeApi": {
+          "id": "CONFIGURE_ME",
+          "name": "Stripe restricted read key"
+        }
+      },
+      "notesInFlow": true,
+      "notes": "Runs graphmyanything-stripe sync. Credential secret must be rk_… (read-only restricted key)."
     },
     {
       "parameters": {
@@ -33,7 +41,7 @@
         "url": "https://api.graphmyanything.com/v1/track",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ metric: $json.metric, value: $json.value, tags: $json.tags }) }}",
+        "jsonBody": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', value: $json.mrrUsd, tags: { source: 'stripe', currency: 'usd' } }) }}",
         "options": {
           "response": {
             "response": {
@@ -47,40 +55,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [460, -120],
+      "disabled": true,
       "notesInFlow": true,
-      "notes": "Future cloud track API. Keep disabled until https://api.graphmyanything.com/v1/track ships."
-    },
-    {
-      "parameters": {
-        "operation": "executeTool",
-        "toolName": "track",
-        "toolParameters": "={{ JSON.stringify({ metric: $json.metric, value: $json.value, tags: $json.tags }) }}"
-      },
-      "id": "mcp-track",
-      "name": "MCP track",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [460, 120],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      },
-      "notesInFlow": true,
-      "notes": "Stdio MCP: npx -y graphmyanything-mcp@latest (Node 22.13+). Optional pin: graphmyanything-mcp@0.1.3."
+      "notes": "Future cloud track API. Leave disabled; CLI sync already writes to SQLite."
     },
     {
       "parameters": {
         "operation": "executeTool",
         "toolName": "query",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d', token_budget: 300 }) }}"
+        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', range: '90d', token_budget: 300 }) }}"
       },
       "id": "mcp-query",
       "name": "MCP query 90d",
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1,
-      "position": [700, 60],
+      "position": [460, 120],
       "credentials": {
         "mcpClientApi": {
           "id": "CONFIGURE_ME",
@@ -92,13 +81,13 @@
       "parameters": {
         "operation": "executeTool",
         "toolName": "insight",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d' }) }}"
+        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', range: '90d' }) }}"
       },
       "id": "mcp-insight",
       "name": "MCP insight",
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1,
-      "position": [940, 60],
+      "position": [700, 120],
       "credentials": {
         "mcpClientApi": {
           "id": "CONFIGURE_ME",
@@ -110,13 +99,13 @@
       "parameters": {
         "operation": "executeTool",
         "toolName": "chart",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d', type: 'area', theme: 'dark' }) }}"
+        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', range: '90d', type: 'area', theme: 'dark' }) }}"
       },
       "id": "mcp-chart",
       "name": "MCP chart SVG",
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1,
-      "position": [1180, 60],
+      "position": [940, 120],
       "credentials": {
         "mcpClientApi": {
           "id": "CONFIGURE_ME",
@@ -126,7 +115,7 @@
     },
     {
       "parameters": {
-        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule pulls (or mocks) Stripe MRR, writes one point with `track`, then runs `query` (90d), `insight`, and `chart` via the GraphMyAnything MCP server. Ingestion runs inside n8n — zero tokens in the agent chat that later asks for the trend. Charts land as SVG files on the n8n host.\n\n## Set up steps\n1. Import this workflow and open **Credentials → MCP Client** (stdio): Command `npx`, Args `-y`, `graphmyanything-mcp@latest` (optional pin `0.1.3`).\n2. Attach that credential to all four MCP Client Tool nodes.\n3. Disable **HTTP track (cloud placeholder)**; enable the MCP path.\n4. Run once manually, then enable the schedule.\n\n## Requirements\n- n8n **1.76+** with MCP Client Tool nodes enabled.\n- **Node.js 22.13+** on the worker (`node:sqlite`).\n- Package **graphmyanything-mcp@latest** (optional pin **0.1.3**).\n\n## Customize\nSwap **Mock Stripe MRR** for a Stripe or HTTP billing node; change metric name, `token_budget`, chart `type`/`theme`, or cron hour. Waitlist: https://graphmyanything.com",
+        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule runs `graphmyanything-stripe sync` (restricted key in the Stripe credential). The CLI writes `stripe.mrr.<ccy>`, subscribers, new/churn, and net revenue into local SQLite — same DB as `graphmyanything-mcp`. Then `query`, `insight`, and `chart` run over `stripe.mrr.usd` with zero agent tokens during ingestion.\n\n## Set up steps\n1. Import this workflow.\n2. **Credentials → Stripe** (name: Stripe restricted read key): paste `rk_test_…` or `rk_live_…` — not `sk_…`.\n3. **MCP Client** stdio: `npx -y graphmyanything-mcp@latest` + **Node 22.13+** on the worker.\n4. Attach MCP credential to query / insight / chart nodes.\n5. Ensure `graphmyanything-stripe` is on PATH via npx from this repo or npm link.\n6. Run once manually, then enable the schedule.\n\nDocs: `docs/stripe-mrr.md` in the GraphMyAnything repo.",
         "height": 520,
         "width": 420
       },
@@ -138,8 +127,8 @@
     },
     {
       "parameters": {
-        "content": "### Section: Schedule\n**Every day 9am** fires the workflow once per day at 09:00 (server timezone). Adjust `triggerAtHour` or switch to a webhook trigger for ad-hoc tests.",
-        "height": 140,
+        "content": "### Section: Schedule\n**Every day 9am** fires the workflow once per day at 09:00 (server timezone).",
+        "height": 120,
         "width": 280
       },
       "id": "sticky-schedule",
@@ -150,9 +139,9 @@
     },
     {
       "parameters": {
-        "content": "### Section: MRR source\n**Mock Stripe MRR** synthesizes a demo value. Replace this Code node with your Stripe trigger or billing HTTP request; output must include `metric`, `value`, and optional `tags`.",
-        "height": 160,
-        "width": 300
+        "content": "### Section: Stripe sync\n**Stripe sync (CLI)** runs `graphmyanything-stripe sync` with `STRIPE_RESTRICTED_KEY` from the Stripe API credential (`rk_…` only).",
+        "height": 140,
+        "width": 320
       },
       "id": "sticky-source",
       "name": "Sticky — Data source",
@@ -162,66 +151,46 @@
     },
     {
       "parameters": {
-        "content": "### Section: Track (pick one path)\n- **MCP track** (use today): stdio MCP `track` → local SQLite.\n- **HTTP track** (later): optional cloud placeholder; leave disabled until the public API exists.",
-        "height": 160,
-        "width": 320
-      },
-      "id": "sticky-track",
-      "name": "Sticky — Track",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [400, -280]
-    },
-    {
-      "parameters": {
-        "content": "### Section: Query\n**MCP query 90d** returns a token-budgeted summary of the last 90 days (`token_budget: 300`). Tighten or loosen the budget if your agent needs more detail.",
-        "height": 140,
+        "content": "### Section: Query\n**MCP query 90d** returns a token-budgeted summary of `stripe.mrr.usd`.",
+        "height": 120,
         "width": 300
       },
       "id": "sticky-query",
       "name": "Sticky — Query",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [660, -120]
+      "position": [420, -120]
     },
     {
       "parameters": {
-        "content": "### Section: Insight\n**MCP insight** adds plain-English trend, anomaly hints, and a simple forecast for `stripe.mrr` over 90d — useful for Slack/email summaries without opening a chart.",
-        "height": 140,
+        "content": "### Section: Insight\n**MCP insight** — trend + simple forecast for `stripe.mrr.usd`.",
+        "height": 120,
         "width": 300
       },
       "id": "sticky-insight",
       "name": "Sticky — Insight",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [900, -120]
+      "position": [660, -120]
     },
     {
       "parameters": {
-        "content": "### Section: Chart\n**MCP chart SVG** writes a dark area chart to disk (`path` in the tool result; `url` is null until hosted charts ship). Open the file on the n8n host or ship it to object storage in a follow-up node.",
-        "height": 160,
+        "content": "### Section: Chart\n**MCP chart SVG** writes a dark area chart for `stripe.mrr.usd` under `~/.graphmyanything/charts/`.",
+        "height": 140,
         "width": 320
       },
       "id": "sticky-chart",
       "name": "Sticky — Chart",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [1140, -140]
+      "position": [900, -120]
     }
   ],
   "connections": {
     "Every day 9am": {
-      "main": [[{ "node": "Mock Stripe MRR", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Stripe sync (CLI)", "type": "main", "index": 0 }]]
     },
-    "Mock Stripe MRR": {
-      "main": [
-        [
-          { "node": "HTTP track (cloud placeholder)", "type": "main", "index": 0 },
-          { "node": "MCP track", "type": "main", "index": 0 }
-        ]
-      ]
-    },
-    "MCP track": {
+    "Stripe sync (CLI)": {
       "main": [[{ "node": "MCP query 90d", "type": "main", "index": 0 }]]
     },
     "MCP query 90d": {
