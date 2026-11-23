@@ -2,7 +2,7 @@
 
 ## Headline (defensible)
 
-> End-to-end (excl. tool defs), GMA lean is **284** tokens vs **658** file-Python (**56.8% fewer**), with **349**-token MCP schemas vs **248**-token file/shell harness schemas.
+> End-to-end (excl. tool defs), GMA lean is **284** tokens vs **658** file-Python (**56.8% fewer**), with **492**-token MCP schemas (`track`, `query`, `insight`, `forget`, `chart`) vs **248**-token file/shell harness schemas.
 
 **Best-case file Python (~167 tokens) is ~4× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → **shared final answer**): **658** tokens (8.6 turns, 6.3 tool calls).
 
@@ -134,13 +134,13 @@
 
 | Bundle | Tools | Schema tokens (tools/list JSON) |
 |--------|-------|----------------------------------|
-| GraphMyAnything MCP | 4 | **349** |
+| GraphMyAnything MCP | 5 | **492** |
 | Python agent harness (representative) | 6 | **248** |
 
 | Flow | Excl. defs | + defs × turns | + defs once (cached) |
 |------|------------|----------------|----------------------|
 | Python file E2E cold | 658 | **2,791** | 906 |
-| GMA lean | 284 | **1,331** | 633 |
+| GMA lean | 284 | **1,760** | 776 |
 
 Prompt caching often discounts repeated tool schemas after turn 1; we show both **worst-case (× turns)** and **cached-once**.
 
@@ -177,7 +177,7 @@ Pricing: [GPT-5.2](https://platform.openai.com/docs/pricing).
 - Modeled flows, not live agent traces; token counts are **reproducible** from step text in `e2e-flows.ts`.
 - **Best-case** row is a deliberate lower bound; citing it without E2E is misleading.
 - File E2E assumes the agent does not paste the whole JSON into chat when told to read from disk.
-- GMA `chart` returns a path, not image bytes (same as Python PNG on disk).
+- GMA `chart`: **local** mode returns a file `path` (not image bytes); **hosted** mode returns a share URL (`https://graphmyanything.com/c/<id>`) plus embed metadata — same “no image bytes in chat” pattern as Python PNG on disk.
 - Other model tokenizers differ slightly; dollar lines scale linearly with token split.
 - **Shared** `SHARED_USER_CONTEXT` on turn 1 and `SHARED_FINAL_ANSWER` on the last step for every flow (`e2e-assumptions.ts`).
 - Python harness defs are a **representative** Cursor-style 6-tool bundle, not a live session export.

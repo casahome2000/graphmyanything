@@ -394,7 +394,7 @@ const summary = computeSummary(series);
 
 const defTable = `| Bundle | Tools | Schema tokens (tools/list JSON) |
 |--------|-------|----------------------------------|
-| GraphMyAnything MCP | 4 | **${formatNum(gmaDefTokens)}** |
+| GraphMyAnything MCP | 5 | **${formatNum(gmaDefTokens)}** |
 | Python agent harness (representative) | 6 | **${formatNum(pyDefTokens)}** |
 
 | Flow | Excl. defs | + defs × turns | + defs once (cached) |
@@ -481,7 +481,7 @@ Pricing: [${ASSUMPTIONS.costModel.label}](${ASSUMPTIONS.costModel.source}).
 - Modeled flows, not live agent traces; token counts are **reproducible** from step text in \`e2e-flows.ts\`.
 - **Best-case** row is a deliberate lower bound; citing it without E2E is misleading.
 - File E2E assumes the agent does not paste the whole JSON into chat when told to read from disk.
-- GMA \`chart\` returns a path, not image bytes (same as Python PNG on disk).
+- GMA \`chart\`: **local** mode returns a file \`path\` (not image bytes); **hosted** mode returns a share URL (\`https://graphmyanything.com/c/<id>\`) plus embed metadata — same “no image bytes in chat” pattern as Python PNG on disk.
 - Other model tokenizers differ slightly; dollar lines scale linearly with token split.
 - **Shared** \`SHARED_USER_CONTEXT\` on turn 1 and \`SHARED_FINAL_ANSWER\` on the last step for every flow (\`e2e-assumptions.ts\`).
 - Python harness defs are a **representative** Cursor-style 6-tool bundle, not a live session export.
