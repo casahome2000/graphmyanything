@@ -10,10 +10,11 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 - **theme**: \`dark\` (default) or \`light\` — match the host UI.
 - **labels**: \`last\` (default, clean) — one end value beside the last point; \`none\` — no value labels; \`extremes\` — first/last/min/max when they fit without overlap; \`all\` — every point (small series only).
 - **range**: same as query — \`7d\`, \`90d\`, \`12w\`, \`1y\`, \`all\` (default).
-- Prefer **labels: last** and **line** for agent-facing visuals unless the user asks for bars or full annotations.
+- **share**: default \`true\` in hosted mode; \`false\` skips the public URL (local \`path\` is still written).
 
 ## Output
-SVG written to local disk; response \`path\` opens the file. \`url\` is null until hosted charts ship.
+- **Local mode:** SVG on disk; response includes \`path\`. \`url\` is null.
+- **Hosted mode** (after \`sync\` or API key): \`path\` (local backup) plus \`url\` at \`https://graphmyanything.com/c/<hex-id>\`, \`embed_svg\`, and \`embed_png\` when \`share\` is not false. Share pages support hover tooltips on markers in a browser.
 `;
 
 /** tools/list blurb — details live in resource chart-guide. */

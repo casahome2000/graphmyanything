@@ -1,4 +1,6 @@
+import fs from "node:fs";
 import { spawnSync } from "node:child_process";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -38,5 +40,22 @@ describe("CLI --help", () => {
     expect(status).toBe(0);
     expect(stdout).toMatch(/graphmyanything-mcp sync/);
     expect(stdout).toMatch(/device/);
+  });
+
+  it("--help does not create the default metrics.db", () => {
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "gma-help-home-"));
+    const dbPath = path.join(home, ".graphmyanything", "metrics.db");
+    const { status } = spawnSync(process.execPath, [bin, "--help"], {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        HOME: home,
+        USERPROFILE: home,
+        NODE_OPTIONS: "--disable-warning=ExperimentalWarning",
+        GRAPHMYANYTHING_DB_PATH: dbPath,
+      },
+    });
+    expect(status).toBe(0);
+    expect(fs.existsSync(dbPath)).toBe(false);
   });
 });

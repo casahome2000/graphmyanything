@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2 — 2026-11-23
+
+- **`--help`** / **`sync --help`** no longer create an empty default SQLite file (lazy MCP server load).
+- Updated MCP resources **chart-guide** and **usage-guide** for hosted share links and plan limits.
+
 ## 0.2.1 — 2026-11-23
 
 - CLI **`--help`** and **`<command> --help`** print usage (commands, flags, env vars, examples) and exit 0.

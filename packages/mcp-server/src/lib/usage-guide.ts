@@ -7,12 +7,17 @@ export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, 
 - **Do:** numbers you will chart or compare again; anything over time; costly-to-fetch data.
 - **Don't:** one-off constants, secrets, raw PII you would not store in a local log.
 - **Names:** \`namespace.metric.unit\` (e.g. \`health.weight.lb\`). Use \`tags\` for dimensions.
-- **Upsert:** \`track\` replaces an existing row with the same **metric + ts** (returns \`written\` / \`replaced\`). Re-track at the same timestamp to correct a value.
+- **Upsert:** \`track\` replaces an existing row with the same **metric + ts\` (returns \`written\` / \`replaced\`). Re-track at the same timestamp to correct a value.
 - **Backfill:** \`points[]\` with \`ts\`; then single \`value\` for incremental days.
 
-## Forget (delete)
+## Forget (hard delete)
 - **Always require \`metric\`.** Modes: \`ts\` (one point), \`from\`+\`to\` (inclusive range), or \`all:true\` + \`confirm:true\` (whole metric).
-- Use when the user withdraws data or you stored the wrong metric name — not for routine corrections (upsert instead).
+- Deletes are permanent. In **hosted** mode, \`forget\` removes data on the server and from local SQLite for the same filter.
+
+## Hosted mode
+- Enable with \`graphmyanything-mcp sync\`, config API key, or \`GRAPHMYANYTHING_API_KEY\` / \`GMA_API_KEY\`.
+- Reads use the hosted API (subject to plan **read_window_days** on Free: 90-day query/chart window; full history stored).
+- Writes mirror to local SQLite. \`chart\` can return share links: \`graphmyanything.com/c/<hex-id>\`.
 
 ## Query vs insight vs chart
 | Need | Tool |
@@ -20,9 +25,6 @@ export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, 
 | Stats + optional series under budget | \`query\` (\`points: 0\`; \`also_chart\` drops pts) |
 | Plain English trend, anomalies, forecast | \`insight\` |
 | SVG for the user | \`chart\` (resource **chart-guide**) |
-
-## Freshness
-- Trust stored history within your SLA; re-fetch when the user needs live data or after known events.
 
 ## Token hints
 - \`query\` + \`chart\` beat big JSON in chat; responses include \`tokens_estimate\` (chars÷4).
