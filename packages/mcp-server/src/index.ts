@@ -10,12 +10,15 @@ import {
 } from "./lib/usage-guide.js";
 import {
   chartToolInputSchema,
+  forgetToolInputSchema,
+  FORGET_TOOL_DESCRIPTION,
   insightToolInputSchema,
   queryToolInputSchema,
   trackToolInputSchema,
 } from "./tool-schemas.js";
 import {
   handleChart,
+  handleForget,
   handleInsight,
   handleQuery,
   handleTrack,
@@ -74,7 +77,7 @@ server.registerTool(
   "track",
   {
     title: "Track metric",
-    description: "Write metric point(s) to local SQLite.",
+    description: "Upsert (metric,ts); written+replaced.",
     inputSchema: trackToolInputSchema,
   },
   async (args) => {
@@ -89,7 +92,7 @@ server.registerTool(
   "query",
   {
     title: "Query metric",
-    description: "Terse summary (s.l/mn/mx/mu/tr/pct/n) + optional LTTB pts.",
+    description: "Summary + optional LTTB pts.",
     inputSchema: queryToolInputSchema,
   },
   async (args) => {
@@ -109,6 +112,21 @@ server.registerTool(
   },
   async (args) => {
     const result = handleInsight(db, args);
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+server.registerTool(
+  "forget",
+  {
+    title: "Forget",
+    description: FORGET_TOOL_DESCRIPTION,
+    inputSchema: forgetToolInputSchema,
+  },
+  async (args) => {
+    const result = handleForget(db, args);
     return {
       content: [{ type: "text", text: JSON.stringify(result) }],
     };

@@ -43,11 +43,24 @@ export const chartToolArgsSchema = z.object({
   labels: z.enum(["none", "last", "extremes", "all"]).optional(),
 });
 
+export const FORGET_TOOL_DESCRIPTION =
+  "Delete points (metric req). Modes in usage-guide.";
+
+export const forgetToolArgsSchema = z.object({
+  metric: z.string(),
+  ts: z.number().optional(),
+  from: z.number().optional(),
+  to: z.number().optional(),
+  all: z.boolean().optional(),
+  confirm: z.boolean().optional(),
+});
+
 export const GMA_TOOL_ARG_SCHEMAS: Record<string, z.ZodTypeAny> = {
   track: trackToolArgsSchema,
   query: queryToolArgsSchema,
   insight: insightToolArgsSchema,
   chart: chartToolArgsSchema,
+  forget: forgetToolArgsSchema,
 };
 
 export const trackToolInputSchema = {
@@ -87,4 +100,13 @@ export const chartToolInputSchema = {
     .enum(["none", "last", "extremes", "all"])
     .optional()
     .describe(CHART_LABELS_DESCRIBE),
+};
+
+export const forgetToolInputSchema = {
+  metric: z.string(),
+  ts: z.number().optional(),
+  from: z.number().optional(),
+  to: z.number().optional(),
+  all: z.boolean().optional(),
+  confirm: z.boolean().optional(),
 };

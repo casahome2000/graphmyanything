@@ -18,13 +18,12 @@ SVG written to local disk; response \`path\` opens the file. \`url\` is null unt
 
 /** tools/list blurb — details live in resource chart-guide. */
 export const CHART_TOOL_DESCRIPTION =
-  "SVG chart to local path. See MCP resource chart-guide for type, theme, labels.";
+  "SVG to path; see chart-guide.";
 
 export const RANGE_DESCRIBE = "7d|90d|1y|all";
 
-export const CHART_TYPE_DESCRIBE = "line=trends; bar=sparse≤120; area=fill";
+export const CHART_TYPE_DESCRIBE = "line|bar|area";
 
-export const CHART_THEME_DESCRIBE = "dark|light UI";
+export const CHART_THEME_DESCRIBE = "dark|light";
 
-export const CHART_LABELS_DESCRIBE =
-  "last=clean default; extremes=peaks; all≤12; none=sparkline";
+export const CHART_LABELS_DESCRIBE = "none|last|extremes|all";

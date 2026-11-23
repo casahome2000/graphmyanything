@@ -52,7 +52,7 @@ try {
 
   const tools = await rpc("tools/list", {});
   const names = (tools.tools ?? []).map((t) => t.name).sort();
-  if (names.join(",") !== "chart,insight,query,track") {
+  if (names.join(",") !== "chart,forget,insight,query,track") {
     throw new Error(`Unexpected tools: ${names.join(", ")}`);
   }
 

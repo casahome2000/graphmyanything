@@ -3,31 +3,31 @@ export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, 
 
 **Build once. Ask forever.** Store time series locally; answer later from history in a few hundred tokens.
 
-## Track (store)
-- **Do:** numbers you will chart or compare again; anything over time; data that is slow or costly to re-fetch (billing APIs, scraped series).
-- **Don't:** one-off constants, secrets, passwords, raw PII you would not store in a local log.
-- **Names:** \`namespace.metric.unit\` (e.g. \`health.weight.lb\`, \`stripe.mrr.usd\`). Units belong in the metric string; use \`tags\` for dimensions.
-- **Batch once:** use \`points[]\` with \`ts\` (Unix seconds) for backfill; then \`value\` for incremental days.
-- **Idempotency:** each \`track\` **inserts** a row. Same \`metric\` + \`ts\` again **adds another row** (no upsert). Queries return all rows ordered by time — prefer distinct timestamps; to fix a mistake, track the corrected value at the intended \`ts\` and know duplicates may appear until manual DB edit.
-- **No delete tool** in 0.1.x; retention is indefinite. Clear data by removing the SQLite file (\`~/.graphmyanything/metrics.db\` or \`GRAPHMYANYTHING_DB_PATH\`).
+## Track (store / upsert)
+- **Do:** numbers you will chart or compare again; anything over time; costly-to-fetch data.
+- **Don't:** one-off constants, secrets, raw PII you would not store in a local log.
+- **Names:** \`namespace.metric.unit\` (e.g. \`health.weight.lb\`). Use \`tags\` for dimensions.
+- **Upsert:** \`track\` replaces an existing row with the same **metric + ts** (returns \`written\` / \`replaced\`). Re-track at the same timestamp to correct a value.
+- **Backfill:** \`points[]\` with \`ts\`; then single \`value\` for incremental days.
+
+## Forget (delete)
+- **Always require \`metric\`.** Modes: \`ts\` (one point), \`from\`+\`to\` (inclusive range), or \`all:true\` + \`confirm:true\` (whole metric).
+- Use when the user withdraws data or you stored the wrong metric name — not for routine corrections (upsert instead).
 
 ## Query vs insight vs chart
 | Need | Tool |
 |------|------|
-| Stats + optional compact series under a token budget | \`query\` (\`points: 0\` = summary only; \`also_chart: true\` drops pts) |
-| Plain English trend, MAD anomalies, naive forecast | \`insight\` |
-| SVG file for the user | \`chart\` (read resource **chart-guide** for type/theme/labels) |
+| Stats + optional series under budget | \`query\` (\`points: 0\`; \`also_chart\` drops pts) |
+| Plain English trend, anomalies, forecast | \`insight\` |
+| SVG for the user | \`chart\` (resource **chart-guide**) |
 
 ## Freshness
-- Trust stored data for history and trends within your SLA.
-- Re-fetch the source when the user asks for "today"/"live", after a known event (deploy, payout), or when the latest stored point is stale for that metric.
+- Trust stored history within your SLA; re-fetch when the user needs live data or after known events.
 
 ## Token hints
-- Prefer \`query\` + \`chart\` over pasting big JSON or matplotlib in chat.
-- Use \`token_budget\` and \`points: 0\` or \`also_chart\` to stay lean.
-- Responses include \`tokens_estimate\` (chars ÷ 4, approximate).
+- \`query\` + \`chart\` beat big JSON in chat; responses include \`tokens_estimate\` (chars÷4).
 
-Read MCP resource **chart-guide** for chart options.
+Read **chart-guide** for chart options.
 `;
 
 /** Initialize \`instructions\` field (≤60 tokens, chars÷4). */

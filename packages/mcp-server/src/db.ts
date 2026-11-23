@@ -13,6 +13,35 @@ export function resolveDbPath(): string {
   return process.env.GRAPHMYANYTHING_DB_PATH ?? DEFAULT_DB;
 }
 
+const UNIQUE_INDEX = "idx_metric_ts_unique";
+
+/** Dedupe (metric, ts) rows and add UNIQUE(metric, ts) — idempotent on fresh DBs. */
+export function migrateUniqueMetricTs(db: GmaDatabase): void {
+  const row = db
+    .prepare(
+      `SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?`,
+    )
+    .get(UNIQUE_INDEX) as { name: string } | undefined;
+  if (row) return;
+
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.exec(`
+      DELETE FROM metric_points
+      WHERE id NOT IN (
+        SELECT MAX(id) FROM metric_points GROUP BY metric, ts
+      );
+    `);
+    db.exec(`
+      CREATE UNIQUE INDEX ${UNIQUE_INDEX} ON metric_points(metric, ts);
+    `);
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
+  }
+}
+
 export function openDatabase(dbPath = resolveDbPath()): GmaDatabase {
   const dir = path.dirname(dbPath);
   fs.mkdirSync(dir, { recursive: true });
@@ -29,6 +58,7 @@ export function openDatabase(dbPath = resolveDbPath()): GmaDatabase {
     );
     CREATE INDEX IF NOT EXISTS idx_metric_ts ON metric_points(metric, ts);
   `);
+  migrateUniqueMetricTs(db);
   return db;
 }
 
@@ -38,25 +68,84 @@ export type MetricPoint = {
   tags: Record<string, string>;
 };
 
-export function insertPoints(
+export type UpsertResult = { written: number; replaced: number };
+
+export function upsertPoints(
   db: GmaDatabase,
   metric: string,
   points: MetricPoint[],
-): number {
-  const stmt = db.prepare(
-    `INSERT INTO metric_points (metric, ts, value, tags) VALUES (?, ?, ?, ?)`,
+): UpsertResult {
+  const existsStmt = db.prepare(
+    `SELECT 1 FROM metric_points WHERE metric = ? AND ts = ? LIMIT 1`,
   );
+  const upsertStmt = db.prepare(`
+    INSERT INTO metric_points (metric, ts, value, tags)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(metric, ts) DO UPDATE SET
+      value = excluded.value,
+      tags = excluded.tags,
+      created_at = unixepoch()
+  `);
+  let written = 0;
+  let replaced = 0;
   db.exec("BEGIN IMMEDIATE");
   try {
     for (const row of points) {
-      stmt.run(metric, row.ts, row.value, JSON.stringify(row.tags ?? {}));
+      const had = existsStmt.get(metric, row.ts);
+      upsertStmt.run(metric, row.ts, row.value, JSON.stringify(row.tags ?? {}));
+      if (had) replaced += 1;
+      else written += 1;
     }
     db.exec("COMMIT");
   } catch (err) {
     db.exec("ROLLBACK");
     throw err;
   }
-  return points.length;
+  return { written, replaced };
+}
+
+/** @deprecated Use upsertPoints — kept for tests that only need rows present. */
+export function insertPoints(
+  db: GmaDatabase,
+  metric: string,
+  points: MetricPoint[],
+): number {
+  const { written, replaced } = upsertPoints(db, metric, points);
+  return written + replaced;
+}
+
+export function deletePoints(
+  db: GmaDatabase,
+  args: {
+    metric: string;
+    ts?: number;
+    from?: number;
+    to?: number;
+    all?: boolean;
+  },
+): number {
+  const metric = args.metric.trim();
+  if (!metric) throw new Error("metric is required");
+
+  let sql = `DELETE FROM metric_points WHERE metric = ?`;
+  const params: (string | number)[] = [metric];
+
+  if (args.all) {
+    // whole metric
+  } else if (args.ts != null) {
+    sql += ` AND ts = ?`;
+    params.push(args.ts);
+  } else if (args.from != null && args.to != null) {
+    sql += ` AND ts >= ? AND ts <= ?`;
+    params.push(args.from, args.to);
+  } else {
+    throw new Error(
+      "Specify ts, from+to, or all:true (with confirm in the tool handler)",
+    );
+  }
+
+  const result = db.prepare(sql).run(...params);
+  return Number(result.changes);
 }
 
 export function queryPoints(
@@ -86,4 +175,11 @@ export function queryPoints(
     value: r.value,
     tags: JSON.parse(r.tags) as Record<string, string>,
   }));
+}
+
+export function countPoints(db: GmaDatabase, metric: string): number {
+  const row = db
+    .prepare(`SELECT COUNT(*) AS n FROM metric_points WHERE metric = ?`)
+    .get(metric) as { n: number };
+  return row.n;
 }

@@ -94,7 +94,7 @@ After the server shows up in your client's MCP list, try:
 
 **What you should see**
 
-1. **`track`** — JSON like `{"ok":true,"metric":"health.weight.lb","written":1,"tokens_estimate":…}`.
+1. **`track`** — JSON like `{"ok":true,"metric":"health.weight.lb","written":1,"replaced":0,"tokens_estimate":…}` (upserts on same `metric` + `ts`).
 2. **`query`** — terse stats (`s.l`, `s.mn`, `s.tr`, …) and maybe downsampled `pts` depending on budget.
 3. **`chart`** — `{"path":"…/.graphmyanything/charts/health.weight.lb-….svg","url":null,"hosted_url_note":…}`.
 
@@ -119,7 +119,7 @@ In Docker, defaults are under `/data` (see image `ENV`).
 Without bloating `tools/list`, the server exposes:
 
 - **`chart-guide`** — `graphmyanything://docs/chart-guide` — chart type, theme, labels, range.
-- **`usage-guide`** — `graphmyanything://docs/usage-guide` — when to track, query, insight, or chart.
+- **`usage-guide`** — `graphmyanything://docs/usage-guide` — when to track, forget, query, insight, or chart.
 
 The server's **initialize** response includes a short instruction to read those resources.
 

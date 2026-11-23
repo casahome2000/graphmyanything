@@ -2,15 +2,24 @@
 
 ## 0.1.4 — 2026-11-23
 
+### track
+
+- **Upsert** on `(metric, ts)` with `UNIQUE` index; legacy DBs dedupe duplicates on open (keeps latest `id`).
+- Response includes **`written`** and **`replaced`** counts.
+
+### forget
+
+- New **`forget`** tool: delete by `ts`, `from`+`to` (Unix seconds), or `all:true` with required `confirm:true`. Always requires `metric`. Returns `deleted`.
+
 ### docs
 
-- Repo guides: [quickstart](../../docs/quickstart.md), [examples](../../docs/examples.md), [agent-guide](../../docs/agent-guide.md).
+- Repo guides: [quickstart](../../docs/quickstart.md), [examples](../../docs/examples.md), [agent-guide](../../docs/agent-guide.md) — updated for upsert/forget.
 
 ### MCP discovery
 
 - New MCP resource **`usage-guide`** (`graphmyanything://docs/usage-guide`) — condensed when-to-track/query/chart guidance for agents.
 - **`initialize` `instructions`** (≤60 tokens) — points agents at `usage-guide` and `chart-guide`.
-- `tools/list` payload unchanged; tests validate documented example tool arguments against Zod schemas.
+- Fifth tool **`forget`** added to `tools/list` (compact schema vs extending `track`).
 
 ## 0.1.3 — 2026-11-23
 

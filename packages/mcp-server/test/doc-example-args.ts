@@ -3,7 +3,7 @@
  */
 export type DocExample = {
   id: string;
-  tool: "track" | "query" | "insight" | "chart";
+  tool: "track" | "query" | "insight" | "chart" | "forget";
   arguments: Record<string, unknown>;
 };
 
@@ -90,12 +90,20 @@ export const DOC_EXAMPLE_TOOL_CALLS: DocExample[] = [
     },
   },
   {
-    id: "weight-correction",
+    id: "weight-correction-upsert",
     tool: "track",
     arguments: {
       metric: "health.weight.lb",
       points: [{ ts: 1732147200, value: 181.9 }],
       tags: { note: "corrected misread" },
+    },
+  },
+  {
+    id: "forget-point",
+    tool: "forget",
+    arguments: {
+      metric: "health.weight.lb",
+      ts: 1731888000,
     },
   },
   {

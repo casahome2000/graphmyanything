@@ -2,7 +2,7 @@
 
 Each example has a **user prompt**, the **tool call** (arguments matching the 0.1.3+ Zod schemas), and a **sample response** shape. Example JSON is validated in CI (`test/example-args.test.ts`).
 
-Tools: `track`, `query`, `insight`, `chart`. All successful responses include `tokens_estimate` (JSON length ÷ 4, approximate).
+Tools: `track`, `forget`, `query`, `insight`, `chart`. All successful responses include `tokens_estimate` (JSON length ÷ 4, approximate).
 
 ---
 
@@ -27,7 +27,8 @@ Tools: `track`, `query`, `insight`, `chart`. All successful responses include `t
   "ok": true,
   "metric": "health.weight.lb",
   "written": 1,
-  "tokens_estimate": 18
+  "replaced": 0,
+  "tokens_estimate": 20
 }
 ```
 
@@ -60,7 +61,8 @@ Tools: `track`, `query`, `insight`, `chart`. All successful responses include `t
   "ok": true,
   "metric": "geo.plano_tx.population",
   "written": 3,
-  "tokens_estimate": 22
+  "replaced": 0,
+  "tokens_estimate": 24
 }
 ```
 
@@ -244,7 +246,7 @@ Use **`insight`** when the user wants narrative + anomalies + forecast, not raw 
 
 ---
 
-## 8. Correct or update a point (append semantics)
+## 8. Correct a point (upsert same date)
 
 **Prompt:** *Yesterday's weigh-in was wrong — it should be 181.9 lb at that day's timestamp.*
 
@@ -258,7 +260,36 @@ Use **`insight`** when the user wants narrative + anomalies + forecast, not raw 
 }
 ```
 
-**Behavior:** The server **inserts** rows only. There is **no upsert** and **no delete tool**. Re-using the same `metric` + `ts` creates a **second row** at that timestamp; `query`/`chart`/`insight` see **both** values in time order. For a clean series, use a distinct correction timestamp or edit the SQLite file manually.
+**Behavior:** `track` **upserts** on `(metric, ts)`. The same timestamp replaces the previous value; response reports `written` (new ts) vs `replaced` (updated ts).
+
+**Sample response (correction):**
+
+```json
+{
+  "ok": true,
+  "metric": "health.weight.lb",
+  "written": 0,
+  "replaced": 1,
+  "tokens_estimate": 22
+}
+```
+
+---
+
+## 9. Delete a point — `forget`
+
+**Prompt:** *Remove the erroneous weigh-in from last Tuesday only — keep the rest of `health.weight.lb`.*
+
+**Tool:** `forget`
+
+```json
+{
+  "metric": "health.weight.lb",
+  "ts": 1731888000
+}
+```
+
+**Other modes:** `from` + `to` (Unix seconds, inclusive); `all: true` with **`confirm: true`** to drop an entire metric. **`metric` is always required.**
 
 **Sample response:**
 
@@ -266,14 +297,14 @@ Use **`insight`** when the user wants narrative + anomalies + forecast, not raw 
 {
   "ok": true,
   "metric": "health.weight.lb",
-  "written": 1,
-  "tokens_estimate": 19
+  "deleted": 1,
+  "tokens_estimate": 18
 }
 ```
 
 ---
 
-## 9. Multiple metrics — naming convention
+## 10. Multiple metrics — naming convention
 
 **Prompt:** *I'm tracking weight in pounds and MRR in dollars — keep namespaces separate.*
 

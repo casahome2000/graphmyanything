@@ -8,11 +8,12 @@ A condensed copy ships as the MCP resource **`usage-guide`** (`graphmyanything:/
 
 ---
 
-## The four tools
+## The five tools
 
 | Tool | Purpose |
 |------|---------|
-| **track** | Write one or many `(timestamp, value)` rows to SQLite |
+| **track** | Upsert one or many `(timestamp, value)` rows by `(metric, ts)` |
+| **forget** | Delete point, range, or whole metric (`metric` always required) |
 | **query** | Terse numeric summary + optional LTTB downsampled `pts` within `token_budget` |
 | **insight** | Plain-English trend, MAD-based anomalies, naive linear forecast |
 | **chart** | 640×320 SVG on disk; `path` is local, `url` is always `null` today |
@@ -49,23 +50,30 @@ Use **`tags`** for dimensions (`plan`, `source`, `env`), not for the primary uni
 
 ---
 
-## Idempotency and duplicates
+## Upsert and corrections
 
-Implementation: each `track` runs **`INSERT`** into `metric_points`. There is **no unique constraint** on `(metric, ts)`.
+SQLite enforces **`UNIQUE(metric, ts)`**. On first open, existing DBs **dedupe** legacy duplicates (keeps the row with the highest `id`).
 
 | Action | Result |
 |--------|--------|
-| `track` with `value` only | One row at **current** Unix time (seconds) |
-| `track` with `points[]` | One row per point; missing `ts` → current time |
-| Same `metric` + same `ts` again | **Another row** — not an update |
-| `query` / `insight` / `chart` | All rows in range, **ORDER BY ts ASC** |
+| `track` with `value` only | Upsert at **current** Unix time (seconds) |
+| `track` with `points[]` | Upsert per point; missing `ts` → current time |
+| Same `metric` + same `ts` again | **Replace** value/tags; `replaced` += 1 |
+| Response | `written` (new timestamps) + `replaced` (updated timestamps) |
 
-**Corrections:** There is **no delete** or **patch** tool in 0.1.x. To fix a value you can:
-
-1. `track` the corrected value at the intended `ts` — knowing **duplicates may appear** if the old row remains.
-2. Manually edit or replace the SQLite DB (`~/.graphmyanything/metrics.db` or `GRAPHMYANYTHING_DB_PATH`).
+**Corrections:** `track` again at the same `ts` with the fixed value — no duplicate point.
 
 **Batch tags:** Top-level `tags` merge into each point; per-point `tags` override on key collision.
+
+## **forget** (delete)
+
+| Mode | Arguments |
+|------|-----------|
+| Single point | `metric` + `ts` |
+| Range (inclusive) | `metric` + `from` + `to` (Unix seconds) |
+| Entire metric | `metric` + `all: true` + **`confirm: true`** |
+
+Never call `forget` without **`metric`**. Returns `{ deleted }`.
 
 ---
 
@@ -74,7 +82,7 @@ Implementation: each `track` runs **`INSERT`** into `metric_points`. There is **
 1. **Backfill:** `track` with `points: [{ value, ts }, …]` from CSV, census, or API history.
 2. **Incremental:** `track` with `value` (and optional `tags`) on a schedule (cron, n8n, agent daily habit).
 
-Avoid re-backfilling the entire series on every run unless the source is authoritative and you accept duplicate timestamps.
+Avoid re-backfilling the entire series on every run unless the source is authoritative — upsert will update overlapping timestamps.
 
 ---
 
@@ -124,9 +132,11 @@ Storage is **local truth for what was recorded**, not a live mirror of third-par
 
 ## Retention and deletion
 
-- Data persists until the DB file is removed or overwritten.
-- **No MCP delete tool** in 0.1.x — no per-metric wipe, no upsert.
-- To reset: delete `metrics.db` (and optional charts under `~/.graphmyanything/charts/` or `GRAPHMYANYTHING_CHARTS_DIR`).
+- Data persists until you **`forget`** it or remove the DB file.
+- **`forget`** handles point, range, or metric-level delete (with `confirm` for `all:true`).
+- Nuclear reset: delete `metrics.db` (and optional charts under `~/.graphmyanything/charts/` or `GRAPHMYANYTHING_CHARTS_DIR`).
+
+**Why a `forget` tool (not delete flags on `track`)?** Delete modes need five optional fields; folding them into `track` bloats the busiest tool in `tools/list`. A compact fifth tool keeps `track` focused on upsert and costs fewer list tokens than an oversized `track` schema.
 
 ---
 
@@ -144,7 +154,7 @@ Responses' **`tokens_estimate`** helps agents self-throttle; it counts the **too
 
 ## MCP discovery (for agent authors)
 
-- **`tools/list`** — four tools; chart details are shortened; see resources for guides.
+- **`tools/list`** — five tools (`track`, `forget`, `query`, `insight`, `chart`); chart details shortened — see resources.
 - **`resources/list`** — `chart-guide`, `usage-guide`.
 - **Initialize `instructions`** — short pointer to read those resources.
 
@@ -155,13 +165,11 @@ Human-readable docs in this repo:
 
 ---
 
-## Behavior gaps (0.1.x)
+## Known limits (0.1.x)
 
-| Gap | Workaround |
-|-----|------------|
-| No delete / upsert | Manual SQLite edit or new metric name |
-| Duplicate `ts` rows | Avoid re-track at same second; or accept duplicate points |
+| Limit | Workaround |
+|-------|------------|
 | `chart` `url` always null | Open local `path` |
-| No server-side schema migration UI | Single `metric_points` table, created on first open |
+| No cloud sync | Local SQLite only |
 
 Feature requests welcome on [GitHub Issues](https://github.com/casahome2000/graphmyanything/issues).
