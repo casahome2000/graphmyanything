@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3 — 2026-11-23
+
+- **server.json** / **package.json** descriptions shortened for MCP registry (≤100 chars).
+- Doc pins and Docker **0.2.3** (metadata-only bump; no functional change from 0.2.2).
+
 ## 0.2.2 — 2026-11-23
 
 - **`--help`** / **`sync --help`** no longer create an empty default SQLite file (lazy MCP server load).

@@ -29,7 +29,8 @@ Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days 
 1. **Track** values (single points, batches, or historical series).
 2. **Query** compact numeric summaries and optional downsampled points within a token budget.
 3. **Insight** plain-English trend, anomalies, and a simple forecast.
-4. **Chart** dark/light **640×320 SVG** locally; in **hosted** mode also returns `url` (`https://graphmyanything.com/c/<id>`), `embed_svg`, and `embed_png` (use `share: false` to omit the public URL). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
+4. **Forget** hard-delete points, ranges, or a whole metric (`confirm` when `all: true`).
+5. **Chart** dark/light **640×320 SVG** locally; in **hosted** mode also returns `url` (`https://graphmyanything.com/c/<id>`), `embed_svg`, and `embed_png` (use `share: false` to omit the public URL). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
 
 Data stays on your machine by default. **`graphmyanything-mcp sync`** (v0.2+) opts into hosted mode with device-code auth while keeping a local SQLite backup. See [quickstart](./docs/quickstart.md) and [hosted API contract](./docs/hosted-api.md).
 
@@ -41,7 +42,7 @@ Data stays on your machine by default. **`graphmyanything-mcp sync`** (v0.2+) op
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.1`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.3`
 
 ### Local paths & env vars
 
@@ -115,7 +116,7 @@ claude mcp add graphmyanything -- npx -y graphmyanything-mcp@latest
 
 ## n8n
 
-Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `0.2.1`).
+Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `0.2.3`).
 
 ## Why tokens matter (one chart question)
 

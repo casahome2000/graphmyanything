@@ -1,8 +1,6 @@
 # graphmyanything-mcp
 
-**Build once. Ask forever.** One MCP call instead of throwaway Python — store metrics in SQLite and answer chart questions from history with token-efficient **track**, **query**, **insight**, and **chart** tools.
-
-[Join the waitlist](https://graphmyanything.com) · Founding member preorder live on the site.
+**Build once. Ask forever.** One MCP call instead of throwaway Python — store metrics in SQLite and answer from history with **track**, **query**, **insight**, **forget**, and **chart**. After `sync`, hosted mode adds share links at [graphmyanything.com](https://graphmyanything.com) (`/c/<id>`); upgrade on the site for the **Founding** plan.
 
 | Population (30y, dark) | Weight (4 points, light) |
 |---|---|
@@ -27,7 +25,7 @@ Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includ
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.2`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.3`
 
 Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
 
@@ -69,7 +67,7 @@ Config: `~/.graphmyanything/config.json` (mode `0600`). API key env: `GRAPHMYANY
 }
 ```
 
-Pin a version (optional): `"graphmyanything-mcp@0.2.2"` as the second arg.
+Pin a version (optional): `"graphmyanything-mcp@0.2.3"` as the second arg.
 
 ## Claude Desktop
 

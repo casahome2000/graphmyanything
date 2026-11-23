@@ -2,20 +2,20 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.casahome2000/graphmyanything-mcp",
   "title": "GraphMyAnything",
-  "description": "Metric memory for agents: track, query, insight, chart. Local SQLite with optional hosted sync and shareable chart links at graphmyanything.com/c/<id>.",
+  "description": "Chart & metric memory for AI agents: track once, query, insight, forget, shareable charts.",
   "websiteUrl": "https://graphmyanything.com",
   "repository": {
     "url": "https://github.com/casahome2000/graphmyanything",
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.2.2",
+  "version": "0.2.3",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "graphmyanything-mcp",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "transport": {
         "type": "stdio"
       },

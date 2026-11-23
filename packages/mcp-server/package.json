@@ -1,7 +1,7 @@
 {
   "name": "graphmyanything-mcp",
-  "version": "0.2.2",
-  "description": "Metric memory for AI agents: track, query, chart via MCP — one call vs throwaway Python",
+  "version": "0.2.3",
+  "description": "Build once, ask forever — MCP track, query, insight, forget, chart (local or hosted).",
   "homepage": "https://graphmyanything.com",
   "license": "MIT",
   "type": "module",
