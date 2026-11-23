@@ -1,6 +1,17 @@
-# graphmyanything-stripe (engine)
+# graphmyanything-stripe
 
-Month-normalized Stripe MRR and billing metrics aligned with Stripe Billing Analytics conventions. Used by the `graphmyanything-stripe` CLI (separate PR) and n8n integrations.
+Month-normalized Stripe MRR and billing metrics aligned with Stripe Billing Analytics conventions.
+
+## CLI
+
+```bash
+export STRIPE_RESTRICTED_KEY=rk_test_…   # never sk_…
+npx graphmyanything-stripe backfill
+npx graphmyanything-stripe sync
+npx graphmyanything-stripe status
+```
+
+Writes metrics with the same upsert semantics as `graphmyanything-mcp` `track` into `GRAPHMYANYTHING_DB_PATH` (default `~/.graphmyanything/metrics.db`). State (no secrets) defaults to `~/.graphmyanything/stripe-connector.json`.
 
 ## Metrics
 
