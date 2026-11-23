@@ -6,6 +6,8 @@
   "scripts": {
     "build:mcp": "npm run build --prefix packages/mcp-server",
     "test:mcp": "npm test --prefix packages/mcp-server",
+    "test:stripe": "npm test --prefix packages/stripe-mrr",
+    "build:stripe": "npm run build --prefix packages/stripe-mrr",
     "benchmark:tokens": "npm run run --prefix benchmarks/token-benchmark",
     "validation": "npm run build:mcp && npm run test:mcp && npm run benchmark:tokens"
   }
