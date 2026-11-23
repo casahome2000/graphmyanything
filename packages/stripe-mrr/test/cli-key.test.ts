@@ -10,6 +10,28 @@ describe("readStripeRestrictedKey", () => {
     ).toBe("rk_test_abc123xyz");
   });
 
+  it("accepts restricted keys with extra underscores", () => {
+    expect(
+      readStripeRestrictedKey({
+        STRIPE_RESTRICTED_KEY: "rk_live_51Abc_def_ghi",
+      }),
+    ).toBe("rk_live_51Abc_def_ghi");
+    expect(
+      readStripeRestrictedKey({
+        STRIPE_RESTRICTED_KEY: "rk_test_51X_y_z",
+      }),
+    ).toBe("rk_test_51X_y_z");
+  });
+
+  it("rejects malformed rk_ keys", () => {
+    expect(() =>
+      readStripeRestrictedKey({ STRIPE_RESTRICTED_KEY: "rk_live_" }),
+    ).toThrow(/rk_live_ or rk_test_/);
+    expect(() =>
+      readStripeRestrictedKey({ STRIPE_RESTRICTED_KEY: "rk_foo_bar" }),
+    ).toThrow(/rk_live_ or rk_test_/);
+  });
+
   it("rejects sk_ secret keys", () => {
     expect(() =>
       readStripeRestrictedKey({ STRIPE_RESTRICTED_KEY: "sk_test_abc" }),

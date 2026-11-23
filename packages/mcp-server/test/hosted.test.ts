@@ -30,6 +30,7 @@ describe("hosted runtime", () => {
     await close();
     delete process.env.GRAPHMYANYTHING_API_BASE;
     delete process.env.GRAPHMYANYTHING_API_KEY;
+    delete process.env.GMA_API_KEY;
     delete process.env.GRAPHMYANYTHING_CONFIG_PATH;
     delete process.env.GRAPHMYANYTHING_MODE;
     try {
@@ -97,6 +98,7 @@ describe("mode resolution", () => {
   afterEach(() => {
     delete process.env.GRAPHMYANYTHING_MODE;
     delete process.env.GRAPHMYANYTHING_API_KEY;
+    delete process.env.GMA_API_KEY;
     delete process.env.GRAPHMYANYTHING_CONFIG_PATH;
     try {
       fs.unlinkSync(configPath);
@@ -116,6 +118,15 @@ describe("mode resolution", () => {
     process.env.GRAPHMYANYTHING_API_KEY = "gma_env";
     expect(resolveMode()).toBe("hosted");
     expect(resolveApiKey()).toBe("gma_env");
+  });
+
+  it("GMA_API_KEY alias selects hosted", () => {
+    delete process.env.GRAPHMYANYTHING_API_KEY;
+    delete process.env.GMA_API_KEY;
+    process.env.GMA_API_KEY = "gma_alias";
+    expect(resolveMode()).toBe("hosted");
+    expect(resolveApiKey()).toBe("gma_alias");
+    delete process.env.GMA_API_KEY;
   });
 
   it("config api_key selects hosted", () => {

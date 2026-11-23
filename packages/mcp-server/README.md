@@ -26,7 +26,7 @@ Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includ
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@0.1.3`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.1`
 
 Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
 
@@ -68,7 +68,7 @@ Config: `~/.graphmyanything/config.json` (mode `0600`). See [hosted API](../../d
 }
 ```
 
-Pin a version (optional): `"graphmyanything-mcp@0.1.3"` as the second arg.
+Pin a version (optional): `"graphmyanything-mcp@0.2.1"` as the second arg.
 
 ## Claude Desktop
 
