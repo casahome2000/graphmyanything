@@ -1,0 +1,28 @@
+{
+  "name": "graphmyanything-stripe",
+  "version": "0.1.0",
+  "description": "Stripe MRR and billing metrics engine for GraphMyAnything",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casahome2000/graphmyanything.git",
+    "directory": "packages/stripe-mrr"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --disable-warning=ExperimentalWarning ./node_modules/vitest/vitest.mjs run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
