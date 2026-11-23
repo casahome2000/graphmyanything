@@ -1,8 +1,8 @@
 # GraphMyAnything
 
-**Chart & metric memory for AI agents.**
+**Build once. Ask forever.**
 
-[`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local-first [Model Context Protocol](https://modelcontextprotocol.io) server: store time-series metrics in SQLite, answer chart questions with token-efficient tool calls instead of throwaway Python, and render SVG charts on disk. No cloud required for core flows.
+[`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local-first [Model Context Protocol](https://modelcontextprotocol.io) server: store time-series metrics in SQLite, answer chart questions with token-efficient tool calls instead of throwaway Python, and render SVG charts on disk. Optional **hosted sync** adds shareable chart links while keeping a local backup.
 
 **Registry name:** `io.github.casahome2000/graphmyanything-mcp` · **License:** MIT
 
@@ -41,7 +41,7 @@ Data stays on your machine by default. **`graphmyanything-mcp sync`** (v0.2+) op
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@0.1.3` — published **0.1.3**
+**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.1`
 
 ### Local paths & env vars
 
@@ -55,7 +55,7 @@ npx -y graphmyanything-mcp@latest
 | `GRAPHMYANYTHING_DB_PATH` | Custom SQLite file path |
 | `GRAPHMYANYTHING_CHARTS_DIR` | Custom chart output directory (otherwise `charts/` next to the DB when the DB path is custom) |
 | `GRAPHMYANYTHING_MODE` | Set to `local` to force local mode |
-| `GRAPHMYANYTHING_API_KEY` | Hosted mode API key (overrides config file) |
+| `GRAPHMYANYTHING_API_KEY` / `GMA_API_KEY` | Hosted mode API key (overrides config file) |
 | `GRAPHMYANYTHING_CONFIG_PATH` | Custom path for `config.json` (default `~/.graphmyanything/config.json`, mode `0600`) |
 | `GRAPHMYANYTHING_API_BASE` | Override hosted API base (testing) |
 
@@ -69,7 +69,7 @@ npx -y graphmyanything-mcp@latest
 | **forget** | Delete point, range, or whole metric (`confirm` when `all:true`) | `forget(metric="stripe.mrr", ts=1732147200)` |
 | **query** | Compact summary (latest, min, max, mean, trend, % change), optional downsampled points within a token budget | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
 | **insight** | Plain-English trend, anomalies, and a simple forecast | `insight(metric="stripe.mrr", range="90d")` |
-| **chart** | Labeled SVG (x-axis ticks, markers, tooltips, `labels` last/none/extremes/all) to local file; no public URL yet | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark", labels="last")` → includes `path`, `tokens_estimate`, `url`: null, `hosted_url_note` |
+| **chart** | Labeled **640×320 SVG**; **local:** `path` on disk; **hosted** (after `sync`): `url`, `embed_svg`, `embed_png` (`share: false` keeps local-only) | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark")` → `path` and/or `https://graphmyanything.com/c/<id>` |
 
 Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-server/src/tool-catalog.ts).
 
@@ -115,7 +115,7 @@ claude mcp add graphmyanything -- npx -y graphmyanything-mcp@latest
 
 ## n8n
 
-Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `0.1.3`).
+Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `0.2.1`).
 
 ## Why tokens matter (one chart question)
 

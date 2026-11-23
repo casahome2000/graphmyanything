@@ -165,11 +165,27 @@ Human-readable docs in this repo:
 
 ---
 
-## Known limits (0.1.x)
+## Hosted vs local
 
-| Limit | Workaround |
-|-------|------------|
-| `chart` `url` is null | Local mode or `share:false`: open the local `path`; run `sync` for live links |
-| No cloud sync | Local SQLite only |
+| Mode | How you get it | Reads | Writes | Charts |
+|------|----------------|-------|--------|--------|
+| **Local** (default) | No API key; or `GRAPHMYANYTHING_MODE=local` | SQLite | SQLite | SVG at local `path` only |
+| **Hosted** | `graphmyanything-mcp sync`, config key, or `GRAPHMYANYTHING_API_KEY` / `GMA_API_KEY` | Hosted API | Hosted API **and** mirrored to local SQLite | Local `path` **plus** share `url` / `embed_svg` / `embed_png` when `share` is not false |
 
-Feature requests welcome on [GitHub Issues](https://github.com/casahome2000/graphmyanything/issues).
+**Forget** is a **hard delete**: removed points do not come back. In **hosted** mode, `forget` deletes on the server **and** in your local SQLite backup for the same filter.
+
+### Plan limits (hosted)
+
+| | **Free** | **Founding** |
+|--|----------|--------------|
+| Distinct metrics | 3 | 50 |
+| Stored points | 10,000 | 1,000,000 |
+| **Read window** (query/insight/chart) | 90 days | Full history |
+| History storage | Full history kept | Full history |
+| Live chart links | 3 | 100 |
+
+On **Free**, older data remains stored but **query**, **insight**, and **chart** only see the last **90 days** (`read_window_days`). Upgrade or export locally if you need older hosted reads.
+
+Share pages at `https://graphmyanything.com/c/<hex-id>` include **hover tooltips** on markers when viewed in a browser.
+
+Feature requests: [GitHub Issues](https://github.com/casahome2000/graphmyanything/issues).
