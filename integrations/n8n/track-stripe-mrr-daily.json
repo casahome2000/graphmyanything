@@ -15,220 +15,435 @@
       "name": "Every day 9am",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "manual-run-now",
+      "name": "Run now (test)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Demo: replace with Stripe node or HTTP to billing API.\nconst base = 78000;\nconst day = Math.floor(Date.now() / 86400000);\nconst mrr = Math.round(base + (day % 90) * 120 + Math.sin(day / 7) * 400);\nreturn [{ json: { metric: 'stripe.mrr', value: mrr, tags: { source: 'stripe', currency: 'usd' } } }];"
+        "method": "GET",
+        "url": "https://api.stripe.com/v1/subscriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "all"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            },
+            {
+              "name": "expand[]",
+              "value": "data.items.data.price"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "starting_after",
+                    "value": "={{ $response.body.data && $response.body.data.length ? $response.body.data[$response.body.data.length - 1].id : '' }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.has_more }}"
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
+        }
       },
-      "id": "mock-stripe",
-      "name": "Mock Stripe MRR",
+      "id": "stripe-subscriptions",
+      "name": "Stripe subscriptions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "stripeApi": {
+          "id": "CONFIGURE_ME",
+          "name": "Stripe restricted read key"
+        }
+      },
+      "notesInFlow": true,
+      "notes": "Stripe API credential: paste rk_test_… or rk_live_… (not sk_…). Or use Header Auth → Authorization: Bearer rk_…"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.stripe.com/v1/invoices",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "paid"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "starting_after",
+                    "value": "={{ $response.body.data && $response.body.data.length ? $response.body.data[$response.body.data.length - 1].id : '' }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.has_more }}"
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
+        }
+      },
+      "id": "stripe-invoices",
+      "name": "Stripe invoices (paid)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "stripeApi": {
+          "id": "CONFIGURE_ME",
+          "name": "Stripe restricted read key"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.stripe.com/v1/refunds",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "100"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "starting_after",
+                    "value": "={{ $response.body.data && $response.body.data.length ? $response.body.data[$response.body.data.length - 1].id : '' }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.has_more }}"
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
+        }
+      },
+      "id": "stripe-refunds",
+      "name": "Stripe refunds",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "stripeApi": {
+          "id": "CONFIGURE_ME",
+          "name": "Stripe restricted read key"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.stripe.com/v1/credit_notes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "100"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "starting_after",
+                    "value": "={{ $response.body.data && $response.body.data.length ? $response.body.data[$response.body.data.length - 1].id : '' }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.has_more }}"
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
+        }
+      },
+      "id": "stripe-credit-notes",
+      "name": "Stripe credit notes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "stripeApi": {
+          "id": "CONFIGURE_ME",
+          "name": "Stripe restricted read key"
+        }
+      },
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const DAY = 86400;\n\nfunction utcDayStart(unixSec) {\n  return Math.floor(unixSec / DAY) * DAY;\n}\n\nfunction monthsInBillingPeriod(interval, intervalCount) {\n  const n = Math.max(1, intervalCount);\n  switch (interval) {\n    case \"day\":\n      return n / 30.437;\n    case \"week\":\n      return (n * 12) / 52;\n    case \"month\":\n      return n;\n    case \"year\":\n      return n * 12;\n    default:\n      return n;\n  }\n}\n\nfunction monthNormalizedAmountCents(\n  unitAmountCents,\n  quantity,\n  interval,\n  intervalCount,\n) {\n  const months = monthsInBillingPeriod(interval, intervalCount);\n  if (months <= 0) return 0;\n  return (unitAmountCents * quantity) / months;\n}\n\nfunction monthsBetween(fromSec, toSec) {\n  const from = new Date(fromSec * 1000);\n  const to = new Date(toSec * 1000);\n  return (\n    (to.getUTCFullYear() - from.getUTCFullYear()) * 12 +\n    (to.getUTCMonth() - from.getUTCMonth())\n  );\n}\n\nfunction discountMultiplier(discount, mrrCents, currency, ctx) {\n  if (!discount?.coupon || mrrCents <= 0) return 1;\n  const coupon = discount.coupon;\n  const day = ctx.dayStart;\n  if (discount.start > day) return 1;\n  if (discount.end != null && day >= discount.end) return 1;\n\n  if (coupon.duration === \"once\") {\n    const periodStart = discount.start;\n    const periodEnd = discount.end ?? periodStart + 30 * DAY;\n    if (day < periodStart || day >= periodEnd) return 1;\n  }\n\n  if (coupon.duration === \"repeating\") {\n    const months = coupon.duration_in_months ?? 0;\n    if (months <= 0) return 1;\n    const elapsed = monthsBetween(discount.start, day);\n    if (elapsed >= months) return 1;\n  }\n\n  if (coupon.percent_off != null) {\n    if (coupon.percent_off >= 100) return 0;\n    return 1 - coupon.percent_off / 100;\n  }\n\n  if (coupon.amount_off != null && coupon.currency === currency) {\n    const after = mrrCents - coupon.amount_off;\n    return after <= 0 ? 0 : after / mrrCents;\n  }\n  return 1;\n}\n\nfunction applyCouponToMrrCents(mrrCents, discount, currency, ctx) {\n  return mrrCents * discountMultiplier(discount, mrrCents, currency, ctx);\n}\n\nfunction licensedCurrency(sub) {\n  for (const item of sub.items.data) {\n    const price = item.price;\n    if (price.recurring && price.recurring.usage_type !== \"metered\") {\n      return price.currency;\n    }\n  }\n  return sub.items.data[0]?.price.currency ?? null;\n}\n\nfunction isPausedOnDay(sub, dayStart) {\n  const p = sub.pause_collection;\n  if (!p) return false;\n  if (sub.status === \"paused\") return true;\n  if (p.resumes_at != null && dayStart < p.resumes_at) return true;\n  return false;\n}\n\nfunction inTrialOnDay(sub, dayStart) {\n  if (sub.trial_start == null || sub.trial_end == null) return false;\n  return dayStart >= sub.trial_start && dayStart < sub.trial_end;\n}\n\nfunction subscriptionEndedBefore(sub, dayStart) {\n  if (sub.ended_at != null && dayStart >= sub.ended_at) return true;\n  if (\n    sub.canceled_at != null &&\n    dayStart >= sub.canceled_at &&\n    !sub.cancel_at_period_end\n  ) {\n    return true;\n  }\n  return false;\n}\n\nfunction subscriptionStarted(sub, dayStart) {\n  const start = sub.start_date ?? sub.created;\n  return dayStart >= utcDayStart(start);\n}\n\nfunction effectiveStatusOnDay(sub, dayStart) {\n  if (subscriptionEndedBefore(sub, dayStart)) return \"canceled\";\n  if (isPausedOnDay(sub, dayStart)) return \"paused\";\n  if (inTrialOnDay(sub, dayStart)) return \"trialing\";\n\n  if (sub.cancel_at_period_end || sub.cancel_at != null) {\n    const end =\n      sub.cancel_at ??\n      (sub.cancel_at_period_end ? sub.current_period_end : null);\n    if (end != null && dayStart >= end) return \"canceled\";\n    if (dayStart < end) {\n      if (sub.status === \"past_due\") return \"past_due\";\n      return \"active\";\n    }\n  }\n\n  if (sub.status === \"canceled\" && sub.canceled_at != null && dayStart < sub.canceled_at) {\n    return \"active\";\n  }\n\n  if (\n    sub.status === \"active\" ||\n    sub.status === \"past_due\" ||\n    sub.status === \"trialing\"\n  ) {\n    return sub.status;\n  }\n  return sub.status;\n}\n\nfunction countsAsSubscriber(sub, dayStart) {\n  if (!subscriptionStarted(sub, dayStart)) return false;\n  if (subscriptionEndedBefore(sub, dayStart)) return false;\n  if (isPausedOnDay(sub, dayStart)) return false;\n  if (inTrialOnDay(sub, dayStart)) return false;\n  const status = effectiveStatusOnDay(sub, dayStart);\n  return status === \"active\" || status === \"past_due\";\n}\n\nfunction subscriptionMrrCentsOnDay(sub, dayStart) {\n  if (inTrialOnDay(sub, dayStart)) {\n    const currency = licensedCurrency(sub);\n    return currency ? { currency, cents: 0 } : null;\n  }\n  if (!countsAsSubscriber(sub, dayStart)) return null;\n\n  let totalCents = 0;\n  const currency = licensedCurrency(sub);\n\n  for (const item of sub.items.data) {\n    const price = item.price;\n    if (!price.recurring) continue;\n    if (price.recurring.usage_type === \"metered\") continue;\n    if (price.unit_amount == null) continue;\n    const qty = item.quantity ?? 1;\n    totalCents += monthNormalizedAmountCents(\n      price.unit_amount,\n      qty,\n      price.recurring.interval,\n      price.recurring.interval_count,\n    );\n  }\n\n  if (!currency) return null;\n  if (totalCents <= 0) return { currency, cents: 0 };\n\n  const ctx = {\n    dayStart,\n    discountAnchor: sub.discount?.start ?? sub.start_date,\n  };\n  totalCents = applyCouponToMrrCents(\n    totalCents,\n    sub.discount,\n    currency,\n    ctx,\n  );\n  return { currency, cents: Math.max(0, totalCents) };\n}\n\nfunction netRevenueByCurrencyOnDay(\n  dayStart,\n  invoices,\n  refunds,\n  creditNotes,\n) {\n  const out = new Map();\n  const add = (ccy, major) => {\n    const k = ccy.toLowerCase();\n    out.set(k, (out.get(k) ?? 0) + major);\n  };\n  for (const inv of invoices) {\n    if (!inv.paid || inv.paid_at == null) continue;\n    if (utcDayStart(inv.paid_at) !== dayStart) continue;\n    add(inv.currency, inv.amount_paid / 100);\n  }\n  for (const rf of refunds) {\n    if (utcDayStart(rf.created) !== dayStart) continue;\n    add(rf.currency, -(rf.amount / 100));\n  }\n  for (const cn of creditNotes) {\n    if (cn.status !== \"issued\") continue;\n    if (utcDayStart(cn.created) !== dayStart) continue;\n    add(cn.currency, -(cn.amount / 100));\n  }\n  return out;\n}\n\nfunction buildDaySnapshot(\n  dayStart,\n  subscriptions,\n  invoices = [],\n  refunds = [],\n  creditNotes = [],\n) {\n  const mrr = new Map();\n  const mrrBySubscription = new Map();\n  let subscribers = 0;\n\n  for (const sub of subscriptions) {\n    if (countsAsSubscriber(sub, dayStart)) subscribers += 1;\n    const row = subscriptionMrrCentsOnDay(sub, dayStart);\n    if (!row) continue;\n    mrrBySubscription.set(sub.id, row);\n    const k = row.currency.toLowerCase();\n    mrr.set(k, (mrr.get(k) ?? 0) + row.cents / 100);\n  }\n\n  const netRevenue = netRevenueByCurrencyOnDay(\n    dayStart,\n    invoices,\n    refunds,\n    creditNotes,\n  );\n  return {\n    ts: dayStart,\n    mrr,\n    subscribers,\n    mrrBySubscription,\n    netRevenue,\n  };\n}\n\nfunction mrrDeltasBetweenDays(prev, next) {\n  const currencies = new Set([\n    ...prev.mrr.keys(),\n    ...next.mrr.keys(),\n    ...[...prev.mrrBySubscription.values()].map((v) =>\n      v.currency.toLowerCase(),\n    ),\n    ...[...next.mrrBySubscription.values()].map((v) =>\n      v.currency.toLowerCase(),\n    ),\n  ]);\n  const deltas = [];\n  for (const currency of currencies) {\n    let newCents = 0;\n    let churnedCents = 0;\n    const prevSubs = new Map();\n    const nextSubs = new Map();\n    for (const [id, row] of prev.mrrBySubscription) {\n      if (row.currency.toLowerCase() === currency) prevSubs.set(id, row.cents);\n    }\n    for (const [id, row] of next.mrrBySubscription) {\n      if (row.currency.toLowerCase() === currency) nextSubs.set(id, row.cents);\n    }\n    const allIds = new Set([...prevSubs.keys(), ...nextSubs.keys()]);\n    for (const id of allIds) {\n      const was = prevSubs.get(id) ?? 0;\n      const now = nextSubs.get(id) ?? 0;\n      const diff = now - was;\n      if (diff > 0) newCents += diff;\n      if (diff < 0) churnedCents += -diff;\n    }\n    deltas.push({\n      currency,\n      newMrr: newCents / 100,\n      churnedMrr: churnedCents / 100,\n    });\n  }\n  return deltas;\n}\n\nconst METRIC = {\n  mrr: (ccy) => `stripe.mrr.${ccy.toLowerCase()}`,\n  subscribers: () => \"stripe.subscribers\",\n  mrrNew: (ccy) => `stripe.mrr.new.${ccy.toLowerCase()}`,\n  mrrChurned: (ccy) => `stripe.mrr.churned.${ccy.toLowerCase()}`,\n  revenueNet: (ccy) => `stripe.revenue.net.${ccy.toLowerCase()}`,\n};\n\nfunction snapshotToBatchPoints(snap, tags = { source: \"stripe\", via: \"n8n\" }) {\n  const points = [];\n  const push = (metric, value) => {\n    if (value == null || Number.isNaN(value)) return;\n    points.push({ metric, ts: snap.ts, value, tags });\n  };\n  push(METRIC.subscribers(), snap.subscribers);\n  for (const [ccy, v] of snap.mrr) push(METRIC.mrr(ccy), v);\n  for (const [ccy, v] of snap.newMrr) push(METRIC.mrrNew(ccy), v);\n  for (const [ccy, v] of snap.churnedMrr) push(METRIC.mrrChurned(ccy), v);\n  for (const [ccy, v] of snap.netRevenue) push(METRIC.revenueNet(ccy), v);\n  return points;\n}\n\nfunction mapStripeSubscription(raw) {\n  const items = raw.items;\n  let discount = null;\n  if (raw.discount && typeof raw.discount === \"object\") {\n    const c = raw.discount.coupon;\n    discount = {\n      start: Number(raw.discount.start),\n      end: raw.discount.end == null ? null : Number(raw.discount.end),\n      coupon: {\n        id: String(c.id),\n        percent_off: c.percent_off ?? null,\n        amount_off: c.amount_off ?? null,\n        currency: c.currency ?? null,\n        duration: c.duration,\n        duration_in_months: c.duration_in_months ?? null,\n      },\n    };\n  }\n  return {\n    id: String(raw.id),\n    customer: String(raw.customer),\n    status: raw.status,\n    created: Number(raw.created),\n    start_date: Number(raw.start_date ?? raw.created),\n    ended_at: raw.ended_at == null ? null : Number(raw.ended_at),\n    canceled_at: raw.canceled_at == null ? null : Number(raw.canceled_at),\n    cancel_at: raw.cancel_at == null ? null : Number(raw.cancel_at),\n    cancel_at_period_end: Boolean(raw.cancel_at_period_end),\n    current_period_start: Number(raw.current_period_start),\n    current_period_end: Number(raw.current_period_end),\n    trial_start: raw.trial_start == null ? null : Number(raw.trial_start),\n    trial_end: raw.trial_end == null ? null : Number(raw.trial_end),\n    pause_collection: raw.pause_collection ?? null,\n    discount,\n    items: {\n      data: (items?.data ?? []).map((item) => ({\n        id: String(item.id),\n        quantity: item.quantity ?? null,\n        price: mapStripePrice(item.price),\n      })),\n    },\n  };\n}\n\nfunction mapStripePrice(raw) {\n  const recurring = raw.recurring;\n  return {\n    id: String(raw.id),\n    currency: String(raw.currency),\n    unit_amount: raw.unit_amount ?? null,\n    recurring: recurring\n      ? {\n          interval: recurring.interval,\n          interval_count: Number(recurring.interval_count ?? 1),\n          usage_type: recurring.usage_type ?? \"licensed\",\n        }\n      : null,\n  };\n}\n\nfunction mapStripeInvoice(raw) {\n  const paidAt =\n    raw.status_transitions?.paid_at != null\n      ? Number(raw.status_transitions.paid_at)\n      : raw.paid_at != null\n        ? Number(raw.paid_at)\n        : null;\n  return {\n    id: String(raw.id),\n    currency: String(raw.currency),\n    status: raw.status ?? null,\n    paid: Boolean(raw.paid),\n    paid_at: paidAt,\n    amount_paid: Number(raw.amount_paid ?? 0),\n    total: Number(raw.total ?? 0),\n    tax: raw.tax ?? null,\n    subscription: raw.subscription == null ? null : String(raw.subscription),\n  };\n}\n\nfunction mapStripeRefund(raw) {\n  return {\n    id: String(raw.id),\n    currency: String(raw.currency),\n    amount: Number(raw.amount),\n    created: Number(raw.created),\n    charge: raw.charge == null ? null : String(raw.charge),\n  };\n}\n\nfunction mapStripeCreditNote(raw) {\n  return {\n    id: String(raw.id),\n    currency: String(raw.currency),\n    amount: Number(raw.amount ?? raw.total ?? 0),\n    created: Number(raw.created),\n    invoice: String(raw.invoice),\n    type: raw.type,\n    status: String(raw.status),\n  };\n}\n\n/** Flatten paginated Stripe list responses from n8n HTTP nodes. */\nfunction flattenStripeListPages(pages) {\n  const out = [];\n  for (const page of pages) {\n    const body = page?.json ?? page;\n    if (Array.isArray(body?.data)) out.push(...body.data);\n  }\n  return out;\n}\n\n/**\n * Daily sync: today + yesterday deltas — mirrors graphmyanything-stripe sync.\n */\nfunction computeDailyBatchPoints(\n  subscriptions,\n  invoices,\n  refunds,\n  creditNotes,\n  nowUnixSec = Math.floor(Date.now() / 1000),\n) {\n  const today = utcDayStart(nowUnixSec);\n  const yesterday = today - DAY;\n  const todaySnap = buildDaySnapshot(\n    today,\n    subscriptions,\n    invoices,\n    refunds,\n    creditNotes,\n  );\n  const ySnap = buildDaySnapshot(\n    yesterday,\n    subscriptions,\n    invoices,\n    refunds,\n    creditNotes,\n  );\n  const newMrr = new Map();\n  const churnedMrr = new Map();\n  for (const d of mrrDeltasBetweenDays(ySnap, todaySnap)) {\n    if (d.newMrr > 0) newMrr.set(d.currency, d.newMrr);\n    if (d.churnedMrr > 0) churnedMrr.set(d.currency, d.churnedMrr);\n  }\n  const rollup = {\n    ts: today,\n    mrr: todaySnap.mrr,\n    subscribers: todaySnap.subscribers,\n    newMrr,\n    churnedMrr,\n    netRevenue: todaySnap.netRevenue,\n  };\n  const points = snapshotToBatchPoints(rollup);\n  return {\n    points,\n    summary: {\n      utcDay: today,\n      subscribers: todaySnap.subscribers,\n      mrrUsd: todaySnap.mrr.get(\"usd\") ?? null,\n    },\n  };\n}\n\n// n8n Code node tail — requires stripe-mrr-sync-core functions in scope (inlined above).\n\nconst subsRaw = flattenStripeListPages($(\"Stripe subscriptions\").all());\nconst invoicesRaw = flattenStripeListPages($(\"Stripe invoices (paid)\").all());\nconst refundsRaw = flattenStripeListPages($(\"Stripe refunds\").all());\nconst creditNotesRaw = flattenStripeListPages($(\"Stripe credit notes\").all());\n\nconst subscriptions = subsRaw.map(mapStripeSubscription);\nconst invoices = invoicesRaw.map(mapStripeInvoice);\nconst refunds = refundsRaw.map(mapStripeRefund);\nconst creditNotes = creditNotesRaw.map(mapStripeCreditNote);\n\nconst { points, summary } = computeDailyBatchPoints(\n  subscriptions,\n  invoices,\n  refunds,\n  creditNotes,\n);\n\nreturn [\n  {\n    json: {\n      points,\n      ...summary,\n    },\n  },\n];\n"
+      },
+      "id": "compute-mrr",
+      "name": "Compute MRR",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 0]
+      "position": [
+        1200,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Pure JS MRR math (same rules as graphmyanything-stripe). No require, no $credentials."
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.graphmyanything.com/v1/track",
+        "url": "https://graphmyanything.com/api/v1/track/batch",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ metric: $json.metric, value: $json.value, tags: $json.tags }) }}",
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true
-            }
-          }
-        }
+        "jsonBody": "={{ JSON.stringify({ points: $json.points }) }}",
+        "options": {}
       },
-      "id": "http-track-placeholder",
-      "name": "HTTP track (cloud placeholder)",
+      "id": "gma-track-batch",
+      "name": "GMA track batch",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [460, -120],
-      "notesInFlow": true,
-      "notes": "Future cloud track API. Keep disabled until https://api.graphmyanything.com/v1/track ships."
-    },
-    {
-      "parameters": {
-        "operation": "executeTool",
-        "toolName": "track",
-        "toolParameters": "={{ JSON.stringify({ metric: $json.metric, value: $json.value, tags: $json.tags }) }}"
-      },
-      "id": "mcp-track",
-      "name": "MCP track",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [460, 120],
+      "position": [
+        1440,
+        0
+      ],
       "credentials": {
-        "mcpClientApi": {
+        "httpHeaderAuth": {
           "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
+          "name": "GraphMyAnything API key"
         }
       },
       "notesInFlow": true,
-      "notes": "Stdio MCP: npx -y graphmyanything-mcp@latest (Node 22.13+). Optional pin: graphmyanything-mcp@0.1.3."
+      "notes": "Header Auth: name Authorization, value Bearer <your GMA API key>",
+      "executeOnce": true
     },
     {
       "parameters": {
-        "operation": "executeTool",
-        "toolName": "query",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d', token_budget: 300 }) }}"
-      },
-      "id": "mcp-query",
-      "name": "MCP query 90d",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [700, 60],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeTool",
-        "toolName": "insight",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d' }) }}"
-      },
-      "id": "mcp-insight",
-      "name": "MCP insight",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [940, 60],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeTool",
-        "toolName": "chart",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr', range: '90d', type: 'area', theme: 'dark' }) }}"
-      },
-      "id": "mcp-chart",
-      "name": "MCP chart SVG",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [1180, 60],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule pulls (or mocks) Stripe MRR, writes one point with `track`, then runs `query` (90d), `insight`, and `chart` via the GraphMyAnything MCP server. Ingestion runs inside n8n — zero tokens in the agent chat that later asks for the trend. Charts land as SVG files on the n8n host.\n\n## Set up steps\n1. Import this workflow and open **Credentials → MCP Client** (stdio): Command `npx`, Args `-y`, `graphmyanything-mcp@latest` (optional pin `0.1.3`).\n2. Attach that credential to all four MCP Client Tool nodes.\n3. Disable **HTTP track (cloud placeholder)**; enable the MCP path.\n4. Run once manually, then enable the schedule.\n\n## Requirements\n- n8n **1.76+** with MCP Client Tool nodes enabled.\n- **Node.js 22.13+** on the worker (`node:sqlite`).\n- Package **graphmyanything-mcp@latest** (optional pin **0.1.3**).\n\n## Customize\nSwap **Mock Stripe MRR** for a Stripe or HTTP billing node; change metric name, `token_budget`, chart `type`/`theme`, or cron hour. Waitlist: https://graphmyanything.com",
+        "content": "# Track Stripe MRR → GraphMyAnything (hosted)\n\n## Flow\n1. **HTTP Request** nodes page Stripe subscriptions (`status=all`, pinned to Stripe API version `2024-11-20.acacia` like the CLI), paid invoices, refunds, and credit notes using your **Stripe API** credential (`rk_…` only).\n2. **Compute MRR** (Code, pure JS) applies the same rules as `packages/stripe-mrr`.\n3. **GMA track batch** POSTs to `https://graphmyanything.com/api/v1/track/batch` with **Header Auth** `Authorization: Bearer <API key>`.\n4. Each Stripe list node runs once (Settings → Execute Once), so paged results are never fetched twice.\n\n## Local SQLite instead of hosted?\nDisable **GMA track batch** and run daily: `STRIPE_RESTRICTED_KEY=rk_… npx graphmyanything-stripe sync` (cron on the n8n host).\n\n## Requirements\n- n8n **1.76+** (HTTP pagination). Tested on 2.48.7.\n- Stripe restricted read key — never `sk_…` in production templates.\n- No `NODE_FUNCTION_ALLOW_BUILTIN` or `$credentials` in Code — this workflow uses neither.\n\nDocs: `docs/stripe-mrr.md`",
         "height": 520,
-        "width": 420
+        "width": 440
       },
       "id": "sticky-overview",
       "name": "Sticky Note — Overview",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-480, -320]
+      "position": [
+        -520,
+        -280
+      ]
     },
     {
       "parameters": {
-        "content": "### Section: Schedule\n**Every day 9am** fires the workflow once per day at 09:00 (server timezone). Adjust `triggerAtHour` or switch to a webhook trigger for ad-hoc tests.",
+        "content": "### Stripe credential\nUse n8n **Stripe API** credential with `rk_test_…` / `rk_live_…`, or **Header Auth** on each Stripe HTTP node (`Authorization: Bearer rk_…`).",
+        "height": 120,
+        "width": 360
+      },
+      "id": "sticky-stripe-cred",
+      "name": "Sticky — Stripe key",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Local alternative\nFor SQLite on the n8n host: `npx graphmyanything-stripe sync` with `STRIPE_RESTRICTED_KEY` + `GRAPHMYANYTHING_DB_PATH`. Disable GMA batch; your agent reads the same DB through `graphmyanything-mcp`.",
         "height": 140,
-        "width": 280
+        "width": 380
       },
-      "id": "sticky-schedule",
-      "name": "Sticky — Schedule",
+      "id": "sticky-local-cli",
+      "name": "Sticky — Local CLI",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [-40, -120]
-    },
-    {
-      "parameters": {
-        "content": "### Section: MRR source\n**Mock Stripe MRR** synthesizes a demo value. Replace this Code node with your Stripe trigger or billing HTTP request; output must include `metric`, `value`, and optional `tags`.",
-        "height": 160,
-        "width": 300
-      },
-      "id": "sticky-source",
-      "name": "Sticky — Data source",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [180, -120]
-    },
-    {
-      "parameters": {
-        "content": "### Section: Track (pick one path)\n- **MCP track** (use today): stdio MCP `track` → local SQLite.\n- **HTTP track** (later): optional cloud placeholder; leave disabled until the public API exists.",
-        "height": 160,
-        "width": 320
-      },
-      "id": "sticky-track",
-      "name": "Sticky — Track",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [400, -280]
-    },
-    {
-      "parameters": {
-        "content": "### Section: Query\n**MCP query 90d** returns a token-budgeted summary of the last 90 days (`token_budget: 300`). Tighten or loosen the budget if your agent needs more detail.",
-        "height": 140,
-        "width": 300
-      },
-      "id": "sticky-query",
-      "name": "Sticky — Query",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [660, -120]
-    },
-    {
-      "parameters": {
-        "content": "### Section: Insight\n**MCP insight** adds plain-English trend, anomaly hints, and a simple forecast for `stripe.mrr` over 90d — useful for Slack/email summaries without opening a chart.",
-        "height": 140,
-        "width": 300
-      },
-      "id": "sticky-insight",
-      "name": "Sticky — Insight",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [900, -120]
-    },
-    {
-      "parameters": {
-        "content": "### Section: Chart\n**MCP chart SVG** writes a dark area chart to disk (`path` in the tool result; `url` is null until hosted charts ship). Open the file on the n8n host or ship it to object storage in a follow-up node.",
-        "height": 160,
-        "width": 320
-      },
-      "id": "sticky-chart",
-      "name": "Sticky — Chart",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [1140, -140]
+      "position": [
+        1320,
+        -160
+      ]
     }
   ],
   "connections": {
     "Every day 9am": {
-      "main": [[{ "node": "Mock Stripe MRR", "type": "main", "index": 0 }]]
-    },
-    "Mock Stripe MRR": {
       "main": [
         [
-          { "node": "HTTP track (cloud placeholder)", "type": "main", "index": 0 },
-          { "node": "MCP track", "type": "main", "index": 0 }
+          {
+            "node": "Stripe subscriptions",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
-    "MCP track": {
-      "main": [[{ "node": "MCP query 90d", "type": "main", "index": 0 }]]
+    "Stripe subscriptions": {
+      "main": [
+        [
+          {
+            "node": "Stripe invoices (paid)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "MCP query 90d": {
-      "main": [[{ "node": "MCP insight", "type": "main", "index": 0 }]]
+    "Stripe invoices (paid)": {
+      "main": [
+        [
+          {
+            "node": "Stripe refunds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "MCP insight": {
-      "main": [[{ "node": "MCP chart SVG", "type": "main", "index": 0 }]]
+    "Stripe refunds": {
+      "main": [
+        [
+          {
+            "node": "Stripe credit notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stripe credit notes": {
+      "main": [
+        [
+          {
+            "node": "Compute MRR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute MRR": {
+      "main": [
+        [
+          {
+            "node": "GMA track batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run now (test)": {
+      "main": [
+        [
+          {
+            "node": "Stripe subscriptions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,

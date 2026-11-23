@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Sample MRR — stripe.mrr.usd</title>
+  <desc id="desc">Synthetic monthly MRR around eight thousand dollars over twelve months. Sample data only.</desc>
+  <rect width="100%" height="100%" fill="#0d0d12"/>
+  <text x="24" y="36" fill="#e8e8f0" font-family="system-ui,sans-serif" font-size="16" font-weight="600">stripe · mrr · usd</text>
+  <text x="24" y="56" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="11">Sample data</text>
+  <line x1="56" y1="72" x2="56" y2="296" stroke="rgba(255,255,255,0.08)"/>
+  <line x1="56" y1="296" x2="608" y2="296" stroke="rgba(255,255,255,0.08)"/>
+  <text x="48" y="104" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="10" text-anchor="end">$9k</text>
+  <text x="48" y="200" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="10" text-anchor="end">$8k</text>
+  <text x="48" y="296" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="10" text-anchor="end">$7k</text>
+  <path fill="rgba(139,92,246,0.22)" stroke="none" d="M 86 248 L 131 240 L 176 232 L 221 228 L 266 218 L 311 206 L 356 196 L 401 192 L 446 182 L 491 172 L 536 162 L 581 152 L 581 296 L 86 296 Z"/>
+  <polyline fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"
+    points="86,248 131,240 176,232 221,228 266,218 311,206 356,196 401,192 446,182 491,172 536,162 581,152"/>
+  <text x="86" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">Jan</text>
+  <text x="176" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">Mar</text>
+  <text x="266" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">May</text>
+  <text x="356" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">Jul</text>
+  <text x="446" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">Sep</text>
+  <text x="536" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">Nov</text>
+  <text x="581" y="316" fill="#a8a8b8" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle">Dec</text>
+</svg>

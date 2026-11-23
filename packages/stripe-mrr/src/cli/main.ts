@@ -62,5 +62,6 @@ Environment:
   STRIPE_RESTRICTED_KEY   rk_test_… or rk_live_… (never sk_…)
   GRAPHMYANYTHING_DB_PATH SQLite metrics DB (default ~/.graphmyanything/metrics.db)
   GRAPHMYANYTHING_STRIPE_STATE_PATH  connector state JSON (no secrets)
-  GRAPHMYANYTHING_TRACK_URL  optional hosted track hook (future)`;
+  GRAPHMYANYTHING_API_KEY    optional: also upload to your hosted account (live chart links)
+  GRAPHMYANYTHING_API_BASE   optional API base (default https://graphmyanything.com/api/v1)`;
 }

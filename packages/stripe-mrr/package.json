@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "pack:n8n": "node ../../integrations/n8n/scripts/pack-workflow.mjs",
     "test": "node --disable-warning=ExperimentalWarning ./node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest"
   },
