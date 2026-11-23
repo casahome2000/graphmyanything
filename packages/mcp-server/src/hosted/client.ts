@@ -90,12 +90,35 @@ export class HostedClient {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ device_code: deviceCode }),
     });
-    return this.parse(res);
+    const text = await res.text();
+    let body: Record<string, unknown> = {};
+    try {
+      body = text ? (JSON.parse(text) as Record<string, unknown>) : {};
+    } catch {
+      /* non-JSON body */
+    }
+    const key =
+      typeof body.access_token === "string"
+        ? body.access_token
+        : typeof body.api_key === "string"
+          ? body.api_key
+          : undefined;
+    if (res.ok && key) return { status: "authorized", api_key: key };
+    // RFC 8628-style polling errors (the server answers 428/400 with an error code).
+    const err = typeof body.error === "string" ? body.error : "";
+    if (err === "authorization_pending" || body.status === "pending") {
+      return { status: "pending" };
+    }
+    if (err === "slow_down") return { status: "slow_down" };
+    if (err === "expired_token" || err === "invalid_grant") {
+      return { status: "expired" };
+    }
+    throw new HostedApiError(err || `HTTP ${res.status}`, res.status, body);
   }
 
   async getAccount(): Promise<{
     plan: string;
-    limits: { max_points?: number; max_metrics?: number };
+    limits: { points?: number; metrics?: number; window_days?: number; live_links?: number };
     usage?: { points?: number; metrics?: number };
   }> {
     const res = await this.fetchFn(`${this.base}/account`, {
