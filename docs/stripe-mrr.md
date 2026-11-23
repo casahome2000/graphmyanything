@@ -63,4 +63,4 @@ Caption: **Sample data** — illustrative only.
 
 ## Hosted mode
 
-Set `GRAPHMYANYTHING_TRACK_URL` when a cloud track endpoint is available; the CLI will POST batches after writing locally. SQLite remains the source of truth for self-hosted MCP.
+Set `GRAPHMYANYTHING_API_KEY` (the key saved by `npx -y graphmyanything-mcp@latest sync`, or one from your account page) and the CLI also uploads each run to your hosted account after writing locally, so your live chart links stay current. Local SQLite is always written too.

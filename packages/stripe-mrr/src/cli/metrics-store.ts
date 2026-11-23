@@ -72,22 +72,48 @@ export function upsertMetricSeries(
 }
 
 /**
- * Optional hosted track endpoint (future). When set, POST batches instead of / in addition to SQLite.
+ * Hosted upload. When GRAPHMYANYTHING_API_KEY is set (the key `graphmyanything-mcp sync`
+ * saves, or one from the account page), also upsert the series to the hosted API
+ * via POST {base}/track/batch so live chart links update. Base defaults to
+ * https://graphmyanything.com/api/v1 (override: GRAPHMYANYTHING_API_BASE).
  */
 export async function pushHostedTrackHook(
   series: MetricSeries[],
-): Promise<void> {
-  const url = process.env.GRAPHMYANYTHING_TRACK_URL?.trim();
-  if (!url) return;
+): Promise<{ written: number; replaced: number } | null> {
+  const key = process.env.GRAPHMYANYTHING_API_KEY?.trim();
+  if (!key) return null;
+  const base = (
+    process.env.GRAPHMYANYTHING_API_BASE?.trim() || "https://graphmyanything.com/api/v1"
+  ).replace(/\/$/, "");
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ series }),
-  });
-  if (!res.ok) {
-    throw new Error(
-      `Hosted track hook failed (${res.status}): ${await res.text()}`,
-    );
+  const points = series.flatMap((s) =>
+    s.points.map((p) => ({ metric: s.metric, ts: p.ts, value: p.value, tags: p.tags })),
+  );
+  let written = 0;
+  let replaced = 0;
+  for (let i = 0; i < points.length; i += 5000) {
+    const res = await fetch(`${base}/track/batch`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${key}`,
+        "x-gma-client": "graphmyanything-stripe",
+      },
+      body: JSON.stringify({ points: points.slice(i, i + 5000) }),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      let msg = `HTTP ${res.status}`;
+      try {
+        msg = (JSON.parse(text) as { error?: string }).error ?? msg;
+      } catch {
+        /* keep status */
+      }
+      throw new Error(`Hosted upload failed: ${msg}`);
+    }
+    const body = JSON.parse(text) as { written?: number; replaced?: number };
+    written += body.written ?? 0;
+    replaced += body.replaced ?? 0;
   }
+  return { written, replaced };
 }
