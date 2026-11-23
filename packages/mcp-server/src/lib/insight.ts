@@ -1,1 +1,1 @@
-export * from "@graphmyanything/core/insight.js";
+export * from "../vendor/core/insight.js";

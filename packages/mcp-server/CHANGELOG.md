@@ -4,7 +4,7 @@
 
 - CLI **`--help`** and **`<command> --help`** print usage (commands, flags, env vars, examples) and exit 0.
 - **`GMA_API_KEY`** env alias for **`GRAPHMYANYTHING_API_KEY`**.
-- Published tarball no longer lists `file:../core`; `@graphmyanything/core` is bundled at pack time.
+- Core logic is copied into `dist/vendor/core` at build time; published package has **no** `@graphmyanything/core` dependency (fixes bun/pnpm registry resolution).
 
 ## 0.2.0 — 2026-11-23
 

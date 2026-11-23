@@ -5,7 +5,7 @@ import {
   type GmaDatabase,
   type MetricPoint,
 } from "../db.js";
-import { buildQueryPayload, parseRange } from "@graphmyanything/core/query.js";
+import { buildQueryPayload, parseRange } from "../vendor/core/query.js";
 import { generateInsight } from "../lib/insight.js";
 import { lttb, type DataPoint } from "../lib/lttb.js";
 import {

@@ -3,6 +3,8 @@
 packages/*/node_modules
 benchmarks/*/node_modules
 packages/*/dist
+packages/mcp-server/src/vendor/core/*
+!packages/mcp-server/src/vendor/core/.gitkeep
 /.pnp
 .pnp.*
 .yarn/*

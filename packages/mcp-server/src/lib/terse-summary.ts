@@ -1,1 +1,1 @@
-export * from "@graphmyanything/core/terse-summary.js";
+export * from "../vendor/core/terse-summary.js";
