@@ -5,6 +5,7 @@ import type { DataPoint } from "./lttb.js";
 
 export type ChartType = "line" | "bar" | "area";
 export type ChartTheme = "dark" | "light";
+export type ChartLabelsMode = "none" | "last" | "extremes" | "all";
 
 const THEMES: Record<
   ChartTheme,
@@ -41,9 +42,11 @@ const MS_MONTHS = [
   "Dec",
 ];
 
-/** Seconds in common spans — used for tick format selection. */
 const SEC_DAY = 86_400;
 const SEC_YEAR = 365 * SEC_DAY;
+const MARKER_R = 3.5;
+const LABEL_FONT_SIZE = 9;
+const TITLE_BOTTOM_Y = 30;
 
 function formatMetricLabel(metric: string): string {
   return metric.replace(/\./g, " · ");
@@ -63,7 +66,6 @@ function escapeXml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/** Classify time span for x-axis label formatting. */
 export function xAxisTimeGranularity(
   spanSec: number,
 ): "intraday" | "daily" | "monthly" | "yearly" {
@@ -73,7 +75,6 @@ export function xAxisTimeGranularity(
   return "yearly";
 }
 
-/** Format a unix-seconds timestamp for an x-axis tick. */
 export function formatXAxisTick(ts: number, spanSec: number): string {
   const g = xAxisTimeGranularity(spanSec);
   const d = new Date(ts * 1000);
@@ -81,7 +82,9 @@ export function formatXAxisTick(ts: number, spanSec: number): string {
   if (g === "monthly") {
     const yr = d.getUTCFullYear();
     const mon = MS_MONTHS[d.getUTCMonth()];
-    return spanSec > SEC_YEAR ? `${mon} '${String(yr).slice(-2)}` : `${mon} ${d.getUTCDate()}`;
+    return spanSec > SEC_YEAR
+      ? `${mon} '${String(yr).slice(-2)}`
+      : `${mon} ${d.getUTCDate()}`;
   }
   if (g === "daily") {
     return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
@@ -91,14 +94,27 @@ export function formatXAxisTick(ts: number, spanSec: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-/** Human-readable date + value for marker tooltips. */
-export function formatMarkerTooltip(ts: number, value: number): string {
+/** Human-readable date + value for marker tooltips (granularity matches the series span). */
+export function formatMarkerTooltip(
+  ts: number,
+  value: number,
+  spanSec: number,
+): string {
+  const g = xAxisTimeGranularity(spanSec);
   const d = new Date(ts * 1000);
-  const iso = d.toISOString().replace("T", " ").replace(/\.\d{3}Z$/, " UTC");
-  return `${iso} — ${formatNumber(value)}`;
+  let datePart: string;
+  if (g === "yearly") {
+    datePart = String(d.getUTCFullYear());
+  } else if (g === "intraday") {
+    const h = d.getUTCHours();
+    const m = d.getUTCMinutes();
+    datePart = `${MS_MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()} ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  } else {
+    datePart = `${MS_MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  }
+  return `${datePart} — ${formatNumber(value)}`;
 }
 
-/** Smallest “nice” step ≥ rawStep (1/2/2.5/5×10ⁿ). */
 function niceStepCeil(rawStep: number): number {
   if (rawStep <= 0 || !Number.isFinite(rawStep)) return 1;
   const exp = Math.floor(Math.log10(rawStep));
@@ -113,7 +129,7 @@ function niceStepCeil(rawStep: number): number {
 }
 
 /**
- * Y-axis domain and tick values on 1/2/2.5/5×10ⁿ steps; data sits inside with margin.
+ * Y-axis domain and tick values on 1/2/2.5/5×10ⁿ steps; extra headroom above data for labels/title.
  */
 export function niceYAxisTicks(
   dataMin: number,
@@ -125,15 +141,17 @@ export function niceYAxisTicks(
     dataMin -= bump;
     dataMax += bump;
   }
-  const margin = (dataMax - dataMin) * 0.06 || Math.abs(dataMax) * 0.02 || 0.5;
+  const span = dataMax - dataMin;
+  const margin = span * 0.06 || Math.abs(dataMax) * 0.02 || 0.5;
+  const topExtra = span * 0.08 || Math.abs(dataMax) * 0.02 || 0.5;
   const wantLo = dataMin - margin;
-  const wantHi = dataMax + margin;
+  const wantHi = dataMax + margin + topExtra;
   const rawRange = wantHi - wantLo;
   const step = niceStepCeil(rawRange / Math.max(2, targetTicks - 1));
   let y0 = Math.floor(wantLo / step) * step;
   let y1 = Math.ceil(wantHi / step) * step;
   while (y0 > dataMin - margin * 0.25) y0 -= step;
-  while (y1 < dataMax + margin * 0.25) y1 += step;
+  while (y1 < dataMax + margin + topExtra * 0.5) y1 += step;
 
   const ticks: number[] = [];
   for (let v = y0; v <= y1 + step * 1e-9; v += step) {
@@ -170,16 +188,15 @@ function pickYearlyXTicks(
   const uniq = [...new Set(out)].sort((a, b) => a - b);
   if (uniq.length > maxTicks) {
     const stride = Math.ceil(uniq.length / maxTicks);
-    const thinned = uniq.filter((_, i) => i === 0 || i === uniq.length - 1 || i % stride === 0);
+    const thinned = uniq.filter(
+      (_, i) => i === 0 || i === uniq.length - 1 || i % stride === 0,
+    );
     if (thinned[thinned.length - 1] !== xMax) thinned.push(xMax);
     return thinned.slice(0, maxTicks);
   }
   return uniq;
 }
 
-/**
- * Build x-axis tick timestamps. Small series (n≤12): exact point dates. Larger: span-aware, first+last always.
- */
 export function pickXAxisTicks(
   xMin: number,
   xMax: number,
@@ -210,7 +227,10 @@ export function pickXAxisTicks(
 
   const unique: number[] = [];
   for (const t of ticks) {
-    if (unique.length === 0 || t - unique[unique.length - 1] >= Math.max(1, span / (count * 3))) {
+    if (
+      unique.length === 0 ||
+      t - unique[unique.length - 1] >= Math.max(1, span / (count * 3))
+    ) {
       unique.push(t);
     }
   }
@@ -219,7 +239,6 @@ export function pickXAxisTicks(
   return unique.slice(0, 8);
 }
 
-/** Indices that receive visible circle markers (max ~60). */
 export function markerPointIndices(n: number, maxMarkers = 60): number[] {
   if (n <= 0) return [];
   if (n <= maxMarkers) return Array.from({ length: n }, (_, i) => i);
@@ -230,11 +249,15 @@ export function markerPointIndices(n: number, maxMarkers = 60): number[] {
   return out;
 }
 
-/** Point indices to annotate with value labels (first, last, min, max; all if n≤12). */
-export function valueLabelIndices(points: DataPoint[]): number[] {
+/** Which point indices to consider for value labels for a given mode. */
+export function valueLabelIndicesForMode(
+  points: DataPoint[],
+  mode: ChartLabelsMode,
+): number[] {
   const n = points.length;
-  if (n === 0) return [];
-  if (n <= 12) return Array.from({ length: n }, (_, i) => i);
+  if (n === 0 || mode === "none") return [];
+  if (mode === "last") return [n - 1];
+  if (mode === "all") return Array.from({ length: n }, (_, i) => i);
 
   let minI = 0;
   let maxI = 0;
@@ -246,15 +269,183 @@ export function valueLabelIndices(points: DataPoint[]): number[] {
   return [...set].sort((a, b) => a - b);
 }
 
+/** @deprecated use valueLabelIndicesForMode */
+export function valueLabelIndices(points: DataPoint[]): number[] {
+  return valueLabelIndicesForMode(points, "extremes");
+}
+
+export type TextAnchor = "start" | "middle" | "end";
+
+export type LabelBox = {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+};
+
+export function approxTextWidth(text: string, fontSize: number): number {
+  return text.length * fontSize * 0.6;
+}
+
+export function labelBoxForText(
+  x: number,
+  y: number,
+  anchor: TextAnchor,
+  text: string,
+  fontSize: number,
+): LabelBox {
+  const w = approxTextWidth(text, fontSize);
+  const h = fontSize * 1.15;
+  let x0: number;
+  if (anchor === "start") x0 = x;
+  else if (anchor === "end") x0 = x - w;
+  else x0 = x - w / 2;
+  const y0 = y - h;
+  return { x0, y0, x1: x0 + w, y1: y0 + h };
+}
+
+export function boxesOverlap(a: LabelBox, b: LabelBox): boolean {
+  return !(a.x1 < b.x0 || b.x1 < a.x0 || a.y1 < b.y0 || b.y1 < a.y0);
+}
+
+export function circleOverlapsBox(
+  cx: number,
+  cy: number,
+  r: number,
+  box: LabelBox,
+): boolean {
+  const closestX = Math.max(box.x0, Math.min(cx, box.x1));
+  const closestY = Math.max(box.y0, Math.min(cy, box.y1));
+  const dx = cx - closestX;
+  const dy = cy - closestY;
+  return dx * dx + dy * dy < (r + 1) * (r + 1);
+}
+
+export type PlacedValueLabel = {
+  index: number;
+  x: number;
+  y: number;
+  anchor: TextAnchor;
+  text: string;
+  box: LabelBox;
+};
+
+export type PlotBounds = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+};
+
+function labelCandidatesForPoint(
+  index: number,
+  n: number,
+  cx: number,
+  cy: number,
+  mode: ChartLabelsMode,
+  plot: PlotBounds,
+): { x: number; y: number; anchor: TextAnchor }[] {
+  const isLast = index === n - 1;
+  const isFirst = index === 0;
+  if (mode === "last" && isLast) {
+    return [
+      { x: plot.right, y: cy + 4, anchor: "end" },
+      { x: cx + MARKER_R + 6, y: cy + 3, anchor: "start" },
+      { x: cx - MARKER_R - 6, y: cy + 3, anchor: "end" },
+      { x: cx - MARKER_R - 6, y: cy + MARKER_R + 18, anchor: "end" },
+      { x: cx, y: cy + MARKER_R + 20, anchor: "middle" },
+      { x: cx, y: cy - MARKER_R - 12, anchor: "middle" },
+    ];
+  }
+  const cands: { x: number; y: number; anchor: TextAnchor }[] = [
+    { x: cx, y: cy - MARKER_R - 10, anchor: "middle" },
+    { x: cx, y: cy + MARKER_R + 14, anchor: "middle" },
+    { x: cx + MARKER_R + 6, y: cy + 3, anchor: "start" },
+    { x: cx - MARKER_R - 6, y: cy + 3, anchor: "end" },
+  ];
+  if (isFirst) {
+    cands.unshift({ x: cx + 4, y: cy - MARKER_R - 10, anchor: "start" });
+  }
+  if (isLast) {
+    cands.unshift({ x: cx - 4, y: cy - MARKER_R - 10, anchor: "end" });
+  }
+  return cands;
+}
+
+function boxInsidePlot(box: LabelBox, plot: PlotBounds): boolean {
+  return (
+    box.x0 >= plot.left - 1 &&
+    box.x1 <= plot.right + 1 &&
+    box.y0 >= plot.top &&
+    box.y1 <= plot.bottom
+  );
+}
+
+function boxClearsTitle(box: LabelBox): boolean {
+  return box.y0 >= TITLE_BOTTOM_Y;
+}
+
+export function layoutValueLabels(
+  points: DataPoint[],
+  mode: ChartLabelsMode,
+  scaleX: (ts: number) => number,
+  scaleY: (v: number) => number,
+  markerIndices: number[],
+  plot: PlotBounds,
+): PlacedValueLabel[] {
+  const indices = valueLabelIndicesForMode(points, mode);
+  const markers = markerIndices.map((i) => {
+    const p = points[i];
+    return { cx: scaleX(p.ts), cy: scaleY(p.value), r: MARKER_R };
+  });
+  const placed: PlacedValueLabel[] = [];
+
+  for (const index of indices) {
+    const p = points[index];
+    const text = formatNumber(p.value);
+    const cx = scaleX(p.ts);
+    const cy = scaleY(p.value);
+    const cands = labelCandidatesForPoint(index, points.length, cx, cy, mode, plot);
+    let chosen: PlacedValueLabel | null = null;
+
+    for (const c of cands) {
+      const box = labelBoxForText(c.x, c.y, c.anchor, text, LABEL_FONT_SIZE);
+      if (!boxInsidePlot(box, plot)) continue;
+      if (!boxClearsTitle(box)) continue;
+      let bad = false;
+      for (const m of markers) {
+        if (circleOverlapsBox(m.cx, m.cy, m.r, box)) {
+          bad = true;
+          break;
+        }
+      }
+      if (bad) continue;
+      for (const prev of placed) {
+        if (boxesOverlap(box, prev.box)) {
+          bad = true;
+          break;
+        }
+      }
+      if (!bad) {
+        chosen = { index, x: c.x, y: c.y, anchor: c.anchor, text, box };
+        break;
+      }
+    }
+    if (chosen) placed.push(chosen);
+  }
+  return placed;
+}
+
 export function renderSvgChart(
   metric: string,
   points: DataPoint[],
   type: ChartType,
   theme: ChartTheme,
+  labelsMode: ChartLabelsMode = "last",
 ): string {
   const W = 640;
   const H = 320;
-  const pad = { t: 36, r: 28, b: 56, l: 60 };
+  const pad = { t: 36, r: 36, b: 56, l: 60 };
   const innerW = W - pad.l - pad.r;
   const innerH = H - pad.t - pad.b;
   const t = THEMES[theme];
@@ -334,28 +525,30 @@ export function renderSvgChart(
       const p = points[i];
       const cx = scaleX(p.ts).toFixed(2);
       const cy = scaleY(p.value).toFixed(2);
-      const tip = escapeXml(formatMarkerTooltip(p.ts, p.value));
-      return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${t.stroke}" stroke="${t.bg}" stroke-width="1.5"><title>${tip}</title></circle>`;
+      const tip = escapeXml(formatMarkerTooltip(p.ts, p.value, spanSec));
+      return `<circle cx="${cx}" cy="${cy}" r="${MARKER_R}" fill="${t.stroke}" stroke="${t.bg}" stroke-width="1.5"><title>${tip}</title></circle>`;
     })
     .join("\n  ");
 
-  const labelIdx = valueLabelIndices(points);
-  const placedLabels: { x: number; y: number }[] = [];
-  const valueLabels = labelIdx
-    .map((i) => {
-      const p = points[i];
-      let x = scaleX(p.ts);
-      let y = scaleY(p.value) - 10;
-      if (i === 0) x += 4;
-      if (i === points.length - 1) x -= 4;
-      for (const prev of placedLabels) {
-        if (Math.hypot(x - prev.x, y - prev.y) < 22) y -= 14;
-      }
-      placedLabels.push({ x, y });
-      const anchor =
-        i === 0 ? "start" : i === points.length - 1 ? "end" : "middle";
-      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" text-anchor="${anchor}" fill="${titleFill}" font-size="9" font-family="ui-monospace,monospace" opacity="0.92">${formatNumber(p.value)}</text>`;
-    })
+  const plot: PlotBounds = {
+    left: pad.l,
+    right: W - pad.r,
+    top: TITLE_BOTTOM_Y,
+    bottom: baseY - 4,
+  };
+  const valueLabelLayout = layoutValueLabels(
+    points,
+    labelsMode,
+    scaleX,
+    scaleY,
+    markerIdx,
+    plot,
+  );
+  const valueLabels = valueLabelLayout
+    .map(
+      (lbl) =>
+        `<text x="${lbl.x.toFixed(2)}" y="${lbl.y.toFixed(2)}" text-anchor="${lbl.anchor}" fill="${titleFill}" font-size="${LABEL_FONT_SIZE}" font-family="ui-monospace,monospace" opacity="0.88">${lbl.text}</text>`,
+    )
     .join("\n  ");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
@@ -382,4 +575,31 @@ export function writeChartFile(
   const file = path.join(dir, `${safe}-${Date.now()}.svg`);
   fs.writeFileSync(file, svg, "utf8");
   return file;
+}
+
+/** Extract marker positions from rendered SVG for overlap tests. */
+export function parseMarkerCircles(svg: string): { cx: number; cy: number; r: number }[] {
+  const re = /<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g;
+  const out: { cx: number; cy: number; r: number }[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(svg)) !== null) {
+    out.push({ cx: Number(m[1]), cy: Number(m[2]), r: Number(m[3]) });
+  }
+  return out;
+}
+
+/** Value label text elements from SVG (excludes axis monospace at y>240 typically). */
+export function parseValueLabelBoxes(svg: string): LabelBox[] {
+  const re =
+    /<text x="([\d.]+)" y="([\d.]+)" text-anchor="(start|middle|end)"[^>]*font-size="9"[^>]*>([^<]+)<\/text>/g;
+  const boxes: LabelBox[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(svg)) !== null) {
+    const x = Number(m[1]);
+    const y = Number(m[2]);
+    const anchor = m[3] as TextAnchor;
+    const text = m[4];
+    boxes.push(labelBoxForText(x, y, anchor, text, LABEL_FONT_SIZE));
+  }
+  return boxes;
 }

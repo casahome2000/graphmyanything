@@ -1,14 +1,58 @@
 import { describe, expect, it } from "vitest";
 import type { DataPoint } from "../src/lib/lttb.js";
 import {
+  boxesOverlap,
+  circleOverlapsBox,
+  formatMarkerTooltip,
   formatXAxisTick,
+  labelBoxForText,
   markerPointIndices,
   niceYAxisTicks,
+  parseMarkerCircles,
+  parseValueLabelBoxes,
   pickXAxisTicks,
   renderSvgChart,
-  valueLabelIndices,
+  valueLabelIndicesForMode,
   xAxisTimeGranularity,
 } from "../src/lib/svg-chart.js";
+
+function planoPopulation29(): DataPoint[] {
+  return Array.from({ length: 29 }, (_, i) => ({
+    ts: Date.UTC(1995, 0, 1) / 1000 + i * 365 * 86_400,
+    value: 184_600 + i * 4_000 + (i > 25 ? 108_000 : 0),
+  }));
+}
+
+function weight4(): DataPoint[] {
+  const base = Date.UTC(2025, 0, 6) / 1000;
+  return [
+    { ts: base, value: 182.4 },
+    { ts: base + 7 * 86_400, value: 181.1 },
+    { ts: base + 14 * 86_400, value: 180.6 },
+    { ts: base + 21 * 86_400, value: 179.8 },
+  ];
+}
+
+function series200(): DataPoint[] {
+  const start = Date.UTC(2020, 0, 1) / 1000;
+  return Array.from({ length: 200 }, (_, i) => ({
+    ts: start + i * 86_400,
+    value: 50 + Math.sin(i / 12) * 20 + i * 0.1,
+  }));
+}
+
+function assertNoLabelOverlaps(svg: string): void {
+  const labels = parseValueLabelBoxes(svg);
+  const markers = parseMarkerCircles(svg);
+  for (let i = 0; i < labels.length; i++) {
+    for (let j = i + 1; j < labels.length; j++) {
+      expect(boxesOverlap(labels[i], labels[j])).toBe(false);
+    }
+    for (const m of markers) {
+      expect(circleOverlapsBox(m.cx, m.cy, m.r, labels[i])).toBe(false);
+    }
+  }
+}
 
 describe("xAxisTimeGranularity", () => {
   it("classifies multi-year as yearly", () => {
@@ -48,6 +92,22 @@ describe("formatXAxisTick", () => {
   });
 });
 
+describe("formatMarkerTooltip", () => {
+  it("uses year only for multi-year spans", () => {
+    const ts = Date.UTC(1996, 0, 1) / 1000;
+    const tip = formatMarkerTooltip(ts, 192_600, 30 * 365 * 86_400);
+    expect(tip).toBe("1996 — 192.6k");
+    expect(tip).not.toContain("UTC");
+  });
+
+  it("uses month day year for daily spans", () => {
+    const ts = Date.UTC(1996, 6, 1) / 1000;
+    const tip = formatMarkerTooltip(ts, 100, 14 * 86_400);
+    expect(tip).toMatch(/Jul 1, 1996/);
+    expect(tip).not.toContain("UTC");
+  });
+});
+
 describe("pickXAxisTicks", () => {
   it("includes first and last and yields 5–8 ticks", () => {
     const ticks = pickXAxisTicks(1_700_000_000, 1_730_000_000, 520);
@@ -83,9 +143,11 @@ describe("niceYAxisTicks", () => {
     expect(y1).toBeGreaterThanOrEqual(182.4);
     for (let i = 1; i < ticks.length; i++) {
       const step = ticks[i] - ticks[i - 1];
-      expect([0.5, 1, 2, 2.5, 5, 10].some((s) => Math.abs(step - s) < 1e-6 || step / s > 0.99 && step / s < 1.01)).toBe(
-        true,
-      );
+      expect(
+        [0.5, 1, 2, 2.5, 5, 10].some(
+          (s) => Math.abs(step - s) < 1e-6 || (step / s > 0.99 && step / s < 1.01),
+        ),
+      ).toBe(true);
     }
     expect(ticks.some((t) => t === 180 || t === 179.5 || t === 181)).toBe(true);
   });
@@ -114,7 +176,7 @@ describe("markerPointIndices", () => {
   });
 });
 
-describe("valueLabelIndices", () => {
+describe("valueLabelIndicesForMode", () => {
   const pts: DataPoint[] = [
     { ts: 1, value: 100 },
     { ts: 2, value: 50 },
@@ -122,16 +184,20 @@ describe("valueLabelIndices", () => {
     { ts: 4, value: 75 },
   ];
 
-  it("labels every point when n ≤ 12", () => {
-    expect(valueLabelIndices(pts)).toEqual([0, 1, 2, 3]);
+  it("last mode returns only final index", () => {
+    expect(valueLabelIndicesForMode(pts, "last")).toEqual([3]);
   });
 
-  it("labels first, last, min, max for larger n", () => {
+  it("all mode labels every point", () => {
+    expect(valueLabelIndicesForMode(pts, "all")).toEqual([0, 1, 2, 3]);
+  });
+
+  it("extremes labels first, last, min, max for larger n", () => {
     const many: DataPoint[] = Array.from({ length: 30 }, (_, i) => ({
       ts: i,
       value: i === 5 ? 1 : i === 25 ? 999 : 50,
     }));
-    const labels = valueLabelIndices(many);
+    const labels = valueLabelIndicesForMode(many, "extremes");
     expect(labels).toContain(0);
     expect(labels).toContain(29);
     expect(labels).toContain(5);
@@ -139,33 +205,93 @@ describe("valueLabelIndices", () => {
   });
 });
 
+describe("label collision safety", () => {
+  it("Plano-shaped 29y series: no overlapping value labels or markers", () => {
+    const svg = renderSvgChart(
+      "city.plano.population",
+      planoPopulation29(),
+      "line",
+      "light",
+      "last",
+    );
+    const labels = parseValueLabelBoxes(svg);
+    expect(labels.length).toBeLessThanOrEqual(1);
+    assertNoLabelOverlaps(svg);
+  });
+
+  it("4-point weight series (labels all)", () => {
+    const svg = renderSvgChart(
+      "health.weight.lb",
+      weight4(),
+      "line",
+      "light",
+      "all",
+    );
+    assertNoLabelOverlaps(svg);
+  });
+
+  it("200-point series (labels last default)", () => {
+    const svg = renderSvgChart(
+      "ops.latency.ms",
+      series200(),
+      "line",
+      "dark",
+      "last",
+    );
+    assertNoLabelOverlaps(svg);
+    expect(markerPointIndices(200).length).toBeLessThan(200);
+  });
+
+  it("extremes mode avoids collisions on Plano series", () => {
+    const svg = renderSvgChart(
+      "city.plano.population",
+      planoPopulation29(),
+      "line",
+      "dark",
+      "extremes",
+    );
+    assertNoLabelOverlaps(svg);
+  });
+});
+
 describe("renderSvgChart markup", () => {
   it("includes x-axis ticks, markers, and axis baseline", () => {
-    const points: DataPoint[] = Array.from({ length: 29 }, (_, i) => ({
-      ts: Date.UTC(1995, 0, 1) / 1000 + i * 365 * 86_400,
-      value: 184_600 + i * 4_000,
-    }));
-    const svg = renderSvgChart("city.plano.population", points, "line", "dark");
+    const svg = renderSvgChart(
+      "city.plano.population",
+      planoPopulation29(),
+      "line",
+      "dark",
+    );
     expect(svg).toContain("<title>");
     expect(svg).toMatch(/1995/);
     expect(svg).toContain("<circle");
     expect(svg.match(/<circle/g)?.length).toBe(29);
-    expect(svg).toContain('text-anchor="end"');
-    expect(svg).toContain('text-anchor="start"');
   });
 
   it("labels each weight point date on the x-axis when n ≤ 12", () => {
-    const base = Date.UTC(2025, 0, 6) / 1000;
-    const points: DataPoint[] = [
-      { ts: base, value: 182.4 },
-      { ts: base + 7 * 86_400, value: 181.1 },
-      { ts: base + 14 * 86_400, value: 180.6 },
-      { ts: base + 21 * 86_400, value: 179.8 },
-    ];
-    const svg = renderSvgChart("health.weight.lb", points, "line", "light");
+    const svg = renderSvgChart("health.weight.lb", weight4(), "line", "light");
     expect(svg).toContain("1/6");
     expect(svg).toContain("1/13");
     expect(svg).toContain("1/20");
     expect(svg).toContain("1/27");
+  });
+
+  it("tooltip on marker uses friendly year for Plano", () => {
+    const svg = renderSvgChart(
+      "city.plano.population",
+      planoPopulation29(),
+      "line",
+      "light",
+    );
+    expect(svg).toMatch(/<title>1996 —/);
+    expect(svg).not.toMatch(/UTC —/);
+  });
+});
+
+describe("labelBoxForText", () => {
+  it("width scales with char count", () => {
+    const short = labelBoxForText(100, 50, "middle", "1.0k", 9);
+    const long = labelBoxForText(100, 50, "middle", "293.4k", 9);
+    expect(long.x1 - long.x0).toBeGreaterThan(short.x1 - short.x0);
   });
 });

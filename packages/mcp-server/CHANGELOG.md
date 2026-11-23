@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.3 — 2026-11-23
+
+### chart
+
+- Default value labels: **labels: last** — one end-value beside the last point; no labels stacked on markers by default.
+- New **labels** option: `none` | `last` (default) | `extremes` | `all` with bounding-box collision avoidance vs markers and other labels.
+- Extra Y-axis headroom so peaks do not crowd the title; wider right padding for end labels.
+- Tooltips use span-aware dates (e.g. `1996 — 192.6k`) instead of raw ISO UTC strings.
+
+### MCP discovery
+
+- Richer enum descriptions on `chart`, `query`, and `insight` tools; short chart blurb in tools/list plus **chart-guide** MCP resource for the full choosing guide.
+
+### docs
+
+- Install docs primary: `npx -y graphmyanything-mcp@latest` with optional pin to `0.1.3`.
+
 ## 0.1.2 — 2026-11-22
 
 ### chart
