@@ -12,6 +12,14 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "bin": {
+    "graphmyanything-stripe": "bin/graphmyanything-stripe.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md"
+  ],
   "exports": {
     ".": "./dist/index.js"
   },
