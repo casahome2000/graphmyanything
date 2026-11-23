@@ -19,37 +19,25 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "track",
     title: "Track metric",
-    description:
-      "Write metric point(s) to local SQLite. Use value for a single point now, or points[] for batch/history.",
+    description: "Write metric point(s) to local SQLite.",
     inputSchema: {
       type: "object",
       properties: {
-        metric: {
-          type: "string",
-          description: "Metric name, dotted namespace e.g. stripe.mrr",
-        },
-        value: {
-          type: "number",
-          description: "Single value recorded at now (unless points[] set)",
-        },
+        metric: { type: "string" },
+        value: { type: "number" },
         points: {
           type: "array",
-          description: "Batch or historical points with optional per-point ts (unix sec) and tags",
           items: {
             type: "object",
             properties: {
               value: { type: "number" },
-              ts: { type: "number", description: "Unix timestamp seconds" },
-              tags: { type: "object", additionalProperties: { type: "string" } },
+              ts: { type: "number" },
+              tags: { type: "object" },
             },
             required: ["value"],
           },
         },
-        tags: {
-          type: "object",
-          additionalProperties: { type: "string" },
-          description: "Tags merged into every point in this call",
-        },
+        tags: { type: "object" },
       },
       required: ["metric"],
     },
@@ -57,31 +45,17 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "query",
     title: "Query metric",
-    description:
-      "Terse summary keys s.l/mn/mx/mu/tr/pct/n plus optional LTTB pts[]. Use before chart when you need numbers, not pixels.",
+    description: "Terse summary (s.l/mn/mx/mu/tr/pct/n) + optional LTTB pts.",
     inputSchema: {
       type: "object",
       properties: {
-        metric: {
-          type: "string",
-          description: "Metric name to read",
-        },
-        range: {
-          type: "string",
-          description: RANGE_DESCRIBE,
-        },
-        token_budget: {
-          type: "number",
-          description: "Target max tokens for JSON body (default 500); may shrink pts",
-        },
+        metric: { type: "string" },
+        range: { type: "string", description: RANGE_DESCRIBE },
+        token_budget: { type: "number" },
         points: {
-          description: "Series detail: omit with auto (default), 0=summary only, or N>0 for LTTB N points",
           oneOf: [{ type: "number", minimum: 0 }, { type: "string", enum: ["auto"] }],
         },
-        also_chart: {
-          type: "boolean",
-          description: "Set true when chart follows — auto mode omits pts to save tokens",
-        },
+        also_chart: { type: "boolean" },
       },
       required: ["metric"],
     },
@@ -89,13 +63,12 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "insight",
     title: "Metric insight",
-    description:
-      "Trend direction, MAD outliers, naive forecast. Use after query when the user wants interpretation, not a chart.",
+    description: "Trend, MAD anomalies, naive forecast.",
     inputSchema: {
       type: "object",
       properties: {
-        metric: { type: "string", description: "Metric name to analyze" },
-        range: { type: "string", description: RANGE_DESCRIBE },
+        metric: { type: "string" },
+        range: { type: "string" },
       },
       required: ["metric"],
     },
@@ -107,7 +80,7 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
     inputSchema: {
       type: "object",
       properties: {
-        metric: { type: "string", description: "Metric name to render" },
+        metric: { type: "string" },
         range: { type: "string", description: RANGE_DESCRIBE },
         type: {
           type: "string",
@@ -132,4 +105,16 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
 
 export function gmaToolsListJson(): string {
   return JSON.stringify({ tools: GMA_TOOL_CATALOG });
+}
+
+export function gmaToolsListTokenEstimate(): number {
+  return Math.ceil(gmaToolsListJson().length / 4);
+}
+
+export function gmaPerToolTokenEstimates(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const tool of GMA_TOOL_CATALOG) {
+    out[tool.name] = Math.ceil(JSON.stringify({ tools: [tool] }).length / 4);
+  }
+  return out;
 }

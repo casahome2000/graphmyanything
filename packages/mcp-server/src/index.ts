@@ -48,32 +48,20 @@ server.registerTool(
   "track",
   {
     title: "Track metric",
-    description:
-      "Write metric point(s) to local SQLite. Use value for a single point now, or points[] for batch/history.",
+    description: "Write metric point(s) to local SQLite.",
     inputSchema: {
-      metric: z
-        .string()
-        .describe("Metric name, dotted namespace e.g. stripe.mrr"),
-      value: z
-        .number()
-        .optional()
-        .describe("Single value recorded at now (unless points[] set)"),
+      metric: z.string(),
+      value: z.number().optional(),
       points: z
         .array(
           z.object({
             value: z.number(),
-            ts: z.number().optional().describe("Unix timestamp seconds"),
+            ts: z.number().optional(),
             tags: z.record(z.string()).optional(),
           }),
         )
-        .optional()
-        .describe(
-          "Batch or historical points with optional per-point ts and tags",
-        ),
-      tags: z
-        .record(z.string())
-        .optional()
-        .describe("Tags merged into every point in this call"),
+        .optional(),
+      tags: z.record(z.string()).optional(),
     },
   },
   async (args) => {
@@ -88,29 +76,13 @@ server.registerTool(
   "query",
   {
     title: "Query metric",
-    description:
-      "Terse summary keys s.l/mn/mx/mu/tr/pct/n plus optional LTTB pts[]. Use before chart when you need numbers, not pixels.",
+    description: "Terse summary (s.l/mn/mx/mu/tr/pct/n) + optional LTTB pts.",
     inputSchema: {
-      metric: z.string().describe("Metric name to read"),
+      metric: z.string(),
       range: z.string().optional().describe(RANGE_DESCRIBE),
-      token_budget: z
-        .number()
-        .optional()
-        .describe(
-          "Target max tokens for JSON body (default 500); may shrink pts",
-        ),
-      points: z
-        .union([z.number().min(0), z.literal("auto")])
-        .optional()
-        .describe(
-          "Series detail: auto (default), 0=summary only, or N>0 for LTTB N points",
-        ),
-      also_chart: z
-        .boolean()
-        .optional()
-        .describe(
-          "Set true when chart follows — auto mode omits pts to save tokens",
-        ),
+      token_budget: z.number().optional(),
+      points: z.union([z.number().min(0), z.literal("auto")]).optional(),
+      also_chart: z.boolean().optional(),
     },
   },
   async (args) => {
@@ -125,11 +97,10 @@ server.registerTool(
   "insight",
   {
     title: "Metric insight",
-    description:
-      "Trend direction, MAD outliers, naive forecast. Use after query when the user wants interpretation, not a chart.",
+    description: "Trend, MAD anomalies, naive forecast.",
     inputSchema: {
-      metric: z.string().describe("Metric name to analyze"),
-      range: z.string().optional().describe(RANGE_DESCRIBE),
+      metric: z.string(),
+      range: z.string().optional(),
     },
   },
   async (args) => {
@@ -146,7 +117,7 @@ server.registerTool(
     title: "Render chart",
     description: CHART_TOOL_DESCRIPTION,
     inputSchema: {
-      metric: z.string().describe("Metric name to render"),
+      metric: z.string(),
       range: z.string().optional().describe(RANGE_DESCRIBE),
       type: z
         .enum(["line", "bar", "area"])

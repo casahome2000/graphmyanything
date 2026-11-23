@@ -16,18 +16,15 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 SVG written to local disk; response \`path\` opens the file. \`url\` is null until hosted charts ship.
 `;
 
-/** Short blurb in tools/list (keeps session token cost down). */
+/** tools/list blurb — details live in resource chart-guide. */
 export const CHART_TOOL_DESCRIPTION =
-  "Render SVG chart to a local file (path; url null until hosted). line=trends (default); bar=sparse compare (n≤120); area=filled trend. theme dark|light. labels last (default, clean)|none|extremes|all — prefer last. See MCP resource chart-guide for full choosing guide.";
+  "SVG chart to local path. See MCP resource chart-guide for type, theme, labels.";
 
-export const RANGE_DESCRIBE =
-  "Time window: 7d, 90d, 12w, 1y, or all (default all). Same syntax as query/insight.";
+export const RANGE_DESCRIBE = "7d|90d|1y|all";
 
-export const CHART_TYPE_DESCRIBE =
-  "line: trends over time (default). bar: compare sparse periods/categories (≤120 pts). area: emphasize volume under a trend.";
+export const CHART_TYPE_DESCRIBE = "line=trends; bar=sparse≤120; area=fill";
 
-export const CHART_THEME_DESCRIBE =
-  "dark: default, for dark UIs. light: light backgrounds and docs.";
+export const CHART_THEME_DESCRIBE = "dark|light UI";
 
 export const CHART_LABELS_DESCRIBE =
-  "last (default): single end value beside last point, no clutter. none: axis only. extremes: first/last/min/max when non-overlapping. all: label every point (small n).";
+  "last=clean default; extremes=peaks; all≤12; none=sparkline";
