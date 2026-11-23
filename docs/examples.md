@@ -205,7 +205,7 @@ Use **`insight`** when the user wants narrative + anomalies + forecast, not raw 
 {
   "path": "/home/you/.graphmyanything/charts/geo.plano_tx.population-2026-11-23T12-00-00.svg",
   "url": null,
-  "hosted_url_note": "Hosted live chart URLs are coming soon: graphmyanything.com",
+  "hosted_url_note": "Local chart only. Run `npx -y graphmyanything-mcp@latest sync` to get live chart links.",
   "tokens_estimate": 48
 }
 ```

@@ -30,14 +30,16 @@ Starts the device code flow.
 { "device_code": "string" }
 ```
 
-**Response 200** (one of)
+**Responses**
 
 ```json
-{ "status": "pending" }
-{ "status": "slow_down" }
-{ "status": "expired" }
-{ "status": "authorized", "api_key": "gma_..." }
+200 { "ok": true, "access_token": "gma_...", "token_type": "Bearer" }
+428 { "error": "authorization_pending" }
+400 { "error": "expired_token" }
+400 { "error": "invalid_grant" }
 ```
+
+The key is returned once; later polls answer `authorization_pending` or `invalid_grant`.
 
 ## Account
 
@@ -47,8 +49,9 @@ Starts the device code flow.
 
 ```json
 {
+  "ok": true,
   "plan": "free",
-  "limits": { "max_points": 100000, "max_metrics": 500 },
+  "limits": { "metrics": 3, "points": 10000, "window_days": 90, "live_links": 3, "chart_wordmark": true },
   "usage": { "points": 42, "metrics": 3 }
 }
 ```

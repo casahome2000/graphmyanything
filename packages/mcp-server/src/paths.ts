@@ -3,7 +3,7 @@ import path from "node:path";
 import { resolveDbPath } from "./db.js";
 
 export const HOSTED_CHART_URL_NOTE =
-  "Hosted live chart URLs are coming soon: graphmyanything.com";
+  "Local chart only. Run `npx -y graphmyanything-mcp@latest sync` to get live chart links.";
 
 /** Local SVG output directory (not bundled in npm `files`). */
 export function resolveChartsDir(): string {

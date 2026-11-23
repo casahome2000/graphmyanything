@@ -141,9 +141,9 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 
 A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
 
-## Hosted live charts (coming soon)
+## Hosted live charts
 
-The `chart` tool writes dependency-free SVG files locally today (see sample PNGs in [`packages/mcp-server/docs/`](packages/mcp-server/docs/)). Public URLs at **graphmyanything.com** are on the roadmap for founding members — [join the waitlist](https://graphmyanything.com).
+Run `npx -y graphmyanything-mcp@latest sync` to link a free account. Your local history uploads, and `chart` then returns a live, unlisted link at `graphmyanything.com/c/<id>` (with `.svg` and `.png` embeds) that you can turn off any time. Pass `share: false` to keep a chart local.
 
 ## Repo map
 

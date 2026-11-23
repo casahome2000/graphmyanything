@@ -98,7 +98,7 @@ track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})
 query(metric="stripe.mrr", range="90d", token_budget=200)
 insight(metric="stripe.mrr", range="90d")
 chart(metric="stripe.mrr", range="90d", type="area", theme="dark", labels="last")
-→ {"path":"/Users/you/.graphmyanything/charts/stripe.mrr-….svg","url":null,"hosted_url_note":"Hosted live chart URLs are coming soon: graphmyanything.com","tokens_estimate":42}
+→ {"path":"/Users/you/.graphmyanything/charts/stripe.mrr-….svg","url":null,"hosted_url_note":"Local chart only. Run `npx -y graphmyanything-mcp@latest sync` to get live chart links.","tokens_estimate":42}
 ```
 
 ## Develop

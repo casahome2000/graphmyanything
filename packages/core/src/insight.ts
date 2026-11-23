@@ -98,7 +98,6 @@ export function generateInsight(
     trendText,
     anomalyText,
     forecastText,
-    "Permanent live chart URLs at https://graphmyanything.com/c/<metric> are coming for founding members.",
   ].join(" ");
 
   return {
