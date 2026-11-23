@@ -1,9 +1,9 @@
 #!/usr/bin/env -S node --disable-warning=ExperimentalWarning
 import { runCli } from "./cli/main.js";
-import { startMcpServer } from "./mcp-server.js";
 
 async function main(): Promise<void> {
   if (await runCli()) return;
+  const { startMcpServer } = await import("./mcp-server.js");
   await startMcpServer();
 }
 
