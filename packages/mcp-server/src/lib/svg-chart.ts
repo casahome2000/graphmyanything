@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { resolveChartsDir } from "../paths.js";
 
-export * from "@graphmyanything/core/svg-chart.js";
+export * from "../vendor/core/svg-chart.js";
 
 export function writeChartFile(
   metric: string,

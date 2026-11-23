@@ -1,1 +1,1 @@
-export * from "@graphmyanything/core/summary.js";
+export * from "../vendor/core/summary.js";

@@ -9,11 +9,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "esModuleInterop": true,
-    "paths": {
-      "@graphmyanything/core": ["../core/dist/index.d.ts"],
-      "@graphmyanything/core/*": ["../core/dist/*"]
-    }
+    "allowJs": true
   },
-  "include": ["src/**/*"],
-  "references": [{ "path": "../core" }]
+  "include": ["src/**/*"]
 }

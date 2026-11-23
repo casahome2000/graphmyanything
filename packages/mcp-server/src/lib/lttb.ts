@@ -1,1 +1,1 @@
-export * from "@graphmyanything/core/lttb.js";
+export * from "../vendor/core/lttb.js";

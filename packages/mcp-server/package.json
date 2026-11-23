@@ -33,15 +33,14 @@
     "server.json"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/inline-core.mjs && tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "test": "node --disable-warning=ExperimentalWarning ./node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest",
     "lint": "eslint src test",
     "docs:chart-samples": "npm run build && node scripts/render-sample-charts.mjs",
-    "prepack": "npm run build --prefix ../core && npm run build && node scripts/prepack-manifest.mjs",
-    "postpack": "node scripts/postpack-manifest.mjs"
+    "prepack": "npm run build"
   },
   "engines": {
     "node": ">=22.13"
@@ -51,13 +50,9 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
-    "@graphmyanything/core": "file:../core",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^22.15.3",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
-  },
-  "bundleDependencies": [
-    "@graphmyanything/core"
-  ]
+  }
 }

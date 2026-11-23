@@ -1,1 +1,1 @@
-export * from "@graphmyanything/core/tokens.js";
+export * from "../vendor/core/tokens.js";
