@@ -6,6 +6,16 @@
 
 **Registry name:** `io.github.casahome2000/graphmyanything-mcp` · **License:** MIT
 
+## Start here
+
+| Doc | Audience |
+|-----|----------|
+| [Quick start (5 min)](./docs/quickstart.md) | Install in Cursor, Claude, VS Code, Windsurf, Docker |
+| [Examples](./docs/examples.md) | Copy-paste prompts, tool JSON, sample responses |
+| [Agent guide](./docs/agent-guide.md) | When to keep, store, update, and use metrics |
+
+MCP resources for agents: **`usage-guide`**, **`chart-guide`** (not duplicated in `tools/list`).
+
 ## Quick start
 
 ```bash
@@ -47,11 +57,12 @@ npx -y graphmyanything-mcp@latest
 
 **No telemetry** in the MCP server — we do not phone home from your agent sessions.
 
-## Tools (four)
+## Tools (five)
 
 | Tool | One-liner | Tiny example |
 |------|-----------|--------------|
-| **track** | Write metric point(s) to local SQLite | `track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})` |
+| **track** | Upsert point(s) by (metric, ts); returns `written` + `replaced` | `track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})` |
+| **forget** | Delete point, range, or whole metric (`confirm` when `all:true`) | `forget(metric="stripe.mrr", ts=1732147200)` |
 | **query** | Compact summary (latest, min, max, mean, trend, % change), optional downsampled points within a token budget | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
 | **insight** | Plain-English trend, anomalies, and a simple forecast | `insight(metric="stripe.mrr", range="90d")` |
 | **chart** | Labeled SVG (x-axis ticks, markers, tooltips, `labels` last/none/extremes/all) to local file; no public URL yet | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark", labels="last")` → includes `path`, `tokens_estimate`, `url`: null, `hosted_url_note` |

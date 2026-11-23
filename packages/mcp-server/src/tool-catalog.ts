@@ -7,6 +7,7 @@ import {
   CHART_TYPE_DESCRIBE,
   RANGE_DESCRIBE,
 } from "./lib/chart-guide.js";
+import { FORGET_TOOL_DESCRIPTION } from "./tool-schemas.js";
 
 export type ToolDef = {
   name: string;
@@ -19,7 +20,7 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "track",
     title: "Track metric",
-    description: "Write metric point(s) to local SQLite.",
+    description: "Upsert (metric,ts); written+replaced.",
     inputSchema: {
       type: "object",
       properties: {
@@ -45,7 +46,7 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "query",
     title: "Query metric",
-    description: "Terse summary (s.l/mn/mx/mu/tr/pct/n) + optional LTTB pts.",
+    description: "Summary + optional LTTB pts.",
     inputSchema: {
       type: "object",
       properties: {
@@ -97,6 +98,23 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
           enum: ["none", "last", "extremes", "all"],
           description: CHART_LABELS_DESCRIBE,
         },
+      },
+      required: ["metric"],
+    },
+  },
+  {
+    name: "forget",
+    title: "Forget",
+    description: FORGET_TOOL_DESCRIPTION,
+    inputSchema: {
+      type: "object",
+      properties: {
+        metric: { type: "string" },
+        ts: { type: "number" },
+        from: { type: "number" },
+        to: { type: "number" },
+        all: { type: "boolean" },
+        confirm: { type: "boolean" },
       },
       required: ["metric"],
     },

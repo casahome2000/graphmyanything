@@ -13,8 +13,8 @@ describe("GMA_TOOL_CATALOG", () => {
     expect(props.labels?.enum).toEqual(["none", "last", "extremes", "all"]);
   });
 
-  it("tools/list payload stays at or under 450 tokens (chars÷4)", () => {
-    expect(gmaToolsListTokenEstimate()).toBeLessThanOrEqual(450);
+  it("tools/list payload stays at or under 650 tokens (chars÷4)", () => {
+    expect(gmaToolsListTokenEstimate()).toBeLessThanOrEqual(650);
     expect(gmaToolsListJson().length).toBeGreaterThan(100);
   });
 
@@ -24,7 +24,7 @@ describe("GMA_TOOL_CATALOG", () => {
       string,
       { description?: string; enum?: string[] }
     >;
-    expect(props.labels?.description).toMatch(/last=clean default/);
+    expect(props.labels?.description).toMatch(/none\|last/);
     expect(props.type?.enum).toEqual(["line", "bar", "area"]);
     expect(chart?.description).toMatch(/chart-guide/);
   });
@@ -33,7 +33,13 @@ describe("GMA_TOOL_CATALOG", () => {
 describe("gmaPerToolTokenEstimates", () => {
   it("exposes per-tool token breakdown", () => {
     const est = gmaPerToolTokenEstimates();
-    expect(Object.keys(est).sort()).toEqual(["chart", "insight", "query", "track"]);
+    expect(Object.keys(est).sort()).toEqual([
+      "chart",
+      "forget",
+      "insight",
+      "query",
+      "track",
+    ]);
     const total = Object.values(est).reduce((a, b) => a + b, 0);
     expect(total).toBeGreaterThan(gmaToolsListTokenEstimate());
   });

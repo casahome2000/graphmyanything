@@ -1,4 +1,10 @@
-import { insertPoints, queryPoints, type GmaDatabase, type MetricPoint } from "../db.js";
+import {
+  deletePoints,
+  queryPoints,
+  upsertPoints,
+  type GmaDatabase,
+  type MetricPoint,
+} from "../db.js";
 import { generateInsight } from "../lib/insight.js";
 import { lttb, type DataPoint } from "../lib/lttb.js";
 import {
@@ -33,7 +39,7 @@ export function handleTrack(
     points?: { value: number; ts?: number; tags?: Record<string, string> }[];
     tags?: Record<string, string>;
   },
-): { ok: true; metric: string; written: number } {
+): { ok: true; metric: string; written: number; replaced: number } {
   const now = Math.floor(Date.now() / 1000);
   const metric = args.metric.trim();
   if (!metric) throw new Error("metric is required");
@@ -57,8 +63,58 @@ export function handleTrack(
     throw new Error("Provide value or points[]");
   }
 
-  const written = insertPoints(db, metric, toInsert);
-  return withTokensEstimate({ ok: true as const, metric, written });
+  const { written, replaced } = upsertPoints(db, metric, toInsert);
+  return withTokensEstimate({ ok: true as const, metric, written, replaced });
+}
+
+export function handleForget(
+  db: GmaDatabase,
+  args: {
+    metric: string;
+    ts?: number;
+    from?: number;
+    to?: number;
+    all?: boolean;
+    confirm?: boolean;
+  },
+): { ok: true; metric: string; deleted: number } {
+  const metric = args.metric.trim();
+  if (!metric) throw new Error("metric is required");
+
+  if (args.all) {
+    if (args.confirm !== true) {
+      throw new Error("all:true requires confirm:true");
+    }
+    if (
+      args.ts != null ||
+      args.from != null ||
+      args.to != null
+    ) {
+      throw new Error("Use all:true alone for whole-metric delete");
+    }
+  } else if (args.ts != null) {
+    if (args.from != null || args.to != null || args.all) {
+      throw new Error("Use ts alone for a single-point delete");
+    }
+  } else if (args.from != null || args.to != null) {
+    if (args.from == null || args.to == null) {
+      throw new Error("Range delete requires both from and to (Unix seconds)");
+    }
+    if (args.ts != null || args.all) {
+      throw new Error("Use from+to alone for range delete");
+    }
+  } else {
+    throw new Error("Specify ts, from+to, or all:true");
+  }
+
+  const deleted = deletePoints(db, {
+    metric,
+    ts: args.ts,
+    from: args.from,
+    to: args.to,
+    all: args.all,
+  });
+  return withTokensEstimate({ ok: true as const, metric, deleted });
 }
 
 const DEFAULT_LTTB = 50;

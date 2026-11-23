@@ -10,6 +10,16 @@
 
 Charts include **x-axis date/time ticks**, **hover tooltips** on markers (open the SVG in a browser), and by default a single **end-value label** (`labels: last`). Every tool response includes `tokens_estimate` (payload size ÷ 4, approximate).
 
+## Start here
+
+| Doc | Contents |
+|-----|----------|
+| [Quick start](../../docs/quickstart.md) | 5-minute MCP install (Cursor, Claude, VS Code, Windsurf, Docker) |
+| [Examples](../../docs/examples.md) | Prompts + validated tool JSON |
+| [Agent guide](../../docs/agent-guide.md) | When to track, query, insight, or chart |
+
+Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includes a short pointer to read them.
+
 ## Install
 
 ```bash
@@ -26,7 +36,8 @@ Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Me
 
 | Tool | What it does |
 |------|----------------|
-| `track` | Record a value, batch, or historical points (`metric`, `value` or `points[]`, optional `tags`) |
+| `track` | Upsert by `(metric, ts)` — `value` or `points[]`, optional `tags`; returns `written` + `replaced` |
+| `forget` | Delete by `ts`, `from`+`to`, or `all:true`+`confirm:true` (always requires `metric`) |
 | `query` | Summary + LTTB series within `token_budget` (`metric`, `range` like `90d`, `token_budget`); includes `tokens_estimate` |
 | `insight` | Plain-English trend, MAD anomalies, naive forecast |
 | `chart` | Writes a dark/light **640×320 SVG** on disk (`path`): x-axis ticks, point markers (≤60 or thinned), `labels` `none`/`last` (default)/`extremes`/`all`. **`url` is always `null`**. MCP resource **`chart-guide`** has the full choosing guide. |

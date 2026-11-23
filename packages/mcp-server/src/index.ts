@@ -2,18 +2,23 @@
 import "./bootstrap.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
 import { openDatabase } from "./db.js";
+import { CHART_GUIDE_RESOURCE, CHART_TOOL_DESCRIPTION } from "./lib/chart-guide.js";
 import {
-  CHART_GUIDE_RESOURCE,
-  CHART_LABELS_DESCRIBE,
-  CHART_THEME_DESCRIBE,
-  CHART_TOOL_DESCRIPTION,
-  CHART_TYPE_DESCRIBE,
-  RANGE_DESCRIBE,
-} from "./lib/chart-guide.js";
+  MCP_SERVER_INSTRUCTIONS,
+  USAGE_GUIDE_RESOURCE,
+} from "./lib/usage-guide.js";
+import {
+  chartToolInputSchema,
+  forgetToolInputSchema,
+  FORGET_TOOL_DESCRIPTION,
+  insightToolInputSchema,
+  queryToolInputSchema,
+  trackToolInputSchema,
+} from "./tool-schemas.js";
 import {
   handleChart,
+  handleForget,
   handleInsight,
   handleQuery,
   handleTrack,
@@ -21,10 +26,15 @@ import {
 
 const db = openDatabase();
 
-const server = new McpServer({
-  name: "graphmyanything",
-  version: "0.1.3",
-});
+const PACKAGE_VERSION = "0.1.4";
+
+const server = new McpServer(
+  {
+    name: "graphmyanything",
+    version: PACKAGE_VERSION,
+  },
+  { instructions: MCP_SERVER_INSTRUCTIONS },
+);
 
 server.registerResource(
   "chart-guide",
@@ -44,25 +54,31 @@ server.registerResource(
   }),
 );
 
+server.registerResource(
+  "usage-guide",
+  "graphmyanything://docs/usage-guide",
+  {
+    mimeType: "text/markdown",
+    description:
+      "When to track, query, insight, or chart — naming, idempotency, freshness, token hints",
+  },
+  async () => ({
+    contents: [
+      {
+        uri: "graphmyanything://docs/usage-guide",
+        mimeType: "text/markdown",
+        text: USAGE_GUIDE_RESOURCE,
+      },
+    ],
+  }),
+);
+
 server.registerTool(
   "track",
   {
     title: "Track metric",
-    description: "Write metric point(s) to local SQLite.",
-    inputSchema: {
-      metric: z.string(),
-      value: z.number().optional(),
-      points: z
-        .array(
-          z.object({
-            value: z.number(),
-            ts: z.number().optional(),
-            tags: z.record(z.string()).optional(),
-          }),
-        )
-        .optional(),
-      tags: z.record(z.string()).optional(),
-    },
+    description: "Upsert (metric,ts); written+replaced.",
+    inputSchema: trackToolInputSchema,
   },
   async (args) => {
     const result = handleTrack(db, args);
@@ -76,14 +92,8 @@ server.registerTool(
   "query",
   {
     title: "Query metric",
-    description: "Terse summary (s.l/mn/mx/mu/tr/pct/n) + optional LTTB pts.",
-    inputSchema: {
-      metric: z.string(),
-      range: z.string().optional().describe(RANGE_DESCRIBE),
-      token_budget: z.number().optional(),
-      points: z.union([z.number().min(0), z.literal("auto")]).optional(),
-      also_chart: z.boolean().optional(),
-    },
+    description: "Summary + optional LTTB pts.",
+    inputSchema: queryToolInputSchema,
   },
   async (args) => {
     const result = handleQuery(db, args);
@@ -98,13 +108,25 @@ server.registerTool(
   {
     title: "Metric insight",
     description: "Trend, MAD anomalies, naive forecast.",
-    inputSchema: {
-      metric: z.string(),
-      range: z.string().optional(),
-    },
+    inputSchema: insightToolInputSchema,
   },
   async (args) => {
     const result = handleInsight(db, args);
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+    };
+  },
+);
+
+server.registerTool(
+  "forget",
+  {
+    title: "Forget",
+    description: FORGET_TOOL_DESCRIPTION,
+    inputSchema: forgetToolInputSchema,
+  },
+  async (args) => {
+    const result = handleForget(db, args);
     return {
       content: [{ type: "text", text: JSON.stringify(result) }],
     };
@@ -116,22 +138,7 @@ server.registerTool(
   {
     title: "Render chart",
     description: CHART_TOOL_DESCRIPTION,
-    inputSchema: {
-      metric: z.string(),
-      range: z.string().optional().describe(RANGE_DESCRIBE),
-      type: z
-        .enum(["line", "bar", "area"])
-        .optional()
-        .describe(CHART_TYPE_DESCRIBE),
-      theme: z
-        .enum(["dark", "light"])
-        .optional()
-        .describe(CHART_THEME_DESCRIBE),
-      labels: z
-        .enum(["none", "last", "extremes", "all"])
-        .optional()
-        .describe(CHART_LABELS_DESCRIBE),
-    },
+    inputSchema: chartToolInputSchema,
   },
   async (args) => {
     const result = handleChart(db, args);
