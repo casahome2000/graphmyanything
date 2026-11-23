@@ -1,6 +1,6 @@
 # graphmyanything-mcp
 
-**One call instead of throwaway Python.** Local-first [MCP](https://modelcontextprotocol.io) server that stores metrics in SQLite and returns token-efficient summaries, insights, and charts for AI agents.
+**Build once. Ask forever.** One MCP call instead of throwaway Python — store metrics in SQLite and answer chart questions from history with token-efficient **track**, **query**, **insight**, and **chart** tools.
 
 [Join the waitlist](https://graphmyanything.com) · Founding member preorder live on the site.
 
@@ -14,9 +14,10 @@ Charts include **x-axis date/time ticks**, **hover tooltips** on markers (open t
 
 | Doc | Contents |
 |-----|----------|
-| [Quick start](../../docs/quickstart.md) | 5-minute MCP install (Cursor, Claude, VS Code, Windsurf, Docker) |
-| [Examples](../../docs/examples.md) | Prompts + validated tool JSON |
-| [Agent guide](../../docs/agent-guide.md) | When to track, query, insight, or chart |
+| [Quick start](https://github.com/casahome2000/graphmyanything/blob/master/docs/quickstart.md) | 5-minute MCP install (Cursor, Claude, VS Code, Windsurf, Docker) |
+| [Examples](https://github.com/casahome2000/graphmyanything/blob/master/docs/examples.md) | Prompts + validated tool JSON |
+| [Agent guide](https://github.com/casahome2000/graphmyanything/blob/master/docs/agent-guide.md) | When to track, query, insight, or chart |
+| [Hosted API](https://github.com/casahome2000/graphmyanything/blob/master/docs/hosted-api.md) | Device sync, plan limits, share URLs |
 
 Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includes a short pointer to read them.
 
@@ -51,7 +52,7 @@ npx graphmyanything-mcp local   # force local mode
 npx graphmyanything-mcp logout
 ```
 
-Config: `~/.graphmyanything/config.json` (mode `0600`). See [hosted API](../../docs/hosted-api.md).
+Config: `~/.graphmyanything/config.json` (mode `0600`). API key env: `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY`. See [hosted API](https://github.com/casahome2000/graphmyanything/blob/master/docs/hosted-api.md).
 
 ## Cursor
 

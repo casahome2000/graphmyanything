@@ -1,6 +1,6 @@
 # GraphMyAnything — example prompts & tool calls
 
-Each example has a **user prompt**, the **tool call** (arguments matching the 0.1.3+ Zod schemas), and a **sample response** shape. Example JSON is validated in CI (`test/example-args.test.ts`).
+Each example has a **user prompt**, the **tool call** (arguments matching the **0.2.1+** Zod schemas), and a **sample response** shape. Example JSON is validated in CI (`test/example-args.test.ts`).
 
 Tools: `track`, `forget`, `query`, `insight`, `chart`. All successful responses include `tokens_estimate` (JSON length ÷ 4, approximate).
 
@@ -199,7 +199,7 @@ Use **`insight`** when the user wants narrative + anomalies + forecast, not raw 
 
 **`labels`:** `none` | `last` (default) | `extremes` | `all`. See MCP resource **`chart-guide`**.
 
-**Sample response:**
+**Sample response (local mode):**
 
 ```json
 {
@@ -209,6 +209,41 @@ Use **`insight`** when the user wants narrative + anomalies + forecast, not raw 
   "tokens_estimate": 48
 }
 ```
+
+---
+
+## 6b. Hosted chart after sync
+
+**Prompt:** *Chart USD MRR for 90 days and give me a shareable link I can paste in Slack.*
+
+Prerequisite: `npx -y graphmyanything-mcp@latest sync` (or `GRAPHMYANYTHING_API_KEY` / `GMA_API_KEY`).
+
+**Tool:** `chart`
+
+```json
+{
+  "metric": "stripe.mrr.usd",
+  "range": "90d",
+  "type": "line",
+  "theme": "dark",
+  "labels": "last",
+  "share": true
+}
+```
+
+**Sample response (hosted mode):**
+
+```json
+{
+  "path": "/home/you/.graphmyanything/charts/stripe.mrr.usd-2026-11-23T12-00-00.svg",
+  "url": "https://graphmyanything.com/c/a1b2c3d4e5f67890",
+  "embed_svg": "https://graphmyanything.com/c/a1b2c3d4e5f67890.svg",
+  "embed_png": "https://graphmyanything.com/c/a1b2c3d4e5f67890.png",
+  "tokens_estimate": 95
+}
+```
+
+Public page URLs also support `https://graphmyanything.com/c/<hex-id>/svg`, `…/png`, and `…/opengraph-image` for previews. Live share pages include **hover tooltips** on chart markers when opened in a browser. Set `"share": false` to skip the public `url` while still writing the local SVG backup.
 
 ---
 

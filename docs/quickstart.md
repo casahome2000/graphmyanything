@@ -39,7 +39,9 @@ Other CLI commands:
 | `logout` | Remove API key from config |
 | `charts` | List recent local SVG chart files |
 
-Force local mode in an MCP session: `GRAPHMYANYTHING_MODE=local`. Use `GRAPHMYANYTHING_API_KEY` for CI without writing config.
+Force local mode in an MCP session: `GRAPHMYANYTHING_MODE=local`. Use `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY` for CI without writing config.
+
+**Hosted deletes:** `forget` is a permanent delete. In hosted mode it removes data on the server **and** from your local SQLite mirror for the same `metric` / time filter.
 
 ### Cursor
 
@@ -117,9 +119,9 @@ After the server shows up in your client's MCP list, try:
 
 1. **`track`** — JSON like `{"ok":true,"metric":"health.weight.lb","written":1,"replaced":0,"tokens_estimate":…}` (upserts on same `metric` + `ts`).
 2. **`query`** — terse stats (`s.l`, `s.mn`, `s.tr`, …) and maybe downsampled `pts` depending on budget.
-3. **`chart`** — `{"path":"…/.graphmyanything/charts/health.weight.lb-….svg","url":null,"hosted_url_note":…}`.
+3. **`chart`** — local mode: `path` to an SVG file. After **`sync`**: optional `url` like `https://graphmyanything.com/c/<hex-id>` plus `embed_svg` / `embed_png` (also `…/svg`, `…/png`, `…/opengraph-image`). Share pages show **hover tooltips** on markers in the browser.
 
-Open the SVG path locally (IDE or browser) for the chart file.
+Open the local `path` in your IDE or browser; open the hosted `url` for a shareable page.
 
 ## Where data lives
 

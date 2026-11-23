@@ -2,20 +2,20 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.casahome2000/graphmyanything-mcp",
   "title": "GraphMyAnything",
-  "description": "Local metric memory for agents: track, query, insight, chart via MCP (stdio).",
+  "description": "Metric memory for agents: track, query, insight, chart. Local SQLite with optional hosted sync and shareable chart links at graphmyanything.com/c/<id>.",
   "websiteUrl": "https://graphmyanything.com",
   "repository": {
     "url": "https://github.com/casahome2000/graphmyanything",
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.1.4",
+  "version": "0.2.1",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "graphmyanything-mcp",
-      "version": "0.1.4",
+      "version": "0.2.1",
       "transport": {
         "type": "stdio"
       },
@@ -33,6 +33,20 @@
           "isRequired": false,
           "format": "string",
           "isSecret": false
+        },
+        {
+          "name": "GRAPHMYANYTHING_API_KEY",
+          "description": "Optional hosted API key (Bearer). Use after sync or from your account.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "GMA_API_KEY",
+          "description": "Alias for GRAPHMYANYTHING_API_KEY",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
         }
       ]
     }
