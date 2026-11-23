@@ -10,6 +10,16 @@
 
 Charts include **x-axis date/time ticks**, **hover tooltips** on markers (open the SVG in a browser), and by default a single **end-value label** (`labels: last`). Every tool response includes `tokens_estimate` (payload size ÷ 4, approximate).
 
+## Start here
+
+| Doc | Contents |
+|-----|----------|
+| [Quick start](../../docs/quickstart.md) | 5-minute MCP install (Cursor, Claude, VS Code, Windsurf, Docker) |
+| [Examples](../../docs/examples.md) | Prompts + validated tool JSON |
+| [Agent guide](../../docs/agent-guide.md) | When to track, query, insight, or chart |
+
+Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includes a short pointer to read them.
+
 ## Install
 
 ```bash

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.4 — 2026-11-23
+
+### docs
+
+- Repo guides: [quickstart](../../docs/quickstart.md), [examples](../../docs/examples.md), [agent-guide](../../docs/agent-guide.md).
+
+### MCP discovery
+
+- New MCP resource **`usage-guide`** (`graphmyanything://docs/usage-guide`) — condensed when-to-track/query/chart guidance for agents.
+- **`initialize` `instructions`** (≤60 tokens) — points agents at `usage-guide` and `chart-guide`.
+- `tools/list` payload unchanged; tests validate documented example tool arguments against Zod schemas.
+
 ## 0.1.3 — 2026-11-23
 
 ### chart

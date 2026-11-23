@@ -6,6 +6,16 @@
 
 **Registry name:** `io.github.casahome2000/graphmyanything-mcp` · **License:** MIT
 
+## Start here
+
+| Doc | Audience |
+|-----|----------|
+| [Quick start (5 min)](./docs/quickstart.md) | Install in Cursor, Claude, VS Code, Windsurf, Docker |
+| [Examples](./docs/examples.md) | Copy-paste prompts, tool JSON, sample responses |
+| [Agent guide](./docs/agent-guide.md) | When to keep, store, update, and use metrics |
+
+MCP resources for agents: **`usage-guide`**, **`chart-guide`** (not duplicated in `tools/list`).
+
 ## Quick start
 
 ```bash
