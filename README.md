@@ -9,7 +9,7 @@
 ## Quick start
 
 ```bash
-claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.2
+claude mcp add graphmyanything -- npx -y graphmyanything-mcp@latest
 ```
 
 Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days and tell me the trend.*
@@ -19,7 +19,7 @@ Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days 
 1. **Track** values (single points, batches, or historical series).
 2. **Query** compact numeric summaries and optional downsampled points within a token budget.
 3. **Insight** plain-English trend, anomalies, and a simple forecast.
-4. **Chart** dark/light **640×320 SVG** files locally — readable x-axis date ticks, point markers with hover tooltips, and value labels on key points; `path` on disk; **`url` is `null`** until hosted live charts ship (see `hosted_url_note`). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
+4. **Chart** dark/light **640×320 SVG** files locally — readable x-axis date ticks, point markers with hover tooltips, and clean default end-value labels (`labels: last`); `path` on disk; **`url` is `null`** until hosted live charts ship (see `hosted_url_note`). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
 
 Data stays on your machine unless you opt into future cloud APIs.
 
@@ -28,10 +28,10 @@ Data stays on your machine unless you opt into future cloud APIs.
 **Node.js 22.13+** (built-in `node:sqlite`, no native compile step):
 
 ```bash
-npx -y graphmyanything-mcp
+npx -y graphmyanything-mcp@latest
 ```
 
-Published package: **0.1.2** — `npx -y graphmyanything-mcp@0.1.2`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@0.1.3` — published **0.1.3**
 
 ### Local paths & env vars
 
@@ -54,7 +54,7 @@ Published package: **0.1.2** — `npx -y graphmyanything-mcp@0.1.2`
 | **track** | Write metric point(s) to local SQLite | `track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})` |
 | **query** | Compact summary (latest, min, max, mean, trend, % change), optional downsampled points within a token budget | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
 | **insight** | Plain-English trend, anomalies, and a simple forecast | `insight(metric="stripe.mrr", range="90d")` |
-| **chart** | Labeled SVG (x-axis ticks, markers, tooltips) to local file; no public URL yet | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark")` → includes `path`, `tokens_estimate`, `url`: null, `hosted_url_note` |
+| **chart** | Labeled SVG (x-axis ticks, markers, tooltips, `labels` last/none/extremes/all) to local file; no public URL yet | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark", labels="last")` → includes `path`, `tokens_estimate`, `url`: null, `hosted_url_note` |
 
 Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-server/src/tool-catalog.ts).
 
@@ -69,7 +69,7 @@ Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-se
   "mcpServers": {
     "graphmyanything": {
       "command": "npx",
-      "args": ["-y", "graphmyanything-mcp@0.1.2"]
+      "args": ["-y", "graphmyanything-mcp@latest"]
     }
   }
 }
@@ -84,7 +84,7 @@ Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-se
   "mcpServers": {
     "graphmyanything": {
       "command": "npx",
-      "args": ["-y", "graphmyanything-mcp@0.1.2"]
+      "args": ["-y", "graphmyanything-mcp@latest"]
     }
   }
 }
@@ -93,12 +93,12 @@ Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-se
 ### Claude Code
 
 ```bash
-claude mcp add graphmyanything -- npx -y graphmyanything-mcp@0.1.2
+claude mcp add graphmyanything -- npx -y graphmyanything-mcp@latest
 ```
 
 ## n8n
 
-Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, pin `graphmyanything-mcp@0.1.2`).
+Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `0.1.3`).
 
 ## Why tokens matter (one chart question)
 

@@ -5,6 +5,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { openDatabase } from "./db.js";
 import {
+  CHART_GUIDE_RESOURCE,
+  CHART_LABELS_DESCRIBE,
+  CHART_THEME_DESCRIBE,
+  CHART_TOOL_DESCRIPTION,
+  CHART_TYPE_DESCRIBE,
+  RANGE_DESCRIBE,
+} from "./lib/chart-guide.js";
+import {
   handleChart,
   handleInsight,
   handleQuery,
@@ -15,17 +23,41 @@ const db = openDatabase();
 
 const server = new McpServer({
   name: "graphmyanything",
-  version: "0.1.2",
+  version: "0.1.3",
 });
+
+server.registerResource(
+  "chart-guide",
+  "graphmyanything://docs/chart-guide",
+  {
+    mimeType: "text/markdown",
+    description: "When to pick line/bar/area, theme, labels, and range for the chart tool",
+  },
+  async () => ({
+    contents: [
+      {
+        uri: "graphmyanything://docs/chart-guide",
+        mimeType: "text/markdown",
+        text: CHART_GUIDE_RESOURCE,
+      },
+    ],
+  }),
+);
 
 server.registerTool(
   "track",
   {
     title: "Track metric",
-    description: "Write metric point(s) to local SQLite.",
+    description:
+      "Write metric point(s) to local SQLite. Use value for a single point now, or points[] for batch/history.",
     inputSchema: {
-      metric: z.string().describe("Metric name, e.g. stripe.mrr"),
-      value: z.number().optional().describe("Single value to record now"),
+      metric: z
+        .string()
+        .describe("Metric name, dotted namespace e.g. stripe.mrr"),
+      value: z
+        .number()
+        .optional()
+        .describe("Single value recorded at now (unless points[] set)"),
       points: z
         .array(
           z.object({
@@ -35,8 +67,13 @@ server.registerTool(
           }),
         )
         .optional()
-        .describe("Batch or historical points"),
-      tags: z.record(z.string()).optional().describe("Tags applied to all points"),
+        .describe(
+          "Batch or historical points with optional per-point ts and tags",
+        ),
+      tags: z
+        .record(z.string())
+        .optional()
+        .describe("Tags merged into every point in this call"),
     },
   },
   async (args) => {
@@ -52,25 +89,28 @@ server.registerTool(
   {
     title: "Query metric",
     description:
-      "Terse summary (s.l/mn/mx/mu/tr/pct/n). points: auto|0|N for LTTB series.",
+      "Terse summary keys s.l/mn/mx/mu/tr/pct/n plus optional LTTB pts[]. Use before chart when you need numbers, not pixels.",
     inputSchema: {
-      metric: z.string(),
-      range: z
-        .string()
-        .optional()
-        .describe("e.g. 7d, 90d, 12w, 1y, or all (default all)"),
+      metric: z.string().describe("Metric name to read"),
+      range: z.string().optional().describe(RANGE_DESCRIBE),
       token_budget: z
         .number()
         .optional()
-        .describe("Target max tokens for JSON response (default 500)"),
+        .describe(
+          "Target max tokens for JSON body (default 500); may shrink pts",
+        ),
       points: z
-        .union([z.number(), z.literal("auto")])
+        .union([z.number().min(0), z.literal("auto")])
         .optional()
-        .describe("0 = summary only; auto (default) = smart omit; N>0 = LTTB N points"),
+        .describe(
+          "Series detail: auto (default), 0=summary only, or N>0 for LTTB N points",
+        ),
       also_chart: z
         .boolean()
         .optional()
-        .describe("Hint: chart call follows — auto mode drops pts"),
+        .describe(
+          "Set true when chart follows — auto mode omits pts to save tokens",
+        ),
     },
   },
   async (args) => {
@@ -85,10 +125,11 @@ server.registerTool(
   "insight",
   {
     title: "Metric insight",
-    description: "Trend, MAD anomalies, naive forecast.",
+    description:
+      "Trend direction, MAD outliers, naive forecast. Use after query when the user wants interpretation, not a chart.",
     inputSchema: {
-      metric: z.string(),
-      range: z.string().optional(),
+      metric: z.string().describe("Metric name to analyze"),
+      range: z.string().optional().describe(RANGE_DESCRIBE),
     },
   },
   async (args) => {
@@ -103,13 +144,22 @@ server.registerTool(
   "chart",
   {
     title: "Render chart",
-    description:
-      "SVG to local file; returns path (url is null until hosted charts ship).",
+    description: CHART_TOOL_DESCRIPTION,
     inputSchema: {
-      metric: z.string(),
-      range: z.string().optional(),
-      type: z.enum(["line", "bar", "area"]).optional(),
-      theme: z.enum(["dark", "light"]).optional(),
+      metric: z.string().describe("Metric name to render"),
+      range: z.string().optional().describe(RANGE_DESCRIBE),
+      type: z
+        .enum(["line", "bar", "area"])
+        .optional()
+        .describe(CHART_TYPE_DESCRIBE),
+      theme: z
+        .enum(["dark", "light"])
+        .optional()
+        .describe(CHART_THEME_DESCRIBE),
+      labels: z
+        .enum(["none", "last", "extremes", "all"])
+        .optional()
+        .describe(CHART_LABELS_DESCRIBE),
     },
   },
   async (args) => {

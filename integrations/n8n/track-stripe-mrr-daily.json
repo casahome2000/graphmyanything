@@ -68,7 +68,7 @@
         }
       },
       "notesInFlow": true,
-      "notes": "Stdio MCP: npx -y graphmyanything-mcp@0.1.2 (Node 22.13+)."
+      "notes": "Stdio MCP: npx -y graphmyanything-mcp@latest (Node 22.13+). Optional pin: graphmyanything-mcp@0.1.3."
     },
     {
       "parameters": {
@@ -126,7 +126,7 @@
     },
     {
       "parameters": {
-        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule pulls (or mocks) Stripe MRR, writes one point with `track`, then runs `query` (90d), `insight`, and `chart` via the GraphMyAnything MCP server. Ingestion runs inside n8n — zero tokens in the agent chat that later asks for the trend. Charts land as SVG files on the n8n host.\n\n## Set up steps\n1. Import this workflow and open **Credentials → MCP Client** (stdio): Command `npx`, Args `-y`, `graphmyanything-mcp@0.1.2`.\n2. Attach that credential to all four MCP Client Tool nodes.\n3. Disable **HTTP track (cloud placeholder)**; enable the MCP path.\n4. Run once manually, then enable the schedule.\n\n## Requirements\n- n8n **1.76+** with MCP Client Tool nodes enabled.\n- **Node.js 22.13+** on the worker (`node:sqlite`).\n- Pin package **graphmyanything-mcp@0.1.2**.\n\n## Customize\nSwap **Mock Stripe MRR** for a Stripe or HTTP billing node; change metric name, `token_budget`, chart `type`/`theme`, or cron hour. Waitlist: https://graphmyanything.com",
+        "content": "# Track Stripe MRR → GraphMyAnything\n\n## How it works\nA daily schedule pulls (or mocks) Stripe MRR, writes one point with `track`, then runs `query` (90d), `insight`, and `chart` via the GraphMyAnything MCP server. Ingestion runs inside n8n — zero tokens in the agent chat that later asks for the trend. Charts land as SVG files on the n8n host.\n\n## Set up steps\n1. Import this workflow and open **Credentials → MCP Client** (stdio): Command `npx`, Args `-y`, `graphmyanything-mcp@latest` (optional pin `0.1.3`).\n2. Attach that credential to all four MCP Client Tool nodes.\n3. Disable **HTTP track (cloud placeholder)**; enable the MCP path.\n4. Run once manually, then enable the schedule.\n\n## Requirements\n- n8n **1.76+** with MCP Client Tool nodes enabled.\n- **Node.js 22.13+** on the worker (`node:sqlite`).\n- Package **graphmyanything-mcp@latest** (optional pin **0.1.3**).\n\n## Customize\nSwap **Mock Stripe MRR** for a Stripe or HTTP billing node; change metric name, `token_budget`, chart `type`/`theme`, or cron hour. Waitlist: https://graphmyanything.com",
         "height": 520,
         "width": 420
       },

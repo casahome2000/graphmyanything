@@ -14,6 +14,7 @@ import {
 import {
   renderSvgChart,
   writeChartFile,
+  type ChartLabelsMode,
   type ChartType,
   type ChartTheme,
 } from "../lib/svg-chart.js";
@@ -154,6 +155,7 @@ export function handleChart(
     range?: string;
     type?: ChartType;
     theme?: ChartTheme;
+    labels?: ChartLabelsMode;
   },
 ): {
   path: string;
@@ -171,7 +173,8 @@ export function handleChart(
     points.length <= 500
       ? points
       : lttb(points, 500);
-  const svg = renderSvgChart(metric, display, type, theme);
+  const labels = args.labels ?? "last";
+  const svg = renderSvgChart(metric, display, type, theme, labels);
   const filePath = writeChartFile(metric, svg);
   return withTokensEstimate({
     path: filePath,
