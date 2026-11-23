@@ -2,44 +2,41 @@
 
 Import [`track-stripe-mrr-daily.json`](./track-stripe-mrr-daily.json) in n8n (**Workflows → Import from File**).
 
-Full setup for the Stripe connector (restricted keys, metric names, backfill): **[`docs/stripe-mrr.md`](../../docs/stripe-mrr.md)**.
+Full setup: **[`docs/stripe-mrr.md`](../../docs/stripe-mrr.md)**.
 
-## Which integration path?
+## Design
 
-| Path | When to use |
-|------|-------------|
-| **`graphmyanything-stripe sync` + MCP** (this workflow) | **Self-hosted n8n** with Node 22+, MCP stdio, and a Stripe **restricted** key (`rk_…`). |
-| **HTTP Request** (`POST https://api.graphmyanything.com/v1/track`) | **Later.** Disabled placeholder until the cloud track API ships. |
+| Piece | Implementation |
+|--------|----------------|
+| Stripe data | **HTTP Request** + Stripe API credential (`rk_…` only) with pagination |
+| MRR math | **Code** node — inlined from [`stripe-mrr-sync-core.mjs`](./stripe-mrr-sync-core.mjs) |
+| GraphMyAnything | **HTTP POST** `https://graphmyanything.com/api/v1/track/batch` + Header Auth Bearer |
+| Local alternative | Sticky note: `npx graphmyanything-stripe sync` + MCP stdio |
 
-## Stripe credential
+The workflow deliberately avoids `require`, `child_process`, and `$credentials` in Code nodes so it runs on default self-hosted n8n.
 
-1. **Credentials → New → Stripe API**.
-2. Name: `Stripe restricted read key`.
-3. Secret: your **`rk_test_…`** or **`rk_live_…`** key (read-only). **Do not** use `sk_…`.
-4. Attach to **Stripe sync (CLI)**.
+After editing the core, repack the workflow:
 
-## MCP credential setup
+```bash
+node integrations/n8n/scripts/pack-workflow.mjs
+```
 
-1. **Credentials → New → MCP Client** (name: `graphmyanything-mcp (stdio)`).
-2. Transport: **stdio**.
-3. Command: `npx`
-4. Arguments: `-y`, `graphmyanything-mcp@latest`
-5. Ensure **Node 22.13+** on the n8n worker.
+Parity with the TypeScript engine: `npm test --prefix packages/stripe-mrr` (`n8n-inline-parity.test.ts`).
 
-Attach MCP credential to **MCP query 90d**, **MCP insight**, and **MCP chart SVG**.
+## Credentials
 
-Install the Stripe CLI package on the worker (`graphmyanything-stripe` from this monorepo or `npx` once published).
+1. **Stripe restricted read key** — n8n **Stripe API** credential, or Header Auth on each Stripe HTTP node.
+2. **GraphMyAnything API key** — **Header Auth** on **GMA track batch**: name `Authorization`, value `Bearer <key>` (from `graphmyanything-mcp sync` or your account page).
+3. **MCP Client** (optional) — stdio `npx -y graphmyanything-mcp@latest` for local SQLite charts.
 
 ## Flow
 
-1. Schedule (daily 9:00).
-2. **Stripe sync (CLI)** → writes metrics to SQLite (same path as MCP).
-3. `query` → `insight` → `chart` on `stripe.mrr.usd` (90d).
-
-Chart files land on the n8n host under `~/.graphmyanything/charts/` (or beside `GRAPHMYANYTHING_DB_PATH`).
+Schedule → Stripe lists (sequential) → Compute MRR → GMA batch → optional MCP query.
 
 ## CLI import (optional)
 
 ```bash
-jq -s . integrations/n8n/track-stripe-mrr-daily.json | n8n import:workflow --input=/dev/stdin
+jq -s . integrations/n8n/track-stripe-mrr-daily.json | npx n8n import:workflow --input=/dev/stdin
 ```
+
+Credentials are not bundled; assign them after import.
