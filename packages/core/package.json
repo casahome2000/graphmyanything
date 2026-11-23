@@ -1,0 +1,60 @@
+{
+  "name": "@graphmyanything/core",
+  "version": "0.1.4",
+  "description": "Pure metric chart, summary, insight, and range logic — no I/O",
+  "homepage": "https://graphmyanything.com",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casahome2000/graphmyanything.git",
+    "directory": "packages/core"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./lttb.js": {
+      "types": "./dist/lttb.d.ts",
+      "default": "./dist/lttb.js"
+    },
+    "./summary.js": {
+      "types": "./dist/summary.d.ts",
+      "default": "./dist/summary.js"
+    },
+    "./insight.js": {
+      "types": "./dist/insight.d.ts",
+      "default": "./dist/insight.js"
+    },
+    "./terse-summary.js": {
+      "types": "./dist/terse-summary.d.ts",
+      "default": "./dist/terse-summary.js"
+    },
+    "./tokens.js": {
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.js"
+    },
+    "./query.js": {
+      "types": "./dist/query.d.ts",
+      "default": "./dist/query.js"
+    },
+    "./svg-chart.js": {
+      "types": "./dist/svg-chart.d.ts",
+      "default": "./dist/svg-chart.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --disable-warning=ExperimentalWarning ../mcp-server/node_modules/vitest/vitest.mjs run",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

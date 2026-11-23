@@ -8,7 +8,12 @@
     "strict": true,
     "skipLibCheck": true,
     "declaration": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@graphmyanything/core": ["../core/dist/index.d.ts"],
+      "@graphmyanything/core/*": ["../core/dist/*"]
+    }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "references": [{ "path": "../core" }]
 }
