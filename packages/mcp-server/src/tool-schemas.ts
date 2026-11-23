@@ -41,6 +41,7 @@ export const chartToolArgsSchema = z.object({
   type: z.enum(["line", "bar", "area"]).optional(),
   theme: z.enum(["dark", "light"]).optional(),
   labels: z.enum(["none", "last", "extremes", "all"]).optional(),
+  share: z.boolean().optional(),
 });
 
 export const FORGET_TOOL_DESCRIPTION =
@@ -100,6 +101,10 @@ export const chartToolInputSchema = {
     .enum(["none", "last", "extremes", "all"])
     .optional()
     .describe(CHART_LABELS_DESCRIBE),
+  share: z
+    .boolean()
+    .optional()
+    .describe("Hosted: include share URL (default true). share:false omits url."),
 };
 
 export const forgetToolInputSchema = {

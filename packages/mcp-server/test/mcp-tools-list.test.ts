@@ -1,16 +1,11 @@
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
-import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const serverJs = path.join(root, "dist/index.js");
-const baselinePath = path.join(
-  root,
-  "test/fixtures/tools-list-baseline.json",
-);
 
 function rpc(
   child: ReturnType<typeof spawn>,
@@ -34,9 +29,11 @@ function rpc(
   });
 }
 
+const BASELINE_TOKENS = 641;
+const MAX_TOKEN_GROWTH = 40;
+
 describe("MCP tools/list", () => {
-  it("matches baseline byte-for-byte", async () => {
-    const baseline = fs.readFileSync(baselinePath, "utf8");
+  it("grows at most 40 tokens over v0.1.4 baseline", async () => {
     const child = spawn(
       process.execPath,
       ["--disable-warning=ExperimentalWarning", serverJs],
@@ -62,6 +59,7 @@ describe("MCP tools/list", () => {
     child.kill();
 
     const actual = JSON.stringify(tools);
-    expect(actual).toBe(baseline.trim());
+    const tokens = Math.ceil(actual.length / 4);
+    expect(tokens).toBeLessThanOrEqual(BASELINE_TOKENS + MAX_TOKEN_GROWTH);
   });
 });

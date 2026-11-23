@@ -29,9 +29,9 @@ Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days 
 1. **Track** values (single points, batches, or historical series).
 2. **Query** compact numeric summaries and optional downsampled points within a token budget.
 3. **Insight** plain-English trend, anomalies, and a simple forecast.
-4. **Chart** dark/light **640×320 SVG** files locally — readable x-axis date ticks, point markers with hover tooltips, and clean default end-value labels (`labels: last`); `path` on disk; **`url` is `null`** until hosted live charts ship (see `hosted_url_note`). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
+4. **Chart** dark/light **640×320 SVG** locally; in **hosted** mode also returns `url` (`https://graphmyanything.com/c/<id>`), `embed_svg`, and `embed_png` (use `share: false` to omit the public URL). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
 
-Data stays on your machine unless you opt into future cloud APIs.
+Data stays on your machine by default. **`graphmyanything-mcp sync`** (v0.2+) opts into hosted mode with device-code auth while keeping a local SQLite backup. See [quickstart](./docs/quickstart.md) and [hosted API contract](./docs/hosted-api.md).
 
 ## Install
 
@@ -54,6 +54,10 @@ npx -y graphmyanything-mcp@latest
 |----------|---------|
 | `GRAPHMYANYTHING_DB_PATH` | Custom SQLite file path |
 | `GRAPHMYANYTHING_CHARTS_DIR` | Custom chart output directory (otherwise `charts/` next to the DB when the DB path is custom) |
+| `GRAPHMYANYTHING_MODE` | Set to `local` to force local mode |
+| `GRAPHMYANYTHING_API_KEY` | Hosted mode API key (overrides config file) |
+| `GRAPHMYANYTHING_CONFIG_PATH` | Custom path for `config.json` (default `~/.graphmyanything/config.json`, mode `0600`) |
+| `GRAPHMYANYTHING_API_BASE` | Override hosted API base (testing) |
 
 **No telemetry** in the MCP server — we do not phone home from your agent sessions.
 
@@ -137,9 +141,9 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 
 A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
 
-## Hosted live charts (coming soon)
+## Hosted live charts
 
-The `chart` tool writes dependency-free SVG files locally today (see sample PNGs in [`packages/mcp-server/docs/`](packages/mcp-server/docs/)). Public URLs at **graphmyanything.com** are on the roadmap for founding members — [join the waitlist](https://graphmyanything.com).
+Run `npx -y graphmyanything-mcp@latest sync` to link a free account. Your local history uploads, and `chart` then returns a live, unlisted link at `graphmyanything.com/c/<id>` (with `.svg` and `.png` embeds) that you can turn off any time. Pass `share: false` to keep a chart local.
 
 ## Repo map
 

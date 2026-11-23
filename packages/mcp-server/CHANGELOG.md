@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 — 2026-11-23
+
+- **Hosted mode** via `sync` (device code), `status`, `local`, `logout`, `charts` CLI commands.
+- Hosted MCP tools use REST API; writes mirror to local SQLite; local DB kept.
+- Chart tool: `share` param; hosted `url`, `embed_svg`, `embed_png`.
+- See [docs/hosted-api.md](../../docs/hosted-api.md).
+
 ## 0.1.4 — 2026-11-23
 
 ### track

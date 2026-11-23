@@ -20,6 +20,27 @@ npx -y graphmyanything-mcp@0.1.3
 
 Clients launch the same command over **stdio** — you do not run `npx` yourself during normal chat; the IDE does.
 
+### Optional: hosted sync (0.2+)
+
+Link the CLI to your GraphMyAnything account and upload existing local history (local DB is kept as backup):
+
+```bash
+npx -y graphmyanything-mcp@0.2.0 sync
+```
+
+You will get a short code to enter at [graphmyanything.com/connect](https://graphmyanything.com/connect). After auth, metrics sync in batches and MCP tools use the hosted API for reads while **writes still mirror to local SQLite**.
+
+Other CLI commands:
+
+| Command | Purpose |
+|---------|---------|
+| `status` | Mode, paths, plan usage when hosted |
+| `local` | Prefer local mode (keeps saved API key) |
+| `logout` | Remove API key from config |
+| `charts` | List recent local SVG chart files |
+
+Force local mode in an MCP session: `GRAPHMYANYTHING_MODE=local`. Use `GRAPHMYANYTHING_API_KEY` for CI without writing config.
+
 ### Cursor
 
 `.cursor/mcp.json` or **Settings → MCP → Add server**:

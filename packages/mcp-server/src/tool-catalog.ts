@@ -98,6 +98,10 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
           enum: ["none", "last", "extremes", "all"],
           description: CHART_LABELS_DESCRIBE,
         },
+        share: {
+          type: "boolean",
+          description: "Hosted only: omit public url when false (default true).",
+        },
       },
       required: ["metric"],
     },

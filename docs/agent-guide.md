@@ -169,7 +169,7 @@ Human-readable docs in this repo:
 
 | Limit | Workaround |
 |-------|------------|
-| `chart` `url` always null | Open local `path` |
+| `chart` `url` is null | Local mode or `share:false`: open the local `path`; run `sync` for live links |
 | No cloud sync | Local SQLite only |
 
 Feature requests welcome on [GitHub Issues](https://github.com/casahome2000/graphmyanything/issues).

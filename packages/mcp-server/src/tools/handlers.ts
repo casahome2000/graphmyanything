@@ -148,6 +148,7 @@ export function handleChart(
     type?: ChartType;
     theme?: ChartTheme;
     labels?: ChartLabelsMode;
+    share?: boolean;
   },
 ): {
   path: string;

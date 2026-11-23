@@ -25,6 +25,7 @@ jobs:
         run: |
           npm install -g "npm@>=11.5.1"
           npm --version
+      - run: npm ci --prefix ../core && npm run build --prefix ../core
       - run: npm ci
       - run: npm run build
       - run: npm test

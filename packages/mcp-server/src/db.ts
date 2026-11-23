@@ -183,3 +183,45 @@ export function countPoints(db: GmaDatabase, metric: string): number {
     .get(metric) as { n: number };
   return row.n;
 }
+
+export type StoredPointRow = {
+  id: number;
+  metric: string;
+  ts: number;
+  value: number;
+  tags: Record<string, string>;
+};
+
+/** Ordered by id for resumable sync uploads. */
+export function listPointsAfterId(
+  db: GmaDatabase,
+  afterId: number,
+  limit: number,
+): StoredPointRow[] {
+  const rows = db
+    .prepare(
+      `SELECT id, metric, ts, value, tags FROM metric_points
+       WHERE id > ? ORDER BY id ASC LIMIT ?`,
+    )
+    .all(afterId, limit) as {
+    id: number;
+    metric: string;
+    ts: number;
+    value: number;
+    tags: string;
+  }[];
+  return rows.map((r) => ({
+    id: r.id,
+    metric: r.metric,
+    ts: r.ts,
+    value: r.value,
+    tags: JSON.parse(r.tags) as Record<string, string>,
+  }));
+}
+
+export function totalPointCount(db: GmaDatabase): number {
+  const row = db.prepare(`SELECT COUNT(*) AS n FROM metric_points`).get() as {
+    n: number;
+  };
+  return row.n;
+}

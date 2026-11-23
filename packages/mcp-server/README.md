@@ -40,9 +40,18 @@ Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Me
 | `forget` | Delete by `ts`, `from`+`to`, or `all:true`+`confirm:true` (always requires `metric`) |
 | `query` | Summary + LTTB series within `token_budget` (`metric`, `range` like `90d`, `token_budget`); includes `tokens_estimate` |
 | `insight` | Plain-English trend, MAD anomalies, naive forecast |
-| `chart` | Writes a dark/light **640×320 SVG** on disk (`path`): x-axis ticks, point markers (≤60 or thinned), `labels` `none`/`last` (default)/`extremes`/`all`. **`url` is always `null`**. MCP resource **`chart-guide`** has the full choosing guide. |
+| `chart` | Writes a dark/light **640×320 SVG** on disk (`path`): x-axis ticks, point markers (≤60 or thinned), `labels` `none`/`last` (default)/`extremes`/`all`. **Local:** `url` is `null`. **Hosted** (after `sync`): `url`, `embed_svg`, `embed_png`; `share: false` omits the public URL. |
 
-Open the file at `path` in your IDE or browser locally. Hosted live chart URLs on [graphmyanything.com](https://graphmyanything.com) are coming for founding members — the tool does not return a fetchable public URL today.
+### Hosted sync (v0.2+)
+
+```bash
+npx graphmyanything-mcp sync    # device code → upload local history → hosted mode
+npx graphmyanything-mcp status
+npx graphmyanything-mcp local   # force local mode
+npx graphmyanything-mcp logout
+```
+
+Config: `~/.graphmyanything/config.json` (mode `0600`). See [hosted API](../../docs/hosted-api.md).
 
 ## Cursor
 
@@ -89,7 +98,7 @@ track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})
 query(metric="stripe.mrr", range="90d", token_budget=200)
 insight(metric="stripe.mrr", range="90d")
 chart(metric="stripe.mrr", range="90d", type="area", theme="dark", labels="last")
-→ {"path":"/Users/you/.graphmyanything/charts/stripe.mrr-….svg","url":null,"hosted_url_note":"Hosted live chart URLs are coming soon: graphmyanything.com","tokens_estimate":42}
+→ {"path":"/Users/you/.graphmyanything/charts/stripe.mrr-….svg","url":null,"hosted_url_note":"Local chart only. Run `npx -y graphmyanything-mcp@latest sync` to get live chart links.","tokens_estimate":42}
 ```
 
 ## Develop
