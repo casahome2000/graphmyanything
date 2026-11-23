@@ -4,7 +4,8 @@
   "private": true,
   "description": "Workspace root for graphmyanything-mcp and local validation scripts",
   "scripts": {
-    "build:mcp": "npm run build --prefix packages/mcp-server",
+    "build:core": "npm run build --prefix packages/core",
+    "build:mcp": "npm run build:core && npm run build --prefix packages/mcp-server",
     "test:mcp": "npm test --prefix packages/mcp-server",
     "benchmark:tokens": "npm run run --prefix benchmarks/token-benchmark",
     "validation": "npm run build:mcp && npm run test:mcp && npm run benchmark:tokens"

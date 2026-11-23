@@ -69,6 +69,8 @@ npx -y graphmyanything-mcp@latest
 
 Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-server/src/tool-catalog.ts).
 
+Pure chart/summary/insight logic (no I/O) lives in [`packages/core`](packages/core/) for pinning or copying into other apps.
+
 ## Client config
 
 ### Cursor

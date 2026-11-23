@@ -5,18 +5,9 @@ import {
   type GmaDatabase,
   type MetricPoint,
 } from "../db.js";
+import { buildQueryPayload, parseRange } from "@graphmyanything/core/query.js";
 import { generateInsight } from "../lib/insight.js";
 import { lttb, type DataPoint } from "../lib/lttb.js";
-import {
-  computeSummary,
-  fitTokenBudget,
-  parseRange,
-} from "../lib/summary.js";
-import {
-  resolveIncludeSeries,
-  terseSummary,
-  type PointsArg,
-} from "../lib/terse-summary.js";
 import {
   renderSvgChart,
   writeChartFile,
@@ -25,7 +16,7 @@ import {
   type ChartTheme,
 } from "../lib/svg-chart.js";
 import { HOSTED_CHART_URL_NOTE } from "../paths.js";
-import { estimateTokens, withTokensEstimate } from "../lib/tokens.js";
+import { withTokensEstimate } from "../lib/tokens.js";
 
 function normalizeTags(tags?: Record<string, string>): Record<string, string> {
   return tags ?? {};
@@ -125,71 +116,16 @@ export function handleQuery(
     metric: string;
     range?: string;
     token_budget?: number;
-    points?: PointsArg;
+    points?: import("../lib/terse-summary.js").PointsArg;
     /** Hint that a chart tool call follows — used by points=auto. */
     also_chart?: boolean;
   },
 ): Record<string, unknown> {
   const metric = args.metric.trim();
-  const tokenBudget = args.token_budget ?? 500;
   const { fromTs, toTs } = parseRange(args.range);
   const rows = queryPoints(db, metric, fromTs, toTs);
   const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
-  const summary = computeSummary(points);
-  const seriesPlan = resolveIncludeSeries(
-    args.points,
-    tokenBudget,
-    args.also_chart,
-  );
-
-  type Payload = {
-    m: string;
-    rg: string;
-    s: Record<string, number | string | null>;
-    pts?: DataPoint[];
-    tokens_estimate: number;
-  };
-
-  const base: Omit<Payload, "tokens_estimate"> = {
-    m: metric,
-    rg: args.range ?? "all",
-    s: terseSummary(summary),
-  };
-
-  let payload: Payload = { ...base, tokens_estimate: 0 };
-  if (seriesPlan.mode === "lttb" && points.length > 0) {
-    payload.pts = lttb(points, seriesPlan.maxPoints);
-  }
-
-  const finalize = (p: Payload): Payload => {
-    const { tokens_estimate: _drop, ...rest } = p;
-    const out = { ...rest, tokens_estimate: 0 } as Payload;
-    out.tokens_estimate = estimateTokens(out);
-    return out;
-  };
-
-  payload = finalize(payload);
-
-  if (
-    payload.pts &&
-    payload.pts.length > 10 &&
-    payload.tokens_estimate > tokenBudget
-  ) {
-    let n = payload.pts.length;
-    while (n > 5) {
-      n = Math.floor(n * 0.7);
-      payload = finalize({ ...base, pts: lttb(points, n), tokens_estimate: 0 });
-      if (payload.tokens_estimate <= tokenBudget) break;
-    }
-  }
-
-  let json = JSON.stringify(payload);
-  json = fitTokenBudget(json, tokenBudget);
-  const parsed = JSON.parse(json) as Payload;
-  if (typeof parsed.tokens_estimate !== "number" || parsed.tokens_estimate < 1) {
-    parsed.tokens_estimate = Math.max(1, estimateTokens(parsed));
-  }
-  return parsed as Record<string, unknown>;
+  return buildQueryPayload(metric, points, args);
 }
 
 export function handleInsight(
