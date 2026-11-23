@@ -1,6 +1,6 @@
 {
   "name": "graphmyanything-stripe",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Stripe MRR and billing metrics engine for GraphMyAnything",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,7 @@
     "directory": "packages/stripe-mrr"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.13"
   },
   "bin": {
     "graphmyanything-stripe": "bin/graphmyanything-stripe.js"
@@ -18,7 +18,8 @@
   "files": [
     "bin",
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": "./dist/index.js"

@@ -49,7 +49,7 @@ if (mode === "hosted" && !apiKey) {
   process.exit(1);
 }
 
-const PACKAGE_VERSION = "0.2.0";
+const PACKAGE_VERSION = "0.2.1";
 
 const server = new McpServer(
   {

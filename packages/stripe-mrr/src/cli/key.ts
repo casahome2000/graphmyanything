@@ -1,4 +1,4 @@
-const RESTRICTED = /^rk_(live|test)_[A-Za-z0-9]+$/;
+const RESTRICTED = /^rk_(live|test)_[A-Za-z0-9_]+$/;
 const SECRET = /^sk_(live|test)_/;
 
 export const SK_KEY_MESSAGE =
