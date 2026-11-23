@@ -21,6 +21,17 @@
       ]
     },
     {
+      "parameters": {},
+      "id": "manual-run-now",
+      "name": "Run now (test)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
       "parameters": {
         "method": "GET",
         "url": "https://api.stripe.com/v1/subscriptions",
@@ -40,10 +51,6 @@
             {
               "name": "expand[]",
               "value": "data.items.data.price"
-            },
-            {
-              "name": "expand[]",
-              "value": "data.discount"
             }
           ]
         },
@@ -63,6 +70,15 @@
               "completeExpression": "={{ !$response.body.has_more }}"
             }
           }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
         }
       },
       "id": "stripe-subscriptions",
@@ -117,6 +133,15 @@
               "completeExpression": "={{ !$response.body.has_more }}"
             }
           }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
         }
       },
       "id": "stripe-invoices",
@@ -132,7 +157,8 @@
           "id": "CONFIGURE_ME",
           "name": "Stripe restricted read key"
         }
-      }
+      },
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -165,6 +191,15 @@
               "completeExpression": "={{ !$response.body.has_more }}"
             }
           }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
         }
       },
       "id": "stripe-refunds",
@@ -180,7 +215,8 @@
           "id": "CONFIGURE_ME",
           "name": "Stripe restricted read key"
         }
-      }
+      },
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -213,6 +249,15 @@
               "completeExpression": "={{ !$response.body.has_more }}"
             }
           }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Stripe-Version",
+              "value": "2024-11-20.acacia"
+            }
+          ]
         }
       },
       "id": "stripe-credit-notes",
@@ -228,7 +273,8 @@
           "id": "CONFIGURE_ME",
           "name": "Stripe restricted read key"
         }
-      }
+      },
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -272,78 +318,12 @@
         }
       },
       "notesInFlow": true,
-      "notes": "Header Auth: name Authorization, value Bearer <your GMA API key>"
+      "notes": "Header Auth: name Authorization, value Bearer <your GMA API key>",
+      "executeOnce": true
     },
     {
       "parameters": {
-        "operation": "executeTool",
-        "toolName": "query",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', range: '90d', token_budget: 300 }) }}"
-      },
-      "id": "mcp-query",
-      "name": "MCP query 90d",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [
-        1680,
-        0
-      ],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      },
-      "notesInFlow": true,
-      "notes": "Optional — local SQLite only. Skip if you use hosted charts exclusively."
-    },
-    {
-      "parameters": {
-        "operation": "executeTool",
-        "toolName": "insight",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', range: '90d' }) }}"
-      },
-      "id": "mcp-insight",
-      "name": "MCP insight",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [
-        1920,
-        0
-      ],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "operation": "executeTool",
-        "toolName": "chart",
-        "toolParameters": "={{ JSON.stringify({ metric: 'stripe.mrr.usd', range: '90d', type: 'area', theme: 'dark' }) }}"
-      },
-      "id": "mcp-chart",
-      "name": "MCP chart SVG",
-      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "typeVersion": 1,
-      "position": [
-        2160,
-        0
-      ],
-      "credentials": {
-        "mcpClientApi": {
-          "id": "CONFIGURE_ME",
-          "name": "graphmyanything-mcp (stdio)"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "content": "# Track Stripe MRR → GraphMyAnything (hosted)\n\n## Flow\n1. **HTTP Request** nodes page Stripe subscriptions (`status=all`, expanded price/discount), paid invoices, refunds, and credit notes using your **Stripe API** credential (`rk_…` only).\n2. **Compute MRR** (Code, pure JS) applies the same rules as `packages/stripe-mrr`.\n3. **GMA track batch** POSTs to `https://graphmyanything.com/api/v1/track/batch` with **Header Auth** `Authorization: Bearer <API key>`.\n4. Optional **MCP** nodes for local SQLite (`graphmyanything-mcp` stdio).\n\n## Local SQLite instead of hosted?\nDisable **GMA track batch** and run daily: `STRIPE_RESTRICTED_KEY=rk_… npx graphmyanything-stripe sync` (cron on the n8n host). Re-enable MCP query/insight/chart for on-box SVGs.\n\n## Requirements\n- n8n **1.76+** (HTTP pagination + MCP tools).\n- Stripe restricted read key — never `sk_…` in production templates.\n- No `NODE_FUNCTION_ALLOW_BUILTIN` or `$credentials` in Code — this workflow uses neither.\n\nDocs: `docs/stripe-mrr.md`",
+        "content": "# Track Stripe MRR → GraphMyAnything (hosted)\n\n## Flow\n1. **HTTP Request** nodes page Stripe subscriptions (`status=all`, pinned to Stripe API version `2024-11-20.acacia` like the CLI), paid invoices, refunds, and credit notes using your **Stripe API** credential (`rk_…` only).\n2. **Compute MRR** (Code, pure JS) applies the same rules as `packages/stripe-mrr`.\n3. **GMA track batch** POSTs to `https://graphmyanything.com/api/v1/track/batch` with **Header Auth** `Authorization: Bearer <API key>`.\n4. Each Stripe list node runs once (Settings → Execute Once), so paged results are never fetched twice.\n\n## Local SQLite instead of hosted?\nDisable **GMA track batch** and run daily: `STRIPE_RESTRICTED_KEY=rk_… npx graphmyanything-stripe sync` (cron on the n8n host).\n\n## Requirements\n- n8n **1.76+** (HTTP pagination). Tested on 2.48.7.\n- Stripe restricted read key — never `sk_…` in production templates.\n- No `NODE_FUNCTION_ALLOW_BUILTIN` or `$credentials` in Code — this workflow uses neither.\n\nDocs: `docs/stripe-mrr.md`",
         "height": 520,
         "width": 440
       },
@@ -373,7 +353,7 @@
     },
     {
       "parameters": {
-        "content": "### Local alternative\nFor SQLite on the n8n host: `npx graphmyanything-stripe sync` with `STRIPE_RESTRICTED_KEY` + `GRAPHMYANYTHING_DB_PATH`. Enable MCP nodes; disable GMA batch.",
+        "content": "### Local alternative\nFor SQLite on the n8n host: `npx graphmyanything-stripe sync` with `STRIPE_RESTRICTED_KEY` + `GRAPHMYANYTHING_DB_PATH`. Disable GMA batch; your agent reads the same DB through `graphmyanything-mcp`.",
         "height": 140,
         "width": 380
       },
@@ -454,33 +434,11 @@
         ]
       ]
     },
-    "GMA track batch": {
+    "Run now (test)": {
       "main": [
         [
           {
-            "node": "MCP query 90d",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "MCP query 90d": {
-      "main": [
-        [
-          {
-            "node": "MCP insight",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "MCP insight": {
-      "main": [
-        [
-          {
-            "node": "MCP chart SVG",
+            "node": "Stripe subscriptions",
             "type": "main",
             "index": 0
           }

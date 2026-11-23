@@ -45,9 +45,9 @@ Import [`integrations/n8n/track-stripe-mrr-daily.json`](../integrations/n8n/trac
 1. **Stripe HTTP nodes** — page `subscriptions` (`status=all`, expanded price/discount), paid `invoices`, `refunds`, and `credit_notes` using n8n’s **Stripe API** credential (paste `rk_test_…` / `rk_live_…`) or **Header Auth** (`Authorization: Bearer rk_…`).
 2. **Compute MRR** — pure JS Code node; same rules as `packages/stripe-mrr` (logic lives in `integrations/n8n/stripe-mrr-sync-core.mjs`).
 3. **GMA track batch** — `POST https://graphmyanything.com/api/v1/track/batch` with **Header Auth** `Authorization: Bearer <your GraphMyAnything API key>`.
-4. **Optional MCP nodes** — `query` / `insight` / `chart` on `stripe.mrr.usd` when the n8n host also runs `graphmyanything-mcp` against local SQLite.
+4. **Run now (test)** — a manual trigger for a one-off run before you activate the schedule.
 
-**Local SQLite instead of hosted upload:** disable **GMA track batch**, enable MCP nodes, and run `STRIPE_RESTRICTED_KEY=rk_… npx graphmyanything-stripe sync` on a schedule on the same host (cron or a separate Execute Command is not required — external cron is enough).
+**Local SQLite instead of hosted upload:** disable **GMA track batch** and run `STRIPE_RESTRICTED_KEY=rk_… npx graphmyanything-stripe sync` on a schedule on the same host (cron or a separate Execute Command is not required — external cron is enough).
 
 ## Example agent questions
 

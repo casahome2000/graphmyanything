@@ -8,10 +8,10 @@ Full setup: **[`docs/stripe-mrr.md`](../../docs/stripe-mrr.md)**.
 
 | Piece | Implementation |
 |--------|----------------|
-| Stripe data | **HTTP Request** + Stripe API credential (`rk_…` only) with pagination |
+| Stripe data | **HTTP Request** + Stripe API credential (`rk_…` only) with pagination, pinned to `Stripe-Version: 2024-11-20.acacia`; each list node runs once (**Execute Once**) |
 | MRR math | **Code** node — inlined from [`stripe-mrr-sync-core.mjs`](./stripe-mrr-sync-core.mjs) |
 | GraphMyAnything | **HTTP POST** `https://graphmyanything.com/api/v1/track/batch` + Header Auth Bearer |
-| Local alternative | Sticky note: `npx graphmyanything-stripe sync` + MCP stdio |
+| Local alternative | Sticky note: `npx graphmyanything-stripe sync` (your agent reads the same DB through `graphmyanything-mcp`) |
 
 The workflow deliberately avoids `require`, `child_process`, and `$credentials` in Code nodes so it runs on default self-hosted n8n.
 
@@ -27,11 +27,12 @@ Parity with the TypeScript engine: `npm test --prefix packages/stripe-mrr` (`n8n
 
 1. **Stripe restricted read key** — n8n **Stripe API** credential, or Header Auth on each Stripe HTTP node.
 2. **GraphMyAnything API key** — **Header Auth** on **GMA track batch**: name `Authorization`, value `Bearer <key>` (from `graphmyanything-mcp sync` or your account page).
-3. **MCP Client** (optional) — stdio `npx -y graphmyanything-mcp@latest` for local SQLite charts.
 
 ## Flow
 
-Schedule → Stripe lists (sequential) → Compute MRR → GMA batch → optional MCP query.
+Schedule (or **Run now (test)**) → Stripe lists (sequential, each once) → Compute MRR → GMA batch.
+
+Tested end to end on n8n 2.48.7 against a mock Stripe API: points land in the hosted account and match `graphmyanything-stripe sync` on the same data.
 
 ## CLI import (optional)
 
