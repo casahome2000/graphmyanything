@@ -1,7 +1,7 @@
 {
   "name": "graphmyanything-mcp",
-  "version": "0.2.2",
-  "description": "Metric memory for AI agents: track, query, chart via MCP — one call vs throwaway Python",
+  "version": "0.2.3",
+  "description": "Build once, ask forever — MCP track, query, insight, forget, chart (local or hosted).",
   "homepage": "https://graphmyanything.com",
   "license": "MIT",
   "type": "module",
@@ -36,7 +36,7 @@
     "build": "node scripts/inline-core.mjs && tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
-    "test": "node --disable-warning=ExperimentalWarning ./node_modules/vitest/vitest.mjs run",
+    "test": "npm run build && node --disable-warning=ExperimentalWarning ./node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest",
     "lint": "eslint src test",
     "docs:chart-samples": "npm run build && node scripts/render-sample-charts.mjs",

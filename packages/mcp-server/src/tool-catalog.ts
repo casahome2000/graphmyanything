@@ -1,12 +1,6 @@
 /** MCP tools/list payload shape (for benchmarks and registration). */
 
-import {
-  CHART_LABELS_DESCRIBE,
-  CHART_THEME_DESCRIBE,
-  CHART_TOOL_DESCRIPTION,
-  CHART_TYPE_DESCRIBE,
-  RANGE_DESCRIBE,
-} from "./lib/chart-guide.js";
+import { CHART_TOOL_DESCRIPTION, RANGE_DESCRIBE } from "./lib/chart-guide.js";
 import { FORGET_TOOL_DESCRIPTION } from "./tool-schemas.js";
 
 export type ToolDef = {
@@ -19,8 +13,8 @@ export type ToolDef = {
 export const GMA_TOOL_CATALOG: ToolDef[] = [
   {
     name: "track",
-    title: "Track metric",
-    description: "Upsert (metric,ts); written+replaced.",
+    title: "Track",
+    description: "Upsert by metric+ts; written/replaced counts.",
     inputSchema: {
       type: "object",
       properties: {
@@ -45,8 +39,8 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   },
   {
     name: "query",
-    title: "Query metric",
-    description: "Summary + optional LTTB pts.",
+    title: "Query",
+    description: "Summary + optional LTTB series.",
     inputSchema: {
       type: "object",
       properties: {
@@ -63,8 +57,8 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   },
   {
     name: "insight",
-    title: "Metric insight",
-    description: "Trend, MAD anomalies, naive forecast.",
+    title: "Insight",
+    description: "Trend, anomalies, naive forecast.",
     inputSchema: {
       type: "object",
       properties: {
@@ -76,32 +70,18 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
   },
   {
     name: "chart",
-    title: "Render chart",
+    title: "Chart",
     description: CHART_TOOL_DESCRIPTION,
     inputSchema: {
       type: "object",
       properties: {
         metric: { type: "string" },
         range: { type: "string", description: RANGE_DESCRIBE },
-        type: {
-          type: "string",
-          enum: ["line", "bar", "area"],
-          description: CHART_TYPE_DESCRIBE,
-        },
-        theme: {
-          type: "string",
-          enum: ["dark", "light"],
-          description: CHART_THEME_DESCRIBE,
-        },
-        labels: {
-          type: "string",
-          enum: ["none", "last", "extremes", "all"],
-          description: CHART_LABELS_DESCRIBE,
-        },
-        share: {
-          type: "boolean",
-          description: "Hosted only: omit public url when false (default true).",
-        },
+        type: { type: "string", enum: ["line", "bar", "area"] },
+        theme: { type: "string", enum: ["dark", "light"] },
+        labels: { type: "string", enum: ["none", "last", "extremes", "all"] },
+        share: { type: "boolean", description: "Hosted share url (default true)." },
+        include_embed: { type: "boolean", description: "Hosted embed urls if true." },
       },
       required: ["metric"],
     },

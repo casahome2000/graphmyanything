@@ -268,8 +268,15 @@ function inlineScriptTurn(dataJson: string): FlowStep {
 
 function buildGmaFlow(
   payloads: GmaPayloadSet,
-  opts: { id: string; label: string; queryJson: string; withInsight?: boolean },
+  opts: {
+    id: string;
+    label: string;
+    queryJson: string;
+    chartJson?: string;
+    withInsight?: boolean;
+  },
 ): E2EFlow {
+  const chartJson = opts.chartJson ?? payloads.chart;
   const steps: FlowStep[] = [
     {
       name: "query call",
@@ -301,7 +308,7 @@ function buildGmaFlow(
         },
       }),
     },
-    finalAnswerFromMetrics(opts.queryJson, payloads.chart),
+    finalAnswerFromMetrics(opts.queryJson, chartJson),
   ];
   if (opts.withInsight) {
     steps.splice(2, 0, {
@@ -418,6 +425,12 @@ export function buildAllE2EFlows(
       id: "gma_lean",
       label: "GMA query+chart lean (auto pts, also_chart)",
       queryJson: payloads.leanQuery,
+    }),
+    buildGmaFlow(payloads, {
+      id: "gma_lean_embed",
+      label: "GMA lean + chart include_embed",
+      queryJson: payloads.leanQuery,
+      chartJson: payloads.chartWithEmbed,
     }),
     buildGmaFlow(payloads, {
       id: "gma_full",

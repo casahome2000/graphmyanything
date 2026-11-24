@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 — 2026-11-23
+
+- **server.json** / **package.json** descriptions shortened for MCP registry (≤100 chars).
+- **`chart` `include_embed`** (default `false`): hosted responses return share `url` only; embed fields when opted in (client-side trim).
+- Doc pins, Docker **0.2.3**, and benchmark refresh for lean default chart payloads.
+
 ## 0.2.2 — 2026-11-23
 
 - **`--help`** / **`sync --help`** no longer create an empty default SQLite file (lazy MCP server load).

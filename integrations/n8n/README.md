@@ -41,3 +41,5 @@ jq -s . integrations/n8n/track-stripe-mrr-daily.json | npx n8n import:workflow -
 ```
 
 Credentials are not bundled; assign them after import.
+
+**GraphMyAnything hosted accounts:** [graphmyanything.com](https://graphmyanything.com) — **Free:** 3 metrics, 10k points, 90-day reads, 3 share links; **Founding:** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).

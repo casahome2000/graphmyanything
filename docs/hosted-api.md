@@ -62,7 +62,7 @@ The key is returned once; later polls answer `authorization_pending` or `invalid
 }
 ```
 
-**Founding** plans use higher limits (50 metrics, 1M points, full-history `read_window_days`, 100 live links).
+**Founding** plans use higher limits (50 metrics, 1M points, full-history `read_window_days`, 100 live links). Billing at [graphmyanything.com](https://graphmyanything.com): **Free** as above; **Founding** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
 
 ## Metrics
 
@@ -140,6 +140,8 @@ Query params: `metric` (required), `range`, `type`, `theme`, `labels`, `share` (
   "tokens_estimate": 120
 }
 ```
+
+The MCP server returns **share `url` by default**. Set tool arg `include_embed: true` to pass through `embed_svg`, `embed_png`, and related embed fields (client-side trim; API unchanged).
 
 Share URL shapes (public `<hex-id>`):
 

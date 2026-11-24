@@ -282,6 +282,7 @@ const fileWarm = byId("python_file_e2e_warm");
 const inlineCold = byId("python_inline_e2e_cold");
 const inlineWarm = byId("python_inline_e2e_warm");
 const gmaLean = byId("gma_lean");
+const gmaLeanEmbed = byId("gma_lean_embed");
 const gmaFull = byId("gma_full");
 const bestCase = buildFilePythonBestCase(POINT_COUNT);
 
@@ -379,6 +380,7 @@ const costRows = [
   ["Python file E2E cold", fileCold, fileCold.total],
   ["Python file E2E warm", fileWarm, fileWarm.total],
   ["GMA lean", gmaLean, gmaLean.total],
+  ["GMA lean include_embed", gmaLeanEmbed, gmaLeanEmbed.total],
   ["GMA full pts=50", gmaFull, gmaFull.total],
   ["Best-case file Python", bestCase, bestCase.total],
 ]
@@ -394,7 +396,7 @@ const summary = computeSummary(series);
 
 const defTable = `| Bundle | Tools | Schema tokens (tools/list JSON) |
 |--------|-------|----------------------------------|
-| GraphMyAnything MCP | 4 | **${formatNum(gmaDefTokens)}** |
+| GraphMyAnything MCP | 5 | **${formatNum(gmaDefTokens)}** |
 | Python agent harness (representative) | 6 | **${formatNum(pyDefTokens)}** |
 
 | Flow | Excl. defs | + defs × turns | + defs once (cached) |
@@ -414,7 +416,7 @@ const md = `# Token benchmark (end-to-end)
 
 **Best-case file Python (~${formatNum(bestCase.total)} tokens) is ~${Math.round(fileCold.total / bestCase.total)}× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → **shared final answer**): **${formatNum(fileCold.total)}** tokens (${fileCold.turns} turns, ${fileCold.toolCalls} tool calls).
 
-**GMA lean (\`points=auto\`, \`also_chart\`):** **${formatNum(gmaLean.inTokens)}** in · **${formatNum(gmaLean.outTokens)}** out · **${formatNum(gmaLean.total)}** total — ${pctDeltaLabel(fileCold.total, gmaLean.total)} than file E2E cold (${formatNum(fileCold.total)}). **GMA full (\`points=50\`):** **${formatNum(gmaFull.total)}** (${formatNum(gmaFull.inTokens)} in · ${formatNum(gmaFull.outTokens)} out).
+**GMA lean (\`points=auto\`, \`also_chart\`, default chart):** **${formatNum(gmaLean.inTokens)}** in · **${formatNum(gmaLean.outTokens)}** out · **${formatNum(gmaLean.total)}** total — ${pctDeltaLabel(fileCold.total, gmaLean.total)} than file E2E cold (${formatNum(fileCold.total)}). **GMA lean + \`include_embed: true\`:** **${formatNum(gmaLeanEmbed.total)}**. **GMA full (\`points=50\`):** **${formatNum(gmaFull.total)}** (${formatNum(gmaFull.inTokens)} in · ${formatNum(gmaFull.outTokens)} out).
 
 **vs inline JSON E2E:** lean ${vsPhrase(inlineCold.total, gmaLean.total)}.
 
@@ -481,7 +483,8 @@ Pricing: [${ASSUMPTIONS.costModel.label}](${ASSUMPTIONS.costModel.source}).
 - Modeled flows, not live agent traces; token counts are **reproducible** from step text in \`e2e-flows.ts\`.
 - **Best-case** row is a deliberate lower bound; citing it without E2E is misleading.
 - File E2E assumes the agent does not paste the whole JSON into chat when told to read from disk.
-- GMA \`chart\` returns a path, not image bytes (same as Python PNG on disk).
+- GMA \`chart\` (hosted): default returns **share URL** only (\`https://graphmyanything.com/c/<id>\`); set \`include_embed: true\` for embed URLs/snippets (not image bytes in chat).
+- **GMA lean variance:** older pins used **284** (local-only) and **344** (URL + embeds always-on); this run: default **${formatNum(gmaLean.total)}**, \`include_embed\` **${formatNum(gmaLeanEmbed.total)}** — drift if payload shape changes; re-run \`npm run benchmark:tokens\` to refresh.
 - Other model tokenizers differ slightly; dollar lines scale linearly with token split.
 - **Shared** \`SHARED_USER_CONTEXT\` on turn 1 and \`SHARED_FINAL_ANSWER\` on the last step for every flow (\`e2e-assumptions.ts\`).
 - Python harness defs are a **representative** Cursor-style 6-tool bundle, not a live session export.
@@ -507,7 +510,7 @@ await sharp(Buffer.from(svg)).resize(2400).png().toFile(path.join(outDir, "token
 
 console.log("Wrote results.md, token-benchmark.svg, token-benchmark.png");
 console.log(
-  `E2E cold file=${fileCold.total} gmaLean=${gmaLean.total} (${pctDeltaLabel(fileCold.total, gmaLean.total)}) gmaFull=${gmaFull.total}`,
+  `E2E cold file=${fileCold.total} gmaLean=${gmaLean.total} gmaLeanEmbed=${gmaLeanEmbed.total} (${pctDeltaLabel(fileCold.total, gmaLean.total)}) gmaFull=${gmaFull.total} defs=${gmaDefTokens}`,
 );
 console.log(`Lean query payload: ${payloads.leanQuery.length} chars, full: ${payloads.fullQuery.length} chars`);
 console.log(`Best case=${bestCase.total}`);
