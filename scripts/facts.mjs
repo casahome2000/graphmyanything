@@ -28,6 +28,10 @@ const MARKER_FILES = [
   "docs/stripe-mrr.md",
 ];
 
+const HEADLINE_LITERAL = "Build once. Ask forever.";
+const HEADLINE_MARKER_RE =
+  /<!-- fact:copy\.headline -->([\s\S]*?)<!-- \/fact -->/g;
+
 const MARKER_RE =
   /<!-- fact:([\w.]+)(?:\s+fmt:(\w+))? -->([\s\S]*?)<!-- \/fact -->/g;
 const TEMPLATE_RE = /\{\{fact:([\w.]+)(?:\s+fmt:(\w+))?\}\}/g;
@@ -50,6 +54,10 @@ function formatValue(value, fmt) {
   if (f === "intPlain") return String(value);
   if (f === "pct") return String(value);
   if (f === "usd") return `$${Number(value).toFixed(2)}`;
+  if (f === "usd0") {
+    const n = Number(value);
+    return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
+  }
   if (f === "compactK") {
     const n = Number(value);
     if (n >= 1000 && n % 1000 === 0) return `${n / 1000}k`;
@@ -138,6 +146,39 @@ function checkRegistryDescriptions(facts) {
   return errors;
 }
 
+/** Flag bare headline copy outside `<!-- fact:copy.headline -->` markers. */
+const HEADLINE_SCAN_FILES = [
+  ...MARKER_FILES,
+  "packages/mcp-server/src/lib/usage-guide.ts",
+];
+
+function checkHeadlineLiterals(facts) {
+  const errors = [];
+  const expected = facts.copy?.headline;
+  if (expected !== HEADLINE_LITERAL) {
+    errors.push(`copy.headline must be ${JSON.stringify(HEADLINE_LITERAL)}`);
+  }
+  for (const rel of HEADLINE_SCAN_FILES) {
+    const abs = path.join(ROOT, rel);
+    if (!fs.existsSync(abs)) continue;
+    const content = fs.readFileSync(abs, "utf8");
+    if (rel.endsWith(".md")) {
+      const withoutMarked = content.replace(HEADLINE_MARKER_RE, "");
+      if (withoutMarked.includes(HEADLINE_LITERAL)) {
+        errors.push(
+          `${rel}: bare "${HEADLINE_LITERAL}" must use <!-- fact:copy.headline --> markers`,
+        );
+      }
+    } else if (rel.endsWith(".ts") && content.includes(HEADLINE_LITERAL)) {
+      if (!content.includes(HEADLINE_LITERAL)) continue;
+      if (expected && !content.includes(expected)) {
+        errors.push(`${rel}: headline text must match copy.headline`);
+      }
+    }
+  }
+  return errors;
+}
+
 function checkBenchmarkFacts(facts) {
   const errors = [];
   const measured = measureBenchmark();
@@ -160,6 +201,7 @@ function checkAll() {
   const facts = loadFacts();
   const errors = [];
   errors.push(...checkRegistryDescriptions(facts));
+  errors.push(...checkHeadlineLiterals(facts));
   errors.push(...checkBenchmarkFacts(facts));
   for (const rel of MARKER_FILES) {
     const abs = path.join(ROOT, rel);

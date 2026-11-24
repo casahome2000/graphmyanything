@@ -1,6 +1,6 @@
 # GraphMyAnything — agent & developer guide
 
-**Positioning:** *Build once. Ask forever.* Load or record a time series once; later questions use **stored history** in a few hundred tokens instead of another research pass, API round-trip, or matplotlib detour.
+**Positioning:** *<!-- fact:copy.headline -->Build once. Ask forever.<!-- /fact -->* Load or record a time series once; later questions use **stored history** in a few hundred tokens instead of another research pass, API round-trip, or matplotlib detour.
 
 This guide answers: **when to keep, store, update, and use** local metric memory — for humans wiring MCP and for agents choosing tools.
 

@@ -1,6 +1,6 @@
 # GraphMyAnything — 5-minute quick start
 
-**Build once. Ask forever.** [`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local MCP server that remembers your metrics in SQLite so the agent can **query**, **insight**, and **chart** from stored history instead of re-fetching or plotting in chat.
+**<!-- fact:copy.headline -->Build once. Ask forever.<!-- /fact -->** [`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local MCP server that remembers your metrics in SQLite so the agent can **query**, **insight**, and **chart** from stored history instead of re-fetching or plotting in chat.
 
 **Requires:** Node.js **22.13+** (built-in `node:sqlite`).
 
@@ -30,7 +30,7 @@ npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.3<!-- /fact --> sync
 
 You will get a short code to enter at [graphmyanything.com/connect](https://graphmyanything.com/connect). After auth, metrics sync in batches and MCP tools use the hosted API for reads while **writes still mirror to local SQLite**.
 
-**Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** <!-- fact:plans.free.metrics -->3<!-- /fact --> metrics, <!-- fact:plans.free.points fmt:compactK -->10k<!-- /fact --> points, <!-- fact:plans.free.readDays -->90<!-- /fact -->-day reads, <!-- fact:plans.free.shareLinks -->3<!-- /fact --> share links; **Founding:** <!-- fact:plans.founding.priceUsd fmt:usd -->$49.00<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then <!-- fact:plans.founding.thenMonthlyUsd fmt:usd -->$9.00<!-- /fact -->/mo (auto-renews; cancel anytime).
+**Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** <!-- fact:plans.free.metrics -->3<!-- /fact --> metrics, <!-- fact:plans.free.points fmt:compactK -->10k<!-- /fact --> points, <!-- fact:plans.free.readDays -->90<!-- /fact -->-day reads, <!-- fact:plans.free.shareLinks -->3<!-- /fact --> share links; **Founding:** <!-- fact:plans.founding.priceUsd fmt:usd0 -->$49<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then <!-- fact:plans.founding.thenMonthlyUsd fmt:usd0 -->$9<!-- /fact -->/mo (auto-renews; cancel anytime).
 
 Other CLI commands:
 
