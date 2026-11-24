@@ -23,23 +23,23 @@
       "outputPerMillionUsd": 14
     },
     "fileE2ETokens": 658,
-    "leanTokens": 293,
-    "leanReductionPct": 55.5,
-    "embedTokens": 349,
-    "embedReductionPct": 47,
+    "leanTokens": 288,
+    "leanReductionPct": 56.2,
+    "embedTokens": 344,
+    "embedReductionPct": 47.7,
     "bestCaseScriptTokens": 167,
-    "fullPts50Tokens": 1501,
+    "fullPts50Tokens": 1496,
     "inlineE2ETokens": 2447,
     "pythonHarnessListTokens": 248,
     "warm30": {
-      "gmaTokens": 8790,
+      "gmaTokens": 8640,
       "fileTokens": 21390,
-      "reductionPct": 58.9
+      "reductionPct": 59.6
     },
     "costPer1kQuestionsUsd": {
       "lean": 1.66,
-      "embed": 1.76,
-      "full": 3.78,
+      "embed": 1.75,
+      "full": 3.77,
       "file": 6,
       "bestCaseScript": 1.65
     }

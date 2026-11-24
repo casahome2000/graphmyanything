@@ -2,7 +2,10 @@
 
 import { getEncoding } from "js-tiktoken";
 import { buildAllE2EFlows } from "./e2e-flows.js";
-import { buildGmaPayloads } from "./gma-payloads.js";
+import {
+  buildGmaPayloads,
+  PUBLISHED_BENCH_SERIES_NOW,
+} from "./gma-payloads.js";
 import {
   gmaToolDefsJson,
   PYTHON_HARNESS_TOOLS_JSON,
@@ -114,9 +117,8 @@ export function measureCanonicalFacts(): {
   listTokens: number;
   benchmark: CanonicalBenchmark;
 } {
-  /** Fixed epoch — payloads must not depend on wall clock. */
   const series = Array.from({ length: ASSUMPTIONS.pointCount }, (_, i) => {
-    const now = 1_700_000_000;
+    const now = PUBLISHED_BENCH_SERIES_NOW;
     return {
       ts: now - (ASSUMPTIONS.pointCount - 1 - i) * 86400,
       value: Math.round(65_000 + i * 95 + Math.sin(i / 12) * 1_200),
