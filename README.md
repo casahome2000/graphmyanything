@@ -135,7 +135,7 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 
 **30 warm sessions (per-session GMA lean <!-- fact:benchmark.leanTokens -->288<!-- /fact -->):** file E2E warm cumulative **<!-- fact:benchmark.warm30.fileTokens fmt:int -->21,390<!-- /fact -->** vs **GMA lean** **<!-- fact:benchmark.warm30.gmaTokens fmt:int -->8,640<!-- /fact -->** (**<!-- fact:benchmark.warm30.reductionPct -->59.6<!-- /fact -->% fewer**).
 
-**Cost per 1,000 identical questions** (<!-- fact:benchmark.costModel -->GPT-5.2<!-- /fact --> at $1.75/M input · $14/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **<!-- fact:benchmark.costPer1kQuestionsUsd.file fmt:usd -->$6.00<!-- /fact -->** vs GMA lean **<!-- fact:benchmark.costPer1kQuestionsUsd.lean fmt:usd -->$1.66<!-- /fact -->**. Dollar lines scale linearly if your model’s per-token pricing differs.
+**Cost per 1,000 identical questions** (<!-- fact:benchmark.costModel.label -->GPT-5.2<!-- /fact --> at $<!-- fact:benchmark.costModel.inputPerMillionUsd -->1.75<!-- /fact -->/M input · $<!-- fact:benchmark.costModel.outputPerMillionUsd -->14<!-- /fact -->/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **<!-- fact:benchmark.costPer1kQuestionsUsd.file fmt:usd -->$6.00<!-- /fact -->** vs GMA lean **<!-- fact:benchmark.costPer1kQuestionsUsd.lean fmt:usd -->$1.66<!-- /fact -->**. Dollar lines scale linearly if your model’s per-token pricing differs.
 
 **Caveats (read before citing):**
 

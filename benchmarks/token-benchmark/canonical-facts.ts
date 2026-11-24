@@ -82,7 +82,11 @@ function measureBestCasePython() {
 
 export type CanonicalBenchmark = {
   tokenizer: string;
-  costModel: string;
+  costModel: {
+    label: string;
+    inputPerMillionUsd: number;
+    outputPerMillionUsd: number;
+  };
   fileE2ETokens: number;
   leanTokens: number;
   leanReductionPct: number;
@@ -150,7 +154,11 @@ export function measureCanonicalFacts(): {
     listTokens: countTokens(gmaToolDefsJson()),
     benchmark: {
       tokenizer: "o200k",
-      costModel: ASSUMPTIONS.costModel.label,
+      costModel: {
+        label: ASSUMPTIONS.costModel.label,
+        inputPerMillionUsd: ASSUMPTIONS.costModel.inputPerMillion,
+        outputPerMillionUsd: ASSUMPTIONS.costModel.outputPerMillion,
+      },
       fileE2ETokens: fileCold.total,
       leanTokens: gmaLean.total,
       leanReductionPct: pctFewer(fileCold.total, gmaLean.total),

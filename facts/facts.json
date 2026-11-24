@@ -17,7 +17,11 @@
   },
   "benchmark": {
     "tokenizer": "o200k",
-    "costModel": "GPT-5.2",
+    "costModel": {
+      "label": "GPT-5.2",
+      "inputPerMillionUsd": 1.75,
+      "outputPerMillionUsd": 14
+    },
     "fileE2ETokens": 658,
     "leanTokens": 288,
     "leanReductionPct": 56.2,
@@ -54,7 +58,8 @@
       "autoRenews": true,
       "metrics": 50,
       "points": 1000000,
-      "shareLinks": 100
+      "shareLinks": 100,
+      "unlimitedHistoryReads": true
     }
   },
   "copy": {
