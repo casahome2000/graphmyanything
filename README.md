@@ -1,6 +1,6 @@
 # GraphMyAnything
 
-**<!-- fact:copy.tagline -->Build once, ask forever.<!-- /fact -->**
+**<!-- fact:copy.headline -->Build once. Ask forever.<!-- /fact -->**
 
 [`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local-first [Model Context Protocol](https://modelcontextprotocol.io) server: store time-series metrics in SQLite, answer chart questions with token-efficient tool calls instead of throwaway Python, and render SVG charts on disk. Optional **hosted sync** adds shareable chart links while keeping a local backup.
 
@@ -64,7 +64,7 @@ npx -y graphmyanything-mcp@latest
 
 **No telemetry** in the MCP server — we do not phone home from your agent sessions.
 
-## Tools (<!-- fact:tools.count -->5<!-- /fact -->)
+## Tools (<!-- fact:tools.count fmt:word -->five<!-- /fact -->)
 
 | Tool | One-liner | Tiny example |
 |------|-----------|--------------|

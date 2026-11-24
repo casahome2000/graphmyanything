@@ -63,6 +63,30 @@ function formatValue(value, fmt) {
     if (n >= 1000 && n % 1000 === 0) return `${n / 1000}k`;
     return String(n);
   }
+  if (f === "compact") {
+    const n = Number(value);
+    if (n >= 1_000_000 && n % 1_000_000 === 0) return `${n / 1_000_000}M`;
+    if (n >= 1000 && n % 1000 === 0) return `${n / 1000}k`;
+    return String(n);
+  }
+  if (f === "word") {
+    const n = Number(value);
+    const words = [
+      "zero",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+      "ten",
+    ];
+    if (Number.isInteger(n) && n >= 0 && n < words.length) return words[n];
+    return String(value);
+  }
   if (f === "boolAutoRenews") {
     return value ? "auto-renews" : "does not auto-renew";
   }
