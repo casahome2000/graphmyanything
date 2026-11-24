@@ -13,6 +13,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Install core deps
+        run: npm ci --prefix packages/core
       - name: Install mcp-server deps
         run: npm ci --prefix packages/mcp-server
       - name: Install token-benchmark deps
