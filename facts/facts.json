@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "package": {
+    "name": "graphmyanything-mcp",
+    "version": "0.2.3"
+  },
+  "tools": {
+    "count": 5,
+    "names": [
+      "track",
+      "query",
+      "insight",
+      "forget",
+      "chart"
+    ],
+    "listTokens": 468
+  },
+  "benchmark": {
+    "tokenizer": "o200k",
+    "costModel": {
+      "label": "GPT-5.2",
+      "inputPerMillionUsd": 1.75,
+      "outputPerMillionUsd": 14
+    },
+    "fileE2ETokens": 658,
+    "leanTokens": 288,
+    "leanReductionPct": 56.2,
+    "embedTokens": 344,
+    "embedReductionPct": 47.7,
+    "bestCaseScriptTokens": 167,
+    "fullPts50Tokens": 1496,
+    "inlineE2ETokens": 2447,
+    "pythonHarnessListTokens": 248,
+    "warm30": {
+      "gmaTokens": 8640,
+      "fileTokens": 21390,
+      "reductionPct": 59.6
+    },
+    "costPer1kQuestionsUsd": {
+      "lean": 1.66,
+      "embed": 1.75,
+      "full": 3.77,
+      "file": 6,
+      "bestCaseScript": 1.65
+    }
+  },
+  "plans": {
+    "free": {
+      "metrics": 3,
+      "points": 10000,
+      "readDays": 90,
+      "shareLinks": 3
+    },
+    "founding": {
+      "priceUsd": 49,
+      "termMonths": 12,
+      "thenMonthlyUsd": 9,
+      "autoRenews": true,
+      "metrics": 50,
+      "points": 1000000,
+      "shareLinks": 100,
+      "unlimitedHistoryReads": true
+    }
+  },
+  "copy": {
+    "tagline": "Build once, ask forever.",
+    "headline": "Build once. Ask forever.",
+    "repoAbout": "Build once, ask forever. Chart and metric memory for AI agents over MCP: track, query, insight, forget, chart. Local-first, optional hosted sync. MIT.",
+    "registryDescription": "Build once, ask forever. Chart & metric memory for AI agents: track, query, insight, forget, chart."
+  }
+}

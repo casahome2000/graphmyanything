@@ -1,6 +1,6 @@
 # GraphMyAnything — 5-minute quick start
 
-**Build once. Ask forever.** [`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local MCP server that remembers your metrics in SQLite so the agent can **query**, **insight**, and **chart** from stored history instead of re-fetching or plotting in chat.
+**<!-- fact:copy.headline -->Build once. Ask forever.<!-- /fact -->** [`graphmyanything-mcp`](https://www.npmjs.com/package/graphmyanything-mcp) is a local MCP server that remembers your metrics in SQLite so the agent can **query**, **insight**, and **chart** from stored history instead of re-fetching or plotting in chat.
 
 **Requires:** Node.js **22.13+** (built-in `node:sqlite`).
 
@@ -15,7 +15,7 @@ npx -y graphmyanything-mcp@latest
 Optional pin (reproducible):
 
 ```bash
-npx -y graphmyanything-mcp@0.2.3
+npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.3<!-- /fact -->
 ```
 
 Clients launch the same command over **stdio** — you do not run `npx` yourself during normal chat; the IDE does.
@@ -25,12 +25,12 @@ Clients launch the same command over **stdio** — you do not run `npx` yourself
 Link the CLI to your GraphMyAnything account and upload existing local history (local DB is kept as backup):
 
 ```bash
-npx -y graphmyanything-mcp@0.2.3 sync
+npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.3<!-- /fact --> sync
 ```
 
 You will get a short code to enter at [graphmyanything.com/connect](https://graphmyanything.com/connect). After auth, metrics sync in batches and MCP tools use the hosted API for reads while **writes still mirror to local SQLite**.
 
-**Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** 3 metrics, 10k points, 90-day reads, 3 share links; **Founding:** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
+**Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** <!-- fact:plans.free.metrics -->3<!-- /fact --> metrics, <!-- fact:plans.free.points fmt:compactK -->10k<!-- /fact --> points, <!-- fact:plans.free.readDays -->90<!-- /fact -->-day reads, <!-- fact:plans.free.shareLinks -->3<!-- /fact --> share links; **Founding:** <!-- fact:plans.founding.priceUsd fmt:usd0 -->$49<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then <!-- fact:plans.founding.thenMonthlyUsd fmt:usd0 -->$9<!-- /fact -->/mo (auto-renews; cancel anytime).
 
 Other CLI commands:
 
@@ -109,7 +109,7 @@ docker build -t graphmyanything-mcp https://github.com/casahome2000/graphmyanyth
 docker run -i --rm -v gma-data:/data graphmyanything-mcp
 ```
 
-The image sets `GRAPHMYANYTHING_DB_PATH=/data/metrics.db`. It installs `graphmyanything-mcp` **0.2.3** by default (`GMA_MCP_VERSION` build-arg). Point your MCP host at `docker run -i … graphmyanything-mcp` as the stdio command.
+The image sets `GRAPHMYANYTHING_DB_PATH=/data/metrics.db`. It installs `graphmyanything-mcp` **<!-- fact:package.version -->0.2.3<!-- /fact -->** by default (`GMA_MCP_VERSION` build-arg). Point your MCP host at `docker run -i … graphmyanything-mcp` as the stdio command.
 
 ## First prompt
 

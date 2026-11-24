@@ -1,6 +1,6 @@
 # GraphMyAnything — agent & developer guide
 
-**Positioning:** *Build once. Ask forever.* Load or record a time series once; later questions use **stored history** in a few hundred tokens instead of another research pass, API round-trip, or matplotlib detour.
+**Positioning:** *<!-- fact:copy.headline -->Build once. Ask forever.<!-- /fact -->* Load or record a time series once; later questions use **stored history** in a few hundred tokens instead of another research pass, API round-trip, or matplotlib detour.
 
 This guide answers: **when to keep, store, update, and use** local metric memory — for humans wiring MCP and for agents choosing tools.
 
@@ -178,13 +178,13 @@ Human-readable docs in this repo:
 
 | | **Free** | **Founding** |
 |--|----------|--------------|
-| Distinct metrics | 3 | 50 |
-| Stored points | 10,000 | 1,000,000 |
-| **Read window** (query/insight/chart) | 90 days | Full history |
+| Distinct metrics | <!-- fact:plans.free.metrics -->3<!-- /fact --> | <!-- fact:plans.founding.metrics -->50<!-- /fact --> |
+| Stored points | <!-- fact:plans.free.points fmt:int -->10,000<!-- /fact --> | <!-- fact:plans.founding.points fmt:int -->1,000,000<!-- /fact --> |
+| **Read window** (query/insight/chart) | <!-- fact:plans.free.readDays -->90<!-- /fact --> days | Full history |
 | History storage | Full history kept | Full history |
-| Live chart links | 3 | 100 |
+| Live chart links | <!-- fact:plans.free.shareLinks -->3<!-- /fact --> | <!-- fact:plans.founding.shareLinks -->100<!-- /fact --> |
 
-On **Free**, older data remains stored but **query**, **insight**, and **chart** only see the last **90 days** (`read_window_days`). Upgrade or export locally if you need older hosted reads.
+On **Free**, older data remains stored but **query**, **insight**, and **chart** only see the last **<!-- fact:plans.free.readDays -->90<!-- /fact --> days** (`read_window_days`). Upgrade or export locally if you need older hosted reads.
 
 Share pages at `https://graphmyanything.com/c/<hex-id>` include **hover tooltips** on markers when viewed in a browser.
 

@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,6 +18,7 @@ import {
   PYTHON_HARNESS_TOOLS_JSON,
 } from "./tool-definitions.js";
 import type { E2EFlow } from "./e2e-assumptions.js";
+import { measureCanonicalFacts } from "./canonical-facts.js";
 
 const enc = getEncoding("o200k_base");
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -514,3 +516,41 @@ console.log(
 );
 console.log(`Lean query payload: ${payloads.leanQuery.length} chars, full: ${payloads.fullQuery.length} chars`);
 console.log(`Best case=${bestCase.total}`);
+
+const repoRoot = path.join(__dirname, "../..");
+const factsPath = path.join(repoRoot, "facts/facts.json");
+const canonical = measureCanonicalFacts();
+const pkgJson = JSON.parse(
+  fs.readFileSync(
+    path.join(repoRoot, "packages/mcp-server/package.json"),
+    "utf8",
+  ),
+) as { version: string; name: string };
+const existing = JSON.parse(fs.readFileSync(factsPath, "utf8")) as Record<
+  string,
+  unknown
+>;
+const toolsExisting = existing.tools as {
+  names: string[];
+  count: number;
+};
+const nextFacts = {
+  ...existing,
+  package: { name: pkgJson.name, version: pkgJson.version },
+  tools: {
+    count: toolsExisting.names.length,
+    names: toolsExisting.names,
+    listTokens: canonical.listTokens,
+  },
+  benchmark: canonical.benchmark,
+};
+fs.writeFileSync(factsPath, `${JSON.stringify(nextFacts, null, 2)}\n`, "utf8");
+const factsWrite = spawnSync("node", ["scripts/facts.mjs", "--write"], {
+  cwd: repoRoot,
+  stdio: "inherit",
+});
+if (factsWrite.status !== 0) {
+  process.exitCode = 1;
+  throw new Error("scripts/facts.mjs --write failed");
+}
+console.log(`Synced ${factsPath} and refreshed fact markers`);
