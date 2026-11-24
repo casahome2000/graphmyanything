@@ -121,7 +121,7 @@ After the server shows up in your client's MCP list, try:
 
 1. **`track`** — JSON like `{"ok":true,"metric":"health.weight.lb","written":1,"replaced":0,"tokens_estimate":…}` (upserts on same `metric` + `ts`).
 2. **`query`** — terse stats (`s.l`, `s.mn`, `s.tr`, …) and maybe downsampled `pts` depending on budget.
-3. **`chart`** — local mode: `path` to an SVG file. After **`sync`**: optional `url` like `https://graphmyanything.com/c/<hex-id>` plus `embed_svg` / `embed_png` (also `…/svg`, `…/png`, `…/opengraph-image`). Share pages show **hover tooltips** on markers in the browser.
+3. **`chart`** — local mode: `path` to an SVG file. After **`sync`**: share `url` like `https://graphmyanything.com/c/<hex-id>` by default; pass `include_embed: true` when you need embed URLs (`…/svg`, `…/png`). Share pages show **hover tooltips** on markers in the browser.
 
 Open the local `path` in your IDE or browser; open the hosted `url` for a shareable page.
 

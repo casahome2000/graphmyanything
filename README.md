@@ -32,7 +32,7 @@ Then ask your agent: *Track my MRR of 84,210 today, then chart the last 90 days 
 2. **Query** compact numeric summaries and optional downsampled points within a token budget.
 3. **Insight** plain-English trend, anomalies, and a simple forecast.
 4. **Forget** hard-delete points, ranges, or a whole metric (`confirm` when `all: true`).
-5. **Chart** dark/light **640×320 SVG** locally; in **hosted** mode also returns `url` (`https://graphmyanything.com/c/<id>`), `embed_svg`, and `embed_png` (use `share: false` to omit the public URL). Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
+5. **Chart** dark/light **640×320 SVG** locally; in **hosted** mode returns share `url` (`https://graphmyanything.com/c/<id>`). `include_embed: true` adds embed URLs; `share: false` omits the public URL. Tool payloads include `tokens_estimate` (chars ÷ 4, approximate).
 
 Data stays on your machine by default. **`graphmyanything-mcp sync`** (v0.2+) opts into hosted mode with device-code auth while keeping a local SQLite backup. See [quickstart](./docs/quickstart.md) and [hosted API contract](./docs/hosted-api.md).
 
@@ -72,7 +72,7 @@ npx -y graphmyanything-mcp@latest
 | **forget** | Delete point, range, or whole metric (`confirm` when `all:true`) | `forget(metric="stripe.mrr", ts=1732147200)` |
 | **query** | Compact summary (latest, min, max, mean, trend, % change), optional downsampled points within a token budget | `query(metric="stripe.mrr", range="90d", token_budget=200, points="auto")` |
 | **insight** | Plain-English trend, anomalies, and a simple forecast | `insight(metric="stripe.mrr", range="90d")` |
-| **chart** | Labeled **640×320 SVG**; **local:** `path` on disk; **hosted** (after `sync`): `url`, `embed_svg`, `embed_png` (`share: false` keeps local-only) | `chart(metric="stripe.mrr", range="90d", type="area", theme="dark")` → `path` and/or `https://graphmyanything.com/c/<id>` |
+| **chart** | Labeled **640×320 SVG**; **local:** `path`; **hosted:** share `url` by default; `include_embed: true` for embed URLs; `share: false` keeps local-only | `chart(...)` → `url` and/or local `path` |
 
 Schema details match [`packages/mcp-server/src/tool-catalog.ts`](packages/mcp-server/src/tool-catalog.ts).
 
@@ -130,23 +130,24 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 |----------|--------|
 | Inline JSON + matplotlib in chat | **2,447** |
 | Python file off-context (E2E) | **658** |
-| **GMA lean** (`query` + `chart`, `points=auto`, `also_chart`) | **344** (**47.7% fewer** than file E2E) |
+| **GMA lean** (`query` + `chart`, default hosted chart) | **288** (**56.2% fewer** than file E2E) |
+| **GMA lean** + `include_embed: true` | **344** (**47.7% fewer**) |
 
-**30 warm sessions (per-session GMA lean 344):** file E2E warm cumulative **21,390** vs **GMA lean** **10,320** (**51.8% fewer**).
+**30 warm sessions (per-session GMA lean 288):** file E2E warm cumulative **21,390** vs **GMA lean** **8,640** (**59.6% fewer**).
 
-**Cost per 1,000 identical questions** (GPT-5.2 at $1.75/M input · $14/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **$6.00** vs GMA lean **$1.75**. Dollar lines scale linearly if your model’s per-token pricing differs.
+**Cost per 1,000 identical questions** (GPT-5.2 at $1.75/M input · $14/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **$6.00** vs GMA lean **$1.66**. Dollar lines scale linearly if your model’s per-token pricing differs.
 
 **Caveats (read before citing):**
 
 - Modeled flows from [`e2e-flows.ts`](benchmarks/token-benchmark/e2e-flows.ts), not live agent traces — counts are reproducible via `npm run benchmark:tokens`.
-- MCP **tool schema overhead** **492** tokens (5 tools, `o200k`) vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
+- MCP **tool schema overhead** **511** tokens (5 tools, `o200k`) vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
 - **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — deliberate lower bound; citing without full E2E is misleading.
 
 A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
 
 ## Hosted live charts
 
-Run `npx -y graphmyanything-mcp@latest sync` to link a free account. Your local history uploads, and `chart` then returns a live share link at `https://graphmyanything.com/c/<id>` (with embed URLs for SVG/PNG) that you can turn off any time. Pass `share: false` to keep a chart local. Plan limits and billing: [graphmyanything.com](https://graphmyanything.com).
+Run `npx -y graphmyanything-mcp@latest sync` to link a free account. Your local history uploads, and `chart` returns a live share link at `https://graphmyanything.com/c/<id>` by default (`include_embed: true` when you need embed URLs). Pass `share: false` to keep a chart local. Plan limits and billing: [graphmyanything.com](https://graphmyanything.com).
 
 ## Repo map
 

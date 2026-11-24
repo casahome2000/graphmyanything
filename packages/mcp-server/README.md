@@ -39,7 +39,7 @@ Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Me
 | `forget` | Delete by `ts`, `from`+`to`, or `all:true`+`confirm:true` (always requires `metric`) |
 | `query` | Summary + LTTB series within `token_budget` (`metric`, `range` like `90d`, `token_budget`); includes `tokens_estimate` |
 | `insight` | Plain-English trend, MAD anomalies, naive forecast |
-| `chart` | Writes a dark/light **640×320 SVG** on disk (`path`): x-axis ticks, point markers (≤60 or thinned), `labels` `none`/`last` (default)/`extremes`/`all`. **Local:** `url` is `null`. **Hosted** (after `sync`): `url`, `embed_svg`, `embed_png`; `share: false` omits the public URL. |
+| `chart` | Writes a dark/light **640×320 SVG** on disk (`path`): x-axis ticks, point markers (≤60 or thinned), `labels` `none`/`last` (default)/`extremes`/`all`. **Local:** `url` is `null`. **Hosted** (after `sync`): share `url` by default; `include_embed: true` adds `embed_svg` / `embed_png`; `share: false` omits the public URL. |
 
 ### Hosted sync (v0.2+)
 

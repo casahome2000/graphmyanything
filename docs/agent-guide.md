@@ -16,7 +16,7 @@ A condensed copy ships as the MCP resource **`usage-guide`** (`graphmyanything:/
 | **forget** | Delete point, range, or whole metric (`metric` always required) |
 | **query** | Terse numeric summary + optional LTTB downsampled `pts` within `token_budget` |
 | **insight** | Plain-English trend, MAD-based anomalies, naive linear forecast |
-| **chart** | 640×320 SVG; **hosted** (after `sync`): share `url` at `graphmyanything.com/c/<id>` + embeds; **local:** file `path` only |
+| **chart** | 640×320 SVG; **hosted:** share `url` by default; `include_embed: true` for embed URLs; **local:** file `path` only |
 
 Every tool response includes **`tokens_estimate`** (JSON string length ÷ 4 — approximate, not a tokenizer count).
 
@@ -170,7 +170,7 @@ Human-readable docs in this repo:
 | Mode | How you get it | Reads | Writes | Charts |
 |------|----------------|-------|--------|--------|
 | **Local** (default) | No API key; or `GRAPHMYANYTHING_MODE=local` | SQLite | SQLite | SVG at local `path` only |
-| **Hosted** | `graphmyanything-mcp sync`, config key, or `GRAPHMYANYTHING_API_KEY` / `GMA_API_KEY` | Hosted API | Hosted API **and** mirrored to local SQLite | Local `path` **plus** share `url` / `embed_svg` / `embed_png` when `share` is not false |
+| **Hosted** | `graphmyanything-mcp sync`, config key, or `GRAPHMYANYTHING_API_KEY` / `GMA_API_KEY` | Hosted API | Hosted API **and** mirrored to local SQLite | Local `path` **plus** share `url` when `share` is not false; `include_embed: true` adds embed URLs |
 
 **Forget** is a **hard delete**: removed points do not come back. In **hosted** mode, `forget` deletes on the server **and** in your local SQLite backup for the same filter.
 

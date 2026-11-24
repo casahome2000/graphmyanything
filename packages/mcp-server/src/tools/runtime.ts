@@ -1,6 +1,7 @@
 import type { GmaDatabase } from "../db.js";
 import { HostedClient } from "../hosted/client.js";
 import type { GmaMode } from "../config.js";
+import { mergeHostedChartResponse } from "../lib/chart-response.js";
 import { withTokensEstimate } from "../lib/tokens.js";
 import {
   handleChart,
@@ -62,23 +63,21 @@ export async function runInsight(
 
 export async function runChart(
   rt: ToolRuntime,
-  args: Parameters<typeof handleChart>[1] & { share?: boolean },
+  args: Parameters<typeof handleChart>[1] & {
+    share?: boolean;
+    include_embed?: boolean;
+  },
 ): Promise<Record<string, unknown>> {
   if (rt.mode === "hosted" && rt.client) {
-    const remote = (await rt.client.chart(args)) as Record<string, unknown>;
+    const { include_embed: _embed, ...apiArgs } = args;
+    const remote = (await rt.client.chart(apiArgs)) as Record<string, unknown>;
     const local = handleChart(rt.db, args);
-    const share = args.share !== false;
-    if (!share) {
-      return withTokensEstimate({
-        ...remote,
-        url: null,
-        path: local.path,
-      });
-    }
-    return withTokensEstimate({
-      ...remote,
-      path: local.path,
+    const merged = mergeHostedChartResponse(remote, {
+      includeEmbed: args.include_embed === true,
+      localPath: local.path,
+      share: args.share,
     });
+    return withTokensEstimate(merged);
   }
   return handleChart(rt.db, args);
 }

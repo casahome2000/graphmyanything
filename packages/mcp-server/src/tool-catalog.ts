@@ -102,6 +102,10 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
           type: "boolean",
           description: "Hosted only: omit public url when false (default true).",
         },
+        include_embed: {
+          type: "boolean",
+          description: "Hosted: embed fields (default false).",
+        },
       },
       required: ["metric"],
     },

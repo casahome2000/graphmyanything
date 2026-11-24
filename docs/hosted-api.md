@@ -141,6 +141,8 @@ Query params: `metric` (required), `range`, `type`, `theme`, `labels`, `share` (
 }
 ```
 
+The MCP server returns **share `url` by default**. Set tool arg `include_embed: true` to pass through `embed_svg`, `embed_png`, and related embed fields (client-side trim; API unchanged).
+
 Share URL shapes (public `<hex-id>`):
 
 | URL | Purpose |

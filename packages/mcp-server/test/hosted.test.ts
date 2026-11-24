@@ -63,7 +63,7 @@ describe("hosted runtime", () => {
     db.close();
   });
 
-  it("chart returns url and embed fields", async () => {
+  it("chart returns share url without embed fields by default", async () => {
     const db = openDatabase(dbPath);
     insertPoints(db, "c.m", [{ ts: 1_700_000_000, value: 1, tags: {} }]);
     const rt: ToolRuntime = {
@@ -73,8 +73,23 @@ describe("hosted runtime", () => {
     };
     const r = await runChart(rt, { metric: "c.m" });
     expect(r.url).toMatch(/graphmyanything\.com\/c\//);
-    expect(r.embed_svg).toContain("<svg");
+    expect(r.embed_svg).toBeUndefined();
+    expect(r.embed_png).toBeUndefined();
     expect(typeof r.path).toBe("string");
+    db.close();
+  });
+
+  it("chart include_embed returns embed fields", async () => {
+    const db = openDatabase(dbPath);
+    insertPoints(db, "c.m", [{ ts: 1_700_000_000, value: 1, tags: {} }]);
+    const rt: ToolRuntime = {
+      mode: "hosted",
+      db,
+      client: new HostedClient({ apiKey: "gma_test_key", baseUrl }),
+    };
+    const r = await runChart(rt, { metric: "c.m", include_embed: true });
+    expect(r.embed_svg).toContain("<svg");
+    expect(r.embed_png).toBeDefined();
     db.close();
   });
 

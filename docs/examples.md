@@ -231,7 +231,17 @@ Prerequisite: `npx -y graphmyanything-mcp@latest sync` (or `GRAPHMYANYTHING_API_
 }
 ```
 
-**Sample response (hosted mode):**
+**Sample response (hosted, default — lean):**
+
+```json
+{
+  "path": "/home/you/.graphmyanything/charts/stripe.mrr.usd-2026-11-23T12-00-00.svg",
+  "url": "https://graphmyanything.com/c/a1b2c3d4e5f67890",
+  "tokens_estimate": 62
+}
+```
+
+**With embed URLs** (`"include_embed": true` on the tool call):
 
 ```json
 {
@@ -243,7 +253,7 @@ Prerequisite: `npx -y graphmyanything-mcp@latest sync` (or `GRAPHMYANYTHING_API_
 }
 ```
 
-Public page URLs also support `https://graphmyanything.com/c/<hex-id>/svg`, `…/png`, and `…/opengraph-image` for previews. Live share pages include **hover tooltips** on chart markers when opened in a browser. Set `"share": false` to skip the public `url` while still writing the local SVG backup.
+Live share pages include **hover tooltips** on chart markers when opened in a browser. Set `"share": false` to skip the public `url` while still writing the local SVG backup.
 
 ---
 

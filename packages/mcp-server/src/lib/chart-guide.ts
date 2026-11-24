@@ -14,7 +14,7 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 
 ## Output
 - **Local mode:** SVG on disk; response includes \`path\`. \`url\` is null.
-- **Hosted mode** (after \`sync\` or API key): \`path\` (local backup) plus \`url\` at \`https://graphmyanything.com/c/<hex-id>\`, \`embed_svg\`, and \`embed_png\` when \`share\` is not false. Share pages support hover tooltips on markers in a browser.
+- **Hosted mode** (after \`sync\` or API key): \`path\` (local backup) plus \`url\` at \`https://graphmyanything.com/c/<hex-id>\` when \`share\` is not false. Set \`include_embed: true\` to add \`embed_svg\` / \`embed_png\` (and related snippets). Share pages support hover tooltips on markers in a browser.
 `;
 
 /** tools/list blurb — details live in resource chart-guide. */

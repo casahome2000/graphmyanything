@@ -7,7 +7,10 @@ import { handleChart, handleQuery } from "../../packages/mcp-server/src/tools/ha
 export type GmaPayloadSet = {
   leanQuery: string;
   fullQuery: string;
+  /** Default hosted chart (share url only). */
   chart: string;
+  /** Same flow with include_embed: true. */
+  chartWithEmbed: string;
 };
 
 export function buildGmaPayloads(series: { ts: number; value: number }[]): GmaPayloadSet {
@@ -47,13 +50,18 @@ export function buildGmaPayloads(series: { ts: number; value: number }[]): GmaPa
     type: "area",
     theme: "dark",
   });
-  /** Hosted path (primary for launch): share URL + embeds; local path kept as backup. */
+  const shareUrl = "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678";
   const chartJson = JSON.stringify({
     path: localChart.path,
-    url: "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678",
-    embed_svg: "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678/svg",
-    embed_png: "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678/png",
+    url: shareUrl,
     tokens_estimate: localChart.tokens_estimate,
+  });
+  const chartWithEmbed = JSON.stringify({
+    path: localChart.path,
+    url: shareUrl,
+    embed_svg: `${shareUrl}/svg`,
+    embed_png: `${shareUrl}/png`,
+    tokens_estimate: localChart.tokens_estimate + 8,
   });
 
   db.close();
@@ -63,5 +71,5 @@ export function buildGmaPayloads(series: { ts: number; value: number }[]): GmaPa
     /* ok */
   }
 
-  return { leanQuery, fullQuery, chart: chartJson };
+  return { leanQuery, fullQuery, chart: chartJson, chartWithEmbed };
 }

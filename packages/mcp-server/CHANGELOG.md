@@ -3,7 +3,8 @@
 ## 0.2.3 — 2026-11-23
 
 - **server.json** / **package.json** descriptions shortened for MCP registry (≤100 chars).
-- Doc pins and Docker **0.2.3** (metadata-only bump; no functional change from 0.2.2).
+- **`chart` `include_embed`** (default `false`): hosted responses return share `url` only; embed fields when opted in (client-side trim).
+- Doc pins, Docker **0.2.3**, and benchmark refresh for lean default chart payloads.
 
 ## 0.2.2 — 2026-11-23
 

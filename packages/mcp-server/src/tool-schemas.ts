@@ -42,6 +42,7 @@ export const chartToolArgsSchema = z.object({
   theme: z.enum(["dark", "light"]).optional(),
   labels: z.enum(["none", "last", "extremes", "all"]).optional(),
   share: z.boolean().optional(),
+  include_embed: z.boolean().optional(),
 });
 
 export const FORGET_TOOL_DESCRIPTION =
@@ -105,6 +106,10 @@ export const chartToolInputSchema = {
     .boolean()
     .optional()
     .describe("Hosted: include share URL (default true). share:false omits url."),
+  include_embed: z
+    .boolean()
+    .optional()
+    .describe("Hosted: embed URLs/snippets (default false)."),
 };
 
 export const forgetToolInputSchema = {
