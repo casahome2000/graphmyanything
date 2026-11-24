@@ -60,6 +60,6 @@
   "copy": {
     "tagline": "Build once, ask forever.",
     "repoAbout": "Build once, ask forever. Chart and metric memory for AI agents over MCP: track, query, insight, forget, chart. Local-first, optional hosted sync. MIT.",
-    "registryDescription": "Build once, ask forever. MCP track, query, insight, forget, chart — metric memory for AI agents."
+    "registryDescription": "Build once, ask forever. Chart & metric memory for AI agents: track, query, insight, forget, chart."
   }
 }
