@@ -18,8 +18,7 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 `;
 
 /** tools/list blurb — details live in resource chart-guide. */
-export const CHART_TOOL_DESCRIPTION =
-  "SVG to path; see chart-guide.";
+export const CHART_TOOL_DESCRIPTION = "Render SVG; read chart-guide.";
 
 export const RANGE_DESCRIBE = "7d|90d|1y|all";
 

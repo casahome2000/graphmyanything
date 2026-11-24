@@ -2,7 +2,7 @@
 
 ## Headline (defensible)
 
-> End-to-end (excl. tool defs), GMA lean is **288** tokens vs **658** file-Python (**56.2% fewer**), with **511**-token MCP schemas vs **248**-token file/shell harness schemas.
+> End-to-end (excl. tool defs), GMA lean is **288** tokens vs **658** file-Python (**56.2% fewer**), with **468**-token MCP schemas vs **248**-token file/shell harness schemas.
 
 **Best-case file Python (~167 tokens) is ~4× too low.** Measured **end-to-end** file flow (search → locate → schema → script → pip → run → **shared final answer**): **658** tokens (8.6 turns, 6.3 tool calls).
 
@@ -144,13 +144,13 @@
 
 | Bundle | Tools | Schema tokens (tools/list JSON) |
 |--------|-------|----------------------------------|
-| GraphMyAnything MCP | 5 | **511** |
+| GraphMyAnything MCP | 5 | **468** |
 | Python agent harness (representative) | 6 | **248** |
 
 | Flow | Excl. defs | + defs × turns | + defs once (cached) |
 |------|------------|----------------|----------------------|
 | Python file E2E cold | 658 | **2,791** | 906 |
-| GMA lean | 288 | **1,821** | 799 |
+| GMA lean | 288 | **1,692** | 756 |
 
 Prompt caching often discounts repeated tool schemas after turn 1; we show both **worst-case (× turns)** and **cached-once**.
 

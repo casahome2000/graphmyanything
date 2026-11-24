@@ -140,7 +140,7 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 **Caveats (read before citing):**
 
 - Modeled flows from [`e2e-flows.ts`](benchmarks/token-benchmark/e2e-flows.ts), not live agent traces — counts are reproducible via `npm run benchmark:tokens`.
-- MCP **tool schema overhead** **511** tokens (5 tools, `o200k`) vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
+- MCP **tool schema overhead** **468** tokens (5 tools, `o200k`) vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
 - **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — deliberate lower bound; citing without full E2E is misleading.
 
 A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.

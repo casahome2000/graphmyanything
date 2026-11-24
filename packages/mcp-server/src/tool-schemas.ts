@@ -1,10 +1,5 @@
 import { z } from "zod";
-import {
-  CHART_LABELS_DESCRIBE,
-  CHART_THEME_DESCRIBE,
-  CHART_TYPE_DESCRIBE,
-  RANGE_DESCRIBE,
-} from "./lib/chart-guide.js";
+import { RANGE_DESCRIBE } from "./lib/chart-guide.js";
 
 /** Zod shapes shared by MCP registration and schema validation tests. */
 export const trackToolArgsSchema = z.object({
@@ -46,7 +41,7 @@ export const chartToolArgsSchema = z.object({
 });
 
 export const FORGET_TOOL_DESCRIPTION =
-  "Delete points (metric req). Modes in usage-guide.";
+  "Delete points (metric required); see usage-guide.";
 
 export const forgetToolArgsSchema = z.object({
   metric: z.string(),
@@ -96,20 +91,11 @@ export const insightToolInputSchema = {
 export const chartToolInputSchema = {
   metric: z.string(),
   range: z.string().optional().describe(RANGE_DESCRIBE),
-  type: z.enum(["line", "bar", "area"]).optional().describe(CHART_TYPE_DESCRIBE),
-  theme: z.enum(["dark", "light"]).optional().describe(CHART_THEME_DESCRIBE),
-  labels: z
-    .enum(["none", "last", "extremes", "all"])
-    .optional()
-    .describe(CHART_LABELS_DESCRIBE),
-  share: z
-    .boolean()
-    .optional()
-    .describe("Hosted: include share URL (default true). share:false omits url."),
-  include_embed: z
-    .boolean()
-    .optional()
-    .describe("Hosted: embed URLs/snippets (default false)."),
+  type: z.enum(["line", "bar", "area"]).optional(),
+  theme: z.enum(["dark", "light"]).optional(),
+  labels: z.enum(["none", "last", "extremes", "all"]).optional(),
+  share: z.boolean().optional().describe("Hosted share url (default true)."),
+  include_embed: z.boolean().optional().describe("Hosted embed urls if true."),
 };
 
 export const forgetToolInputSchema = {

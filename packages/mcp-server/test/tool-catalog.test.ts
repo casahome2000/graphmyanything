@@ -18,14 +18,16 @@ describe("GMA_TOOL_CATALOG", () => {
     expect(gmaToolsListJson().length).toBeGreaterThan(100);
   });
 
-  it("keeps steering copy on chart enum fields", () => {
+  it("chart schema exposes share and include_embed", () => {
     const chart = GMA_TOOL_CATALOG.find((t) => t.name === "chart");
     const props = chart?.inputSchema.properties as Record<
       string,
       { description?: string; enum?: string[] }
     >;
-    expect(props.labels?.description).toMatch(/none\|last/);
+    expect(props.labels?.enum).toEqual(["none", "last", "extremes", "all"]);
     expect(props.type?.enum).toEqual(["line", "bar", "area"]);
+    expect(props.share?.description).toMatch(/share url/i);
+    expect(props.include_embed?.description).toMatch(/embed/i);
     expect(chart?.description).toMatch(/chart-guide/);
   });
 });

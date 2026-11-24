@@ -99,8 +99,8 @@ export async function startMcpServer(): Promise<void> {
   server.registerTool(
     "track",
     {
-      title: "Track metric",
-      description: "Upsert (metric,ts); written+replaced.",
+      title: "Track",
+      description: "Upsert by metric+ts; written/replaced counts.",
       inputSchema: trackToolInputSchema,
     },
     async (args) => {
@@ -114,8 +114,8 @@ export async function startMcpServer(): Promise<void> {
   server.registerTool(
     "query",
     {
-      title: "Query metric",
-      description: "Summary + optional LTTB pts.",
+      title: "Query",
+      description: "Summary + optional LTTB series.",
       inputSchema: queryToolInputSchema,
     },
     async (args) => {
@@ -129,8 +129,8 @@ export async function startMcpServer(): Promise<void> {
   server.registerTool(
     "insight",
     {
-      title: "Metric insight",
-      description: "Trend, MAD anomalies, naive forecast.",
+      title: "Insight",
+      description: "Trend, anomalies, naive forecast.",
       inputSchema: insightToolInputSchema,
     },
     async (args) => {
@@ -159,7 +159,7 @@ export async function startMcpServer(): Promise<void> {
   server.registerTool(
     "chart",
     {
-      title: "Render chart",
+      title: "Chart",
       description: CHART_TOOL_DESCRIPTION,
       inputSchema: chartToolInputSchema,
     },
