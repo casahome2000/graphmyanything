@@ -1,0 +1,25 @@
+name: facts-check
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  facts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install mcp-server deps
+        run: npm ci --prefix packages/mcp-server
+      - name: Install token-benchmark deps
+        run: npm ci --prefix benchmarks/token-benchmark
+      - name: Build MCP server
+        run: npm run build:mcp
+      - name: facts:check
+        run: npm run facts:check
+      - name: Test MCP server
+        run: npm test --prefix packages/mcp-server

@@ -1,6 +1,6 @@
 # graphmyanything-mcp
 
-**Build once. Ask forever.** One MCP call instead of throwaway Python — store metrics in SQLite and answer from history with **track**, **query**, **insight**, **forget**, and **chart**. After `sync`, `chart` returns share links at `https://graphmyanything.com/c/<id>`. **Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** 3 metrics, 10k points, 90-day reads, 3 share links; **Founding:** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
+**<!-- fact:copy.tagline -->Build once, ask forever.<!-- /fact -->** One MCP call instead of throwaway Python — store metrics in SQLite and answer from history with **track**, **query**, **insight**, **forget**, and **chart**. After `sync`, `chart` returns share links at `https://graphmyanything.com/c/<id>`. **Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** <!-- fact:plans.free.metrics -->3<!-- /fact --> metrics, <!-- fact:plans.free.points fmt:compactK -->10k<!-- /fact --> points, <!-- fact:plans.free.readDays -->90<!-- /fact -->-day reads, <!-- fact:plans.free.shareLinks -->3<!-- /fact --> share links; **Founding:** $<!-- fact:plans.founding.priceUsd -->49<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then $<!-- fact:plans.founding.thenMonthlyUsd -->9<!-- /fact -->/mo (auto-renews; cancel anytime).
 
 | Population (30y, dark) | Weight (4 points, light) |
 |---|---|
@@ -25,7 +25,7 @@ Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includ
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@0.2.3`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.3<!-- /fact -->`
 
 Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
 
@@ -67,7 +67,7 @@ Config: `~/.graphmyanything/config.json` (mode `0600`). API key env: `GRAPHMYANY
 }
 ```
 
-Pin a version (optional): `"graphmyanything-mcp@0.2.3"` as the second arg.
+Pin a version (optional): `"graphmyanything-mcp@<!-- fact:package.version -->0.2.3<!-- /fact -->"` as the second arg.
 
 ## Claude Desktop
 

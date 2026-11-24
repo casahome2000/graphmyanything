@@ -52,17 +52,17 @@ The key is returned once; later polls answer `authorization_pending` or `invalid
   "ok": true,
   "plan": "free",
   "limits": {
-    "metrics": 3,
-    "points": 10000,
-    "read_window_days": 90,
-    "live_links": 3,
+    "metrics": <!-- fact:plans.free.metrics -->3<!-- /fact -->,
+    "points": <!-- fact:plans.free.points -->10000<!-- /fact -->,
+    "read_window_days": <!-- fact:plans.free.readDays -->90<!-- /fact -->,
+    "live_links": <!-- fact:plans.free.shareLinks -->3<!-- /fact -->,
     "chart_wordmark": true
   },
   "usage": { "points": 42, "metrics": 3 }
 }
 ```
 
-**Founding** plans use higher limits (50 metrics, 1M points, full-history `read_window_days`, 100 live links). Billing at [graphmyanything.com](https://graphmyanything.com): **Free** as above; **Founding** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
+**Founding** plans use higher limits (<!-- fact:plans.founding.metrics -->50<!-- /fact --> metrics, <!-- fact:plans.founding.points fmt:int -->1,000,000<!-- /fact --> points, full-history `read_window_days`, <!-- fact:plans.founding.shareLinks -->100<!-- /fact --> live links). Billing at [graphmyanything.com](https://graphmyanything.com): **Free** as above; **Founding** $<!-- fact:plans.founding.priceUsd -->49<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then $<!-- fact:plans.founding.thenMonthlyUsd -->9<!-- /fact -->/mo (auto-renews; cancel anytime).
 
 ## Metrics
 

@@ -10,6 +10,8 @@
     "test:stripe": "npm test --prefix packages/stripe-mrr",
     "build:stripe": "npm run build --prefix packages/stripe-mrr",
     "benchmark:tokens": "npm run run --prefix benchmarks/token-benchmark",
-    "validation": "npm run build:mcp && npm run test:mcp && npm run benchmark:tokens"
+    "facts:check": "node scripts/facts.mjs --check",
+    "facts:write": "node scripts/facts.mjs --write",
+    "validation": "npm run build:mcp && npm run test:mcp && npm run benchmark:tokens && npm run facts:check"
   }
 }
