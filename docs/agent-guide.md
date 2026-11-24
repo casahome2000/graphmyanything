@@ -16,7 +16,7 @@ A condensed copy ships as the MCP resource **`usage-guide`** (`graphmyanything:/
 | **forget** | Delete point, range, or whole metric (`metric` always required) |
 | **query** | Terse numeric summary + optional LTTB downsampled `pts` within `token_budget` |
 | **insight** | Plain-English trend, MAD-based anomalies, naive linear forecast |
-| **chart** | 640×320 SVG on disk; `path` is local, `url` is always `null` today |
+| **chart** | 640×320 SVG; **hosted** (after `sync`): share `url` at `graphmyanything.com/c/<id>` + embeds; **local:** file `path` only |
 
 Every tool response includes **`tokens_estimate`** (JSON string length ÷ 4 — approximate, not a tokenizer count).
 

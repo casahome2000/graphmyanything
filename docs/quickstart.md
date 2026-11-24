@@ -30,6 +30,8 @@ npx -y graphmyanything-mcp@0.2.3 sync
 
 You will get a short code to enter at [graphmyanything.com/connect](https://graphmyanything.com/connect). After auth, metrics sync in batches and MCP tools use the hosted API for reads while **writes still mirror to local SQLite**.
 
+**Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** 3 metrics, 10k points, 90-day reads, 3 share links; **Founding:** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
+
 Other CLI commands:
 
 | Command | Purpose |

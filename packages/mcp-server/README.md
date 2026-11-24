@@ -1,6 +1,6 @@
 # graphmyanything-mcp
 
-**Build once. Ask forever.** One MCP call instead of throwaway Python — store metrics in SQLite and answer from history with **track**, **query**, **insight**, **forget**, and **chart**. After `sync`, hosted mode adds share links at [graphmyanything.com](https://graphmyanything.com) (`/c/<id>`); upgrade on the site for the **Founding** plan.
+**Build once. Ask forever.** One MCP call instead of throwaway Python — store metrics in SQLite and answer from history with **track**, **query**, **insight**, **forget**, and **chart**. After `sync`, `chart` returns share links at `https://graphmyanything.com/c/<id>`. **Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** 3 metrics, 10k points, 90-day reads, 3 share links; **Founding:** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
 
 | Population (30y, dark) | Weight (4 points, light) |
 |---|---|

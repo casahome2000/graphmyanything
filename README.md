@@ -6,6 +6,8 @@
 
 **Registry name:** `io.github.casahome2000/graphmyanything-mcp` · **License:** MIT
 
+**Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** 3 metrics, 10k points, 90-day reads, 3 share links; **Founding:** $49 for the first 12 months, then $9/mo (auto-renews; cancel anytime).
+
 ## Start here
 
 | Doc | Audience |
@@ -128,23 +130,23 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 |----------|--------|
 | Inline JSON + matplotlib in chat | **2,447** |
 | Python file off-context (E2E) | **658** |
-| **GMA lean** (`query` + `chart`, `points=auto`, `also_chart`) | **284** (**56.8% fewer** than file E2E) |
+| **GMA lean** (`query` + `chart`, `points=auto`, `also_chart`) | **344** (**47.7% fewer** than file E2E) |
 
-**30 warm sessions (per-session GMA lean 284):** file E2E warm cumulative **21,390** vs **GMA lean** **8,520** (**60.2% fewer**).
+**30 warm sessions (per-session GMA lean 344):** file E2E warm cumulative **21,390** vs **GMA lean** **10,320** (**51.8% fewer**).
 
-**Cost per 1,000 identical questions** (GPT-5.2 at $1.75/M input · $14/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **$6.00** vs GMA lean **$1.65**. Dollar lines scale linearly if your model’s per-token pricing differs.
+**Cost per 1,000 identical questions** (GPT-5.2 at $1.75/M input · $14/M output — see [`results.md`](benchmarks/token-benchmark/results.md)): file E2E cold **$6.00** vs GMA lean **$1.75**. Dollar lines scale linearly if your model’s per-token pricing differs.
 
 **Caveats (read before citing):**
 
 - Modeled flows from [`e2e-flows.ts`](benchmarks/token-benchmark/e2e-flows.ts), not live agent traces — counts are reproducible via `npm run benchmark:tokens`.
-- MCP **tool schema overhead** **349** tokens vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
+- MCP **tool schema overhead** **492** tokens (5 tools, `o200k`) vs **248** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
 - **Best-case** file Python (pre-cached script, no discovery) ≈ **167** tokens — deliberate lower bound; citing without full E2E is misleading.
 
 A script that already exists and needs no discovery can still be cheaper (~167 tokens); GraphMyAnything wins on the full workflow and on repeat questions.
 
 ## Hosted live charts
 
-Run `npx -y graphmyanything-mcp@latest sync` to link a free account. Your local history uploads, and `chart` then returns a live, unlisted link at `graphmyanything.com/c/<id>` (with `.svg` and `.png` embeds) that you can turn off any time. Pass `share: false` to keep a chart local.
+Run `npx -y graphmyanything-mcp@latest sync` to link a free account. Your local history uploads, and `chart` then returns a live share link at `https://graphmyanything.com/c/<id>` (with embed URLs for SVG/PNG) that you can turn off any time. Pass `share: false` to keep a chart local. Plan limits and billing: [graphmyanything.com](https://graphmyanything.com).
 
 ## Repo map
 

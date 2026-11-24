@@ -41,15 +41,20 @@ export function buildGmaPayloads(series: { ts: number; value: number }[]): GmaPa
     }),
   );
 
-  const chartPath = path.join(os.tmpdir(), "gma-bench-chart.svg");
-  const chartJson = JSON.stringify(
-    handleChart(db, {
-      metric: "stripe.mrr",
-      range: "90d",
-      type: "area",
-      theme: "dark",
-    }),
-  );
+  const localChart = handleChart(db, {
+    metric: "stripe.mrr",
+    range: "90d",
+    type: "area",
+    theme: "dark",
+  });
+  /** Hosted path (primary for launch): share URL + embeds; local path kept as backup. */
+  const chartJson = JSON.stringify({
+    path: localChart.path,
+    url: "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678",
+    embed_svg: "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678/svg",
+    embed_png: "https://graphmyanything.com/c/a1b2c3d4e5f6789012345678/png",
+    tokens_estimate: localChart.tokens_estimate,
+  });
 
   db.close();
   try {

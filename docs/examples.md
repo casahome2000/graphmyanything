@@ -1,6 +1,6 @@
 # GraphMyAnything — example prompts & tool calls
 
-Each example has a **user prompt**, the **tool call** (arguments matching the **0.2.1+** Zod schemas), and a **sample response** shape. Example JSON is validated in CI (`test/example-args.test.ts`).
+Each example has a **user prompt**, the **tool call** (arguments matching the **0.2.3** Zod schemas), and a **sample response** shape. Example JSON is validated in CI (`test/example-args.test.ts`).
 
 Tools: `track`, `forget`, `query`, `insight`, `chart`. All successful responses include `tokens_estimate` (JSON length ÷ 4, approximate).
 
