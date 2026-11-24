@@ -114,8 +114,9 @@ export function measureCanonicalFacts(): {
   listTokens: number;
   benchmark: CanonicalBenchmark;
 } {
+  /** Fixed epoch — payloads must not depend on wall clock. */
   const series = Array.from({ length: ASSUMPTIONS.pointCount }, (_, i) => {
-    const now = Math.floor(Date.now() / 1000);
+    const now = 1_700_000_000;
     return {
       ts: now - (ASSUMPTIONS.pointCount - 1 - i) * 86400,
       value: Math.round(65_000 + i * 95 + Math.sin(i / 12) * 1_200),

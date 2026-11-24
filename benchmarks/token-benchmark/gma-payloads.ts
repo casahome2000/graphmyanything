@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { openDatabase, insertPoints } from "../../packages/mcp-server/src/db.js";
 import { handleChart, handleQuery } from "../../packages/mcp-server/src/tools/handlers.js";
@@ -13,11 +12,20 @@ export type GmaPayloadSet = {
   chartWithEmbed: string;
 };
 
+/** Stable paths/timestamps so o200k counts match across CI and dev machines. */
+const BENCH_CHARTS_DIR = "/var/tmp/gma-benchmark/charts";
+const BENCH_DB_PATH = "/var/tmp/gma-benchmark/bench.sqlite";
+const BENCH_CHART_MS = 1_700_000_000_000;
+
 export function buildGmaPayloads(series: { ts: number; value: number }[]): GmaPayloadSet {
-  const dbPath = path.join(
-    os.tmpdir(),
-    `gma-bench-${process.pid}-${Date.now()}.db`,
-  );
+  const prevChartsDir = process.env.GRAPHMYANYTHING_CHARTS_DIR;
+  const prevDbPath = process.env.GRAPHMYANYTHING_DB_PATH;
+  process.env.GRAPHMYANYTHING_CHARTS_DIR = BENCH_CHARTS_DIR;
+  process.env.GRAPHMYANYTHING_DB_PATH = BENCH_DB_PATH;
+
+  const dbPath = BENCH_DB_PATH;
+  const dateNow = Date.now;
+  Date.now = () => BENCH_CHART_MS;
   const db = openDatabase(dbPath);
   insertPoints(
     db,
@@ -70,6 +78,12 @@ export function buildGmaPayloads(series: { ts: number; value: number }[]): GmaPa
   } catch {
     /* ok */
   }
+
+  Date.now = dateNow;
+  if (prevChartsDir === undefined) delete process.env.GRAPHMYANYTHING_CHARTS_DIR;
+  else process.env.GRAPHMYANYTHING_CHARTS_DIR = prevChartsDir;
+  if (prevDbPath === undefined) delete process.env.GRAPHMYANYTHING_DB_PATH;
+  else process.env.GRAPHMYANYTHING_DB_PATH = prevDbPath;
 
   return { leanQuery, fullQuery, chart: chartJson, chartWithEmbed };
 }
