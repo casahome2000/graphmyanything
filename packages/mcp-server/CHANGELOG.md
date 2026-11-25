@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.2.5)
+## 0.2.5 — 2026-11-25
 
 - **TTY stdio hint:** when the MCP server starts on a TTY, one stderr line points at [docs](https://graphmyanything.com/docs) (stdout stays clean for MCP framing).
 - **CLI:** `--version` / `-v`, **`doctor`** and **`--self-test`** (Node 22.13+, masked credentials check, hosted API reachability).
