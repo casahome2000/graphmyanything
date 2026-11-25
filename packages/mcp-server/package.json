@@ -1,6 +1,6 @@
 {
   "name": "graphmyanything-mcp",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Build once, ask forever. Chart & metric memory for AI agents: track, query, insight, forget, chart.",
   "homepage": "https://graphmyanything.com",
   "license": "MIT",
