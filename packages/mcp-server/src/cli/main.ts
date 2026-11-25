@@ -1,11 +1,19 @@
 import { runCharts } from "./charts.js";
 import { runLocal } from "./local.js";
 import { runLogout } from "./logout.js";
+import { runSelfTest } from "./self-test.js";
 import { runStatus } from "./status.js";
 import { runSync } from "./sync.js";
 import { isHelpFlag, printCommandHelp, printRootHelp } from "./usage.js";
 
-const COMMANDS = new Set(["sync", "status", "local", "logout", "charts"]);
+const COMMANDS = new Set([
+  "sync",
+  "status",
+  "local",
+  "logout",
+  "charts",
+  "doctor",
+]);
 
 export async function runCli(argv = process.argv): Promise<boolean> {
   const cmd = argv[2];
@@ -35,6 +43,9 @@ export async function runCli(argv = process.argv): Promise<boolean> {
       break;
     case "charts":
       code = runCharts();
+      break;
+    case "doctor":
+      code = await runSelfTest();
       break;
     default:
       return false;

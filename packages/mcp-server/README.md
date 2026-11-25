@@ -50,7 +50,15 @@ npx graphmyanything-mcp local   # force local mode
 npx graphmyanything-mcp logout
 ```
 
-Config: `~/.graphmyanything/config.json` (mode `0600`). API key env: `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY`. See [hosted API](https://github.com/casahome2000/graphmyanything/blob/master/docs/hosted-api.md).
+Credentials: `~/.graphmyanything/credentials.json` (file mode `0600`, includes a `_warning` field). Legacy `config.json` is still read. API key env: `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY`.
+
+**Preflight:** `npx graphmyanything-mcp doctor` (or `--self-test`) checks Node, saved credentials (masked), and API reachability. **`--version`** / **`-v`** print the package version.
+
+When you run the server on a TTY (not piped stdio), it prints one line on **stderr** with a link to [graphmyanything.com/docs](https://graphmyanything.com/docs).
+
+**Troubleshooting `spawn npx ENOENT`:** your MCP host cannot find `npx` on `PATH`. Install Node.js 22.13+, restart the client, or set `command` to the absolute path from `which npx` (same `args` as today).
+
+See [hosted API](https://github.com/casahome2000/graphmyanything/blob/master/docs/hosted-api.md).
 
 ## Cursor
 

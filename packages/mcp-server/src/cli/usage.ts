@@ -6,13 +6,18 @@ export function isHelpFlag(arg: string | undefined): boolean {
   return arg === "--help" || arg === "-h";
 }
 
+export function isVersionFlag(arg: string | undefined): boolean {
+  if (!arg) return false;
+  return arg === "--version" || arg === "-v";
+}
+
 const ENV_BLOCK = `Environment:
   GRAPHMYANYTHING_API_KEY   Hosted API key (Bearer). Alias: GMA_API_KEY
   GMA_API_KEY               Same as GRAPHMYANYTHING_API_KEY
   GRAPHMYANYTHING_API_BASE  API base (default ${SITE}/api/v1)
   GRAPHMYANYTHING_MODE      Set to "local" to force local MCP tools
   GRAPHMYANYTHING_DB_PATH   SQLite metrics DB (default ~/.graphmyanything/metrics.db)
-  GRAPHMYANYTHING_CONFIG_PATH  Config JSON (default ~/.graphmyanything/config.json)
+  GRAPHMYANYTHING_CONFIG_PATH  Credentials JSON (default ~/.graphmyanything/credentials.json)
   GRAPHMYANYTHING_CHARTS_DIR   Chart SVG output directory`;
 
 export function printRootHelp(): void {
@@ -25,8 +30,11 @@ Usage:
   graphmyanything-mcp local           Force local-only mode in config
   graphmyanything-mcp logout          Clear saved API key
   graphmyanything-mcp charts          List recent chart SVG paths
+  graphmyanything-mcp doctor          Node, credentials, and hosted API checks
 
   graphmyanything-mcp --help
+  graphmyanything-mcp -v, --version   Print package version
+  graphmyanything-mcp --self-test     Same checks as doctor
   graphmyanything-mcp <command> --help
 
 ${ENV_BLOCK}
@@ -88,6 +96,17 @@ Usage:
 
 Usage:
   graphmyanything-mcp charts [--help]
+
+${ENV_BLOCK}
+`,
+
+  doctor: `graphmyanything-mcp doctor — Preflight for local install
+
+Checks Node.js version, whether an API key is saved (masked), and hosted API reachability.
+
+Usage:
+  graphmyanything-mcp doctor [--help]
+  graphmyanything-mcp --self-test
 
 ${ENV_BLOCK}
 `,
