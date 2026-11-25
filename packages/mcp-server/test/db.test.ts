@@ -52,17 +52,17 @@ describe("upsertPoints", () => {
 
   it("replaces same metric+ts instead of duplicating", () => {
     const db = openDatabase(dbPath);
-    const first = upsertPoints(db, "health.weight.lb", [
-      { ts: 1732147200, value: 183.0, tags: {} },
+    const first = upsertPoints(db, "github.stars.modelcontextprotocol.servers", [
+      { ts: 1732147200, value: 92_100, tags: {} },
     ]);
     expect(first).toEqual({ written: 1, replaced: 0 });
 
-    const second = upsertPoints(db, "health.weight.lb", [
-      { ts: 1732147200, value: 181.9, tags: { note: "fix" } },
+    const second = upsertPoints(db, "github.stars.modelcontextprotocol.servers", [
+      { ts: 1732147200, value: 92_180, tags: { note: "fix" } },
     ]);
     expect(second).toEqual({ written: 0, replaced: 1 });
-    expect(queryPoints(db, "health.weight.lb")).toHaveLength(1);
-    expect(queryPoints(db, "health.weight.lb")[0].value).toBe(181.9);
+    expect(queryPoints(db, "github.stars.modelcontextprotocol.servers")).toHaveLength(1);
+    expect(queryPoints(db, "github.stars.modelcontextprotocol.servers")[0].value).toBe(92_180);
     db.close();
     fs.unlinkSync(dbPath);
   });

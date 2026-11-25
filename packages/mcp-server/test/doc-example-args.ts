@@ -1,20 +1,39 @@
 /**
  * Example tool arguments documented in docs/examples.md — validated in example-args.test.ts.
  */
+import {
+  GITHUB_STARS_CURRENT,
+  GITHUB_STARS_METRIC,
+  githubStarsBackfill14,
+} from "./demo-github-stars.js";
+
 export type DocExample = {
   id: string;
   tool: "track" | "query" | "insight" | "chart" | "forget";
   arguments: Record<string, unknown>;
 };
 
+const starsBackfill = githubStarsBackfill14();
+const correctionTs = starsBackfill[starsBackfill.length - 2]!.ts;
+const forgetTs = starsBackfill[starsBackfill.length - 3]!.ts;
+
 export const DOC_EXAMPLE_TOOL_CALLS: DocExample[] = [
   {
-    id: "daily-weight",
+    id: "github-stars-backfill",
     tool: "track",
     arguments: {
-      metric: "health.weight.lb",
-      value: 182.4,
-      tags: { source: "scale" },
+      metric: GITHUB_STARS_METRIC,
+      points: starsBackfill,
+      tags: { source: "github", repo: "modelcontextprotocol/servers" },
+    },
+  },
+  {
+    id: "github-stars-daily",
+    tool: "track",
+    arguments: {
+      metric: GITHUB_STARS_METRIC,
+      value: GITHUB_STARS_CURRENT,
+      tags: { source: "github" },
     },
   },
   {
@@ -61,11 +80,11 @@ export const DOC_EXAMPLE_TOOL_CALLS: DocExample[] = [
     },
   },
   {
-    id: "weight-trend-insight",
+    id: "github-stars-insight",
     tool: "insight",
     arguments: {
-      metric: "health.weight.lb",
-      range: "90d",
+      metric: GITHUB_STARS_METRIC,
+      range: "14d",
     },
   },
   {
@@ -80,30 +99,30 @@ export const DOC_EXAMPLE_TOOL_CALLS: DocExample[] = [
     },
   },
   {
-    id: "weight-range-query",
+    id: "github-stars-query",
     tool: "query",
     arguments: {
-      metric: "health.weight.lb",
-      range: "7d",
+      metric: GITHUB_STARS_METRIC,
+      range: "14d",
       token_budget: 250,
       points: 12,
     },
   },
   {
-    id: "weight-correction-upsert",
+    id: "github-stars-correction",
     tool: "track",
     arguments: {
-      metric: "health.weight.lb",
-      points: [{ ts: 1732147200, value: 181.9 }],
-      tags: { note: "corrected misread" },
+      metric: GITHUB_STARS_METRIC,
+      points: [{ ts: correctionTs, value: 91_870 }],
+      tags: { note: "corrected API snapshot" },
     },
   },
   {
     id: "forget-point",
     tool: "forget",
     arguments: {
-      metric: "health.weight.lb",
-      ts: 1731888000,
+      metric: GITHUB_STARS_METRIC,
+      ts: forgetTs,
     },
   },
   {

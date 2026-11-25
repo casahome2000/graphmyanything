@@ -2,9 +2,9 @@
 
 **<!-- fact:copy.headline -->Build once. Ask forever.<!-- /fact -->** One MCP call instead of throwaway Python — store metrics in SQLite and answer from history with **track**, **query**, **insight**, **forget**, and **chart**. After `sync`, `chart` returns share links at `https://graphmyanything.com/c/<id>`. **Pricing:** [graphmyanything.com](https://graphmyanything.com) — **Free:** <!-- fact:plans.free.metrics -->3<!-- /fact --> metrics, <!-- fact:plans.free.points fmt:compactK -->10k<!-- /fact --> points, <!-- fact:plans.free.readDays -->90<!-- /fact -->-day reads, <!-- fact:plans.free.shareLinks -->3<!-- /fact --> share links; **Founding:** <!-- fact:plans.founding.priceUsd fmt:usd0 -->$49<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then <!-- fact:plans.founding.thenMonthlyUsd fmt:usd0 -->$9<!-- /fact -->/mo (auto-renews; cancel anytime).
 
-| Population (30y, dark) | Weight (4 points, light) |
+| Population (30y, dark) | GitHub stars (4 points, light) |
 |---|---|
-| ![30-year population chart](./docs/sample-population-30y-dark.png) | ![Weight trend chart](./docs/sample-weight-4pt-light.png) |
+| ![30-year population chart](./docs/sample-population-30y-dark.png) | ![GitHub stars chart](./docs/sample-github-stars-4pt-light.png) |
 
 Charts include **x-axis date/time ticks**, **hover tooltips** on markers (open the SVG in a browser), and by default a single **end-value label** (`labels: last`). Every tool response includes `tokens_estimate` (payload size ÷ 4, approximate).
 

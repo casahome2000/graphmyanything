@@ -115,11 +115,11 @@ The image sets `GRAPHMYANYTHING_DB_PATH=/data/metrics.db`. It installs `graphmya
 
 After the server shows up in your client's MCP list, try:
 
-> Track my weight as 182.4 lb in metric `health.weight.lb`, then query the last 7 days and chart it with a dark line chart.
+> Backfill the last 14 days of GitHub stars for `modelcontextprotocol/servers` into metric `github.stars.modelcontextprotocol.servers` (illustrative daily counts), then query `14d` and chart with a dark line chart.
 
 **What you should see**
 
-1. **`track`** — JSON like `{"ok":true,"metric":"health.weight.lb","written":1,"replaced":0,"tokens_estimate":…}` (upserts on same `metric` + `ts`).
+1. **`track`** — JSON like `{"ok":true,"metric":"github.stars.modelcontextprotocol.servers","written":14,"replaced":0,"tokens_estimate":…}` (upserts on same `metric` + `ts`).
 2. **`query`** — terse stats (`s.l`, `s.mn`, `s.tr`, …) and maybe downsampled `pts` depending on budget.
 3. **`chart`** — local mode: `path` to an SVG file. After **`sync`**: share `url` like `https://graphmyanything.com/c/<hex-id>` by default; pass `include_embed: true` when you need embed URLs (`…/svg`, `…/png`). Share pages show **hover tooltips** on markers in the browser.
 
