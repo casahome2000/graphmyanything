@@ -28,7 +28,6 @@ import {
   type ToolRuntime,
 } from "./tools/runtime.js";
 
-import { maybePrintMcpTtyHint } from "./lib/stdio-hint.js";
 import { PACKAGE_VERSION } from "./version.js";
 
 export async function startMcpServer(): Promise<void> {
@@ -172,7 +171,6 @@ export async function startMcpServer(): Promise<void> {
     },
   );
 
-  maybePrintMcpTtyHint();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

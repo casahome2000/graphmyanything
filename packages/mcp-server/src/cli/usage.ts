@@ -11,6 +11,10 @@ export function isVersionFlag(arg: string | undefined): boolean {
   return arg === "--version" || arg === "-v";
 }
 
+export function isStdioFlag(arg: string | undefined): boolean {
+  return arg === "--stdio";
+}
+
 const ENV_BLOCK = `Environment:
   GRAPHMYANYTHING_API_KEY   Hosted API key (Bearer). Alias: GMA_API_KEY
   GMA_API_KEY               Same as GRAPHMYANYTHING_API_KEY
@@ -24,7 +28,8 @@ export function printRootHelp(): void {
   const text = `graphmyanything-mcp — Metric memory MCP server (stdio) or CLI
 
 Usage:
-  graphmyanything-mcp                 Start MCP server on stdio (default)
+  graphmyanything-mcp                 Installed check on a TTY; MCP stdio when piped
+  graphmyanything-mcp --stdio         Force MCP stdio server (e.g. manual testing on a TTY)
   graphmyanything-mcp sync            Link device + upload local SQLite to hosted
   graphmyanything-mcp status          Mode, paths, and hosted account summary
   graphmyanything-mcp local           Force local-only mode in config
@@ -35,6 +40,7 @@ Usage:
   graphmyanything-mcp --help
   graphmyanything-mcp -v, --version   Print package version
   graphmyanything-mcp --self-test     Same checks as doctor
+  graphmyanything-mcp --stdio         Run MCP on stdio even when stdin is a TTY
   graphmyanything-mcp <command> --help
 
 ${ENV_BLOCK}
@@ -46,6 +52,7 @@ Examples:
   npx graphmyanything-mcp sync
   GMA_API_KEY=gma_… npx graphmyanything-mcp status
   npx -y graphmyanything-mcp@latest
+  npx graphmyanything-mcp --stdio   # manual MCP stdio test on a TTY
 `;
   process.stdout.write(text);
 }

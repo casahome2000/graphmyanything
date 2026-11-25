@@ -2,7 +2,9 @@
 import { runCli } from "./cli/main.js";
 import { runSelfTest } from "./cli/self-test.js";
 import { isVersionFlag } from "./cli/usage.js";
+import { hasStdioFlag, shouldStartMcpServer } from "./lib/entry-routing.js";
 import { redactSecretsInText } from "./lib/mask-secret.js";
+import { printTtyBareInstallCheck } from "./lib/tty-bare-install.js";
 import { PACKAGE_VERSION } from "./version.js";
 
 async function main(): Promise<void> {
@@ -14,7 +16,15 @@ async function main(): Promise<void> {
   if (arg === "--self-test") {
     process.exit(await runSelfTest());
   }
-  if (await runCli()) return;
+  const cliHandled = await runCli();
+  if (cliHandled) return;
+  const stdioFlag = hasStdioFlag();
+  if (
+    !shouldStartMcpServer(Boolean(process.stdin.isTTY), stdioFlag, false)
+  ) {
+    printTtyBareInstallCheck();
+    return;
+  }
   const { startMcpServer } = await import("./mcp-server.js");
   await startMcpServer();
 }

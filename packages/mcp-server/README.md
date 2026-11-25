@@ -54,7 +54,7 @@ Credentials: `~/.graphmyanything/credentials.json` (file mode `0600`, includes a
 
 **Preflight:** `npx graphmyanything-mcp doctor` (or `--self-test`) checks Node, saved credentials (masked), and API reachability. **`--version`** / **`-v`** print the package version.
 
-When you run the server on a TTY (not piped stdio), it prints one line on **stderr** with a link to [graphmyanything.com/docs](https://graphmyanything.com/docs).
+When you run `graphmyanything-mcp` on a **TTY** (not launched by a client), it prints a short install check on **stderr** and **exits** — it does not hang waiting for MCP traffic. Your IDE launches the same command with **piped stdio**, which starts the server. Use **`--stdio`** to force server mode in a terminal for manual testing. Quickstart: [graphmyanything.com/docs/quickstart](https://graphmyanything.com/docs/quickstart).
 
 **Troubleshooting `spawn npx ENOENT`:** your MCP host cannot find `npx` on `PATH`. Install Node.js 22.13+, restart the client, or set `command` to the absolute path from `which npx` (same `args` as today).
 

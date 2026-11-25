@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased (0.2.6)
+
+- **TTY bare run:** `graphmyanything-mcp` on a terminal prints install/version/Node check and quickstart link on **stderr**, then **exits 0** (no hung stdio wait). MCP clients still use piped stdio; **`--stdio`** forces server mode on a TTY for manual testing.
+
 ## 0.2.5 — 2026-11-25
 
 - **TTY stdio hint:** when the MCP server starts on a TTY, one stderr line points at [docs](https://graphmyanything.com/docs) (stdout stays clean for MCP framing).
