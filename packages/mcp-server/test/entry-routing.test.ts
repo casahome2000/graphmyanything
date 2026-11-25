@@ -77,7 +77,7 @@ describe("entry spawn", () => {
 
   it("TTY bare run prints check and exits 0", () => {
     const out = path.join(os.tmpdir(), `gma-tty-${Date.now()}.txt`);
-  const r = spawnSync("script", ["-q", "-c", `${process.execPath} ${serverJs}`, out], {
+    const r = spawnSync("script", ["-q", "-c", `${process.execPath} ${serverJs}`, out], {
       encoding: "utf8",
       env: mcpSpawnEnv(),
     });
