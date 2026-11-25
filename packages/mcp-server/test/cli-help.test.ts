@@ -25,6 +25,18 @@ describe("CLI --help", () => {
     if (build.status !== 0) throw new Error("build failed");
   });
 
+  it("graphmyanything-mcp --version prints version and exits 0", () => {
+    const { stdout, status } = runHelp(["--version"]);
+    expect(status).toBe(0);
+    expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it("graphmyanything-mcp -v prints version and exits 0", () => {
+    const { stdout, status } = runHelp(["-v"]);
+    expect(status).toBe(0);
+    expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
   it("graphmyanything-mcp --help exits 0 with usage", () => {
     const { status, stdout } = runHelp(["--help"]);
     expect(status).toBe(0);
@@ -33,6 +45,7 @@ describe("CLI --help", () => {
     expect(stdout).toMatch(/GMA_API_KEY/);
     expect(stdout).toMatch(/GRAPHMYANYTHING_API_KEY/);
     expect(stdout).toMatch(/graphmyanything\.com/);
+    expect(stdout).toMatch(/--version/);
   });
 
   it("graphmyanything-mcp sync --help exits 0", () => {

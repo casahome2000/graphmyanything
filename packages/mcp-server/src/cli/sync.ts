@@ -5,6 +5,7 @@ import {
   totalPointCount,
 } from "../db.js";
 import { readConfig, writeConfig } from "../config.js";
+import { redactSecretsInText } from "../lib/mask-secret.js";
 import { resolveApiKey } from "../mode.js";
 
 const BATCH = 1000;
@@ -83,7 +84,7 @@ export async function runSync(): Promise<number> {
       db.close();
       const msg = e instanceof Error ? e.message : String(e);
       console.error(
-        `Upload stopped after ${uploaded}/${total} points: ${msg}\n` +
+        `Upload stopped after ${uploaded}/${total} points: ${redactSecretsInText(msg)}\n` +
           "Your API key is saved; run `graphmyanything-mcp sync` again to resume.",
       );
       return 1;

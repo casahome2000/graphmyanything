@@ -1,3 +1,5 @@
+import { redactSecretsInText } from "../lib/mask-secret.js";
+
 export const DEFAULT_API_BASE = "https://graphmyanything.com/api/v1";
 
 export function resolveApiBase(): string {
@@ -59,7 +61,7 @@ export class HostedClient {
         typeof (body as { error: unknown }).error === "string"
           ? (body as { error: string }).error
           : `HTTP ${res.status}`;
-      throw new HostedApiError(msg, res.status, body);
+      throw new HostedApiError(redactSecretsInText(msg), res.status, body);
     }
     return body as T;
   }
@@ -113,7 +115,11 @@ export class HostedClient {
     if (err === "expired_token" || err === "invalid_grant") {
       return { status: "expired" };
     }
-    throw new HostedApiError(err || `HTTP ${res.status}`, res.status, body);
+    throw new HostedApiError(
+      redactSecretsInText(err || `HTTP ${res.status}`),
+      res.status,
+      body,
+    );
   }
 
   async getAccount(): Promise<{

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased (0.2.5)
+
+- **TTY stdio hint:** when the MCP server starts on a TTY, one stderr line points at [docs](https://graphmyanything.com/docs) (stdout stays clean for MCP framing).
+- **CLI:** `--version` / `-v`, **`doctor`** and **`--self-test`** (Node 22.13+, masked credentials check, hosted API reachability).
+- **Credentials:** default file `~/.graphmyanything/credentials.json` (0600, `_warning` field); still reads legacy `config.json`.
+- **Secrets:** API keys are redacted in CLI errors (last 4 only in doctor output).
+- **Docs:** troubleshooting for `spawn npx ENOENT`.
+
 ## 0.2.4 — 2026-11-24
 
 - Docs-only: npm README sample chart and built-in **usage-guide** use the GitHub stars example (`github.stars.modelcontextprotocol.servers`) instead of `health.weight.lb`.

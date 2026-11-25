@@ -1,4 +1,5 @@
 import { HostedClient } from "../hosted/client.js";
+import { redactSecretsInText } from "../lib/mask-secret.js";
 import { readConfig, resolveConfigPath } from "../config.js";
 import { resolveApiKey, resolveMode } from "../mode.js";
 import { openDatabase, totalPointCount } from "../db.js";
@@ -32,7 +33,7 @@ export async function runStatus(): Promise<number> {
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.error(`Could not reach GraphMyAnything API: ${msg}`);
+      console.error(`Could not reach GraphMyAnything API: ${redactSecretsInText(msg)}`);
       return 1;
     }
   } else {

@@ -28,7 +28,8 @@ import {
   type ToolRuntime,
 } from "./tools/runtime.js";
 
-const PACKAGE_VERSION = "0.2.4";
+import { maybePrintMcpTtyHint } from "./lib/stdio-hint.js";
+import { PACKAGE_VERSION } from "./version.js";
 
 export async function startMcpServer(): Promise<void> {
   const db = openDatabase();
@@ -171,6 +172,7 @@ export async function startMcpServer(): Promise<void> {
     },
   );
 
+  maybePrintMcpTtyHint();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

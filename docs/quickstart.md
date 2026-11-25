@@ -40,6 +40,8 @@ Other CLI commands:
 | `local` | Prefer local mode (keeps saved API key) |
 | `logout` | Remove API key from config |
 | `charts` | List recent local SVG chart files |
+| `doctor` | Node version, credentials (masked), API reachability |
+| `--version` / `-v` | Print installed package version |
 
 Force local mode in an MCP session: `GRAPHMYANYTHING_MODE=local`. Use `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY` for CI without writing config.
 
@@ -154,6 +156,24 @@ The server's **initialize** response includes a short instruction to read those 
 2. **Restart** the MCP server / reload MCP in the client (`@latest` picks up npm on the next process start).
 
 There is no in-process upgrade; each client spawn runs `npx` again.
+
+## Troubleshooting
+
+### MCP host shows `spawn npx ENOENT`
+
+The IDE could not find `npx` on its `PATH` (common right after installing Node, before a client restart).
+
+1. Install **Node.js 22.13+** and confirm `npx -y graphmyanything-mcp@latest --version` works in a terminal.
+2. **Restart** the MCP client (Cursor, Claude Desktop, VS Code, etc.) so it picks up your shell `PATH`.
+3. If it still fails, point `command` at the absolute `npx` path from `which npx` (keep the same `args`, e.g. `["-y", "graphmyanything-mcp@latest"]`).
+
+### Server seems idle with no output
+
+When stdin is a **TTY** (you ran `npx graphmyanything-mcp` in a terminal), the server prints one line on **stderr** with a link to [graphmyanything.com/docs](https://graphmyanything.com/docs) and waits for an MCP client. Piped stdio (normal IDE launch) stays silent on stderr so MCP JSON framing is not disturbed.
+
+### Hosted sign-in
+
+Saved keys live in `~/.graphmyanything/credentials.json` (mode `0600`). Legacy `~/.graphmyanything/config.json` is still read. Run `graphmyanything-mcp doctor` to verify Node, credentials (masked), and API reachability.
 
 ## Next steps
 

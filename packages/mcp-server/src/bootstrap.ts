@@ -1,12 +1,12 @@
 /** Fail fast before `node:sqlite` when Node is too old. */
-const MIN_NODE = { major: 22, minor: 13, patch: 0 };
+export const MIN_NODE = { major: 22, minor: 13, patch: 0 };
 
-function parseNodeVersion(raw: string): { major: number; minor: number; patch: number } {
+export function parseNodeVersion(raw: string): { major: number; minor: number; patch: number } {
   const [major, minor, patch] = raw.split(".").map((n) => Number.parseInt(n, 10) || 0);
   return { major, minor, patch };
 }
 
-function nodeTooOld(current: string): boolean {
+export function nodeTooOld(current: string): boolean {
   const v = parseNodeVersion(current);
   if (v.major !== MIN_NODE.major) return v.major < MIN_NODE.major;
   if (v.minor !== MIN_NODE.minor) return v.minor < MIN_NODE.minor;
