@@ -27,7 +27,7 @@ Every tool response includes **`tokens_estimate`** (JSON string length ÷ 4 — 
 **Do track when:**
 
 - The user will ask again about this number or series.
-- The value is part of a **time series** (daily MRR, weight, fleet count, test pass rate).
+- The value is part of a **time series** (daily MRR, GitHub stars, fleet count, test pass rate).
 - Fetching it is **slow, rate-limited, or expensive** (Stripe dashboard, census tables, custom APIs).
 - You've **already researched** a public series once (population, stock close) and want recall without repeating work.
 
@@ -39,7 +39,7 @@ Every tool response includes **`tokens_estimate`** (JSON string length ÷ 4 — 
 
 **Naming:** Prefer dotted paths with an optional unit suffix:
 
-- `health.weight.lb`
+- `github.stars.modelcontextprotocol.servers`
 - `stripe.mrr.usd`
 - `geo.plano_tx.population`
 - `app.api.p99_latency.ms`

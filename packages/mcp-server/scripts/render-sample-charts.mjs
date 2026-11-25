@@ -33,13 +33,13 @@ function populationSeries() {
   }));
 }
 
-function weightSeries() {
+function githubStarsSeries() {
   const base = Date.UTC(2025, 0, 6) / 1000;
   return [
-    { ts: base, value: 182.4 },
-    { ts: base + 7 * 86_400, value: 181.1 },
-    { ts: base + 14 * 86_400, value: 180.6 },
-    { ts: base + 21 * 86_400, value: 179.8 },
+    { ts: base, value: 92_120 },
+    { ts: base + 7 * 86_400, value: 92_155 },
+    { ts: base + 14 * 86_400, value: 92_190 },
+    { ts: base + 21 * 86_400, value: 92_228 },
   ];
 }
 
@@ -51,9 +51,9 @@ const specs = [
     type: "line",
   },
   {
-    name: "sample-weight-4pt",
-    metric: "health.weight.lb",
-    points: weightSeries(),
+    name: "sample-github-stars-4pt",
+    metric: "github.stars.modelcontextprotocol.servers",
+    points: githubStarsSeries(),
     type: "line",
   },
 ];

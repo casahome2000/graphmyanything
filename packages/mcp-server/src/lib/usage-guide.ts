@@ -6,7 +6,7 @@ export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, 
 ## Track (store / upsert)
 - **Do:** numbers you will chart or compare again; anything over time; costly-to-fetch data.
 - **Don't:** one-off constants, secrets, raw PII you would not store in a local log.
-- **Names:** \`namespace.metric.unit\` (e.g. \`health.weight.lb\`). Use \`tags\` for dimensions.
+- **Names:** \`namespace.metric.unit\` (e.g. \`github.stars.modelcontextprotocol.servers\`). Use \`tags\` for dimensions.
 - **Upsert:** \`track\` replaces an existing row with the same **metric + ts\` (returns \`written\` / \`replaced\`). Re-track at the same timestamp to correct a value.
 - **Backfill:** \`points[]\` with \`ts\`; then single \`value\` for incremental days.
 

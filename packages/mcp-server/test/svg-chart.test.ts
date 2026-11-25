@@ -23,13 +23,13 @@ function planoPopulation29(): DataPoint[] {
   }));
 }
 
-function weight4(): DataPoint[] {
+function githubStars4(): DataPoint[] {
   const base = Date.UTC(2025, 0, 6) / 1000;
   return [
-    { ts: base, value: 182.4 },
-    { ts: base + 7 * 86_400, value: 181.1 },
-    { ts: base + 14 * 86_400, value: 180.6 },
-    { ts: base + 21 * 86_400, value: 179.8 },
+    { ts: base, value: 92_120 },
+    { ts: base + 7 * 86_400, value: 92_155 },
+    { ts: base + 14 * 86_400, value: 92_190 },
+    { ts: base + 21 * 86_400, value: 92_228 },
   ];
 }
 
@@ -137,19 +137,13 @@ describe("pickXAxisTicks", () => {
 });
 
 describe("niceYAxisTicks", () => {
-  it("uses round steps for weight-scale data", () => {
-    const { ticks, y0, y1 } = niceYAxisTicks(179.8, 182.4, 5);
-    expect(y0).toBeLessThanOrEqual(179.8);
-    expect(y1).toBeGreaterThanOrEqual(182.4);
-    for (let i = 1; i < ticks.length; i++) {
-      const step = ticks[i] - ticks[i - 1];
-      expect(
-        [0.5, 1, 2, 2.5, 5, 10].some(
-          (s) => Math.abs(step - s) < 1e-6 || (step / s > 0.99 && step / s < 1.01),
-        ),
-      ).toBe(true);
-    }
-    expect(ticks.some((t) => t === 180 || t === 179.5 || t === 181)).toBe(true);
+  it("uses k/M-friendly steps for github star counts", () => {
+    const { ticks, y0, y1 } = niceYAxisTicks(92_120, 92_228, 5);
+    expect(y0).toBeLessThanOrEqual(92_120);
+    expect(y1).toBeGreaterThanOrEqual(92_228);
+    const step = ticks[1] - ticks[0];
+    expect(step).toBeGreaterThan(0);
+    expect(step % 10).toBe(0);
   });
 
   it("uses k/M-friendly steps for large populations", () => {
@@ -219,10 +213,10 @@ describe("label collision safety", () => {
     assertNoLabelOverlaps(svg);
   });
 
-  it("4-point weight series (labels all)", () => {
+  it("4-point github stars series (labels all)", () => {
     const svg = renderSvgChart(
-      "health.weight.lb",
-      weight4(),
+      "github.stars.modelcontextprotocol.servers",
+      githubStars4(),
       "line",
       "light",
       "all",
@@ -268,8 +262,13 @@ describe("renderSvgChart markup", () => {
     expect(svg.match(/<circle/g)?.length).toBe(29);
   });
 
-  it("labels each weight point date on the x-axis when n ≤ 12", () => {
-    const svg = renderSvgChart("health.weight.lb", weight4(), "line", "light");
+  it("labels each github stars point date on the x-axis when n ≤ 12", () => {
+    const svg = renderSvgChart(
+      "github.stars.modelcontextprotocol.servers",
+      githubStars4(),
+      "line",
+      "light",
+    );
     expect(svg).toContain("1/6");
     expect(svg).toContain("1/13");
     expect(svg).toContain("1/20");

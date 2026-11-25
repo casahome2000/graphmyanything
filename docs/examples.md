@@ -6,29 +6,46 @@ Tools: `track`, `forget`, `query`, `insight`, `chart`. All successful responses 
 
 ---
 
-## 1. Daily metric — body weight
+## 1. GitHub stars — 14-day backfill (illustrative)
 
-**Prompt:** *Log my weight today: 182.4 pounds. Use metric `health.weight.lb`.*
+**Prompt:** *Backfill daily star counts for `modelcontextprotocol/servers` into `github.stars.modelcontextprotocol.servers` for the last 14 days — illustrative counts only, not live sync.*
 
 **Tool:** `track`
 
 ```json
 {
-  "metric": "health.weight.lb",
-  "value": 182.4,
-  "tags": { "source": "scale" }
+  "metric": "github.stars.modelcontextprotocol.servers",
+  "points": [
+    { "ts": 1762819200, "value": 90862 },
+    { "ts": 1762905600, "value": 90928 },
+    { "ts": 1762992000, "value": 90985 },
+    { "ts": 1763078400, "value": 91052 },
+    { "ts": 1763164800, "value": 91110 },
+    { "ts": 1763251200, "value": 91168 },
+    { "ts": 1763337600, "value": 91225 },
+    { "ts": 1763424000, "value": 91290 },
+    { "ts": 1763510400, "value": 91355 },
+    { "ts": 1763596800, "value": 91420 },
+    { "ts": 1763683200, "value": 91495 },
+    { "ts": 1763769600, "value": 91580 },
+    { "ts": 1763856000, "value": 91890 },
+    { "ts": 1763942400, "value": 92228 }
+  ],
+  "tags": { "source": "github", "repo": "modelcontextprotocol/servers" }
 }
 ```
+
+`ts` values are Unix **seconds** (UTC). Per-point `tags` merge with top-level `tags`.
 
 **Sample response:**
 
 ```json
 {
   "ok": true,
-  "metric": "health.weight.lb",
-  "written": 1,
+  "metric": "github.stars.modelcontextprotocol.servers",
+  "written": 14,
   "replaced": 0,
-  "tokens_estimate": 20
+  "tokens_estimate": 48
 }
 ```
 
@@ -149,14 +166,14 @@ Import the workflow: [`integrations/n8n/track-stripe-mrr-daily.json`](../integra
 
 ## 5. Insight on a trend
 
-**Prompt:** *In plain English, how has my weight moved over the last 90 days? Flag weird spikes.*
+**Prompt:** *In plain English, how have GitHub stars on `modelcontextprotocol/servers` grown over the last 14 days? Flag weird spikes.*
 
 **Tool:** `insight`
 
 ```json
 {
-  "metric": "health.weight.lb",
-  "range": "90d"
+  "metric": "github.stars.modelcontextprotocol.servers",
+  "range": "14d"
 }
 ```
 
@@ -164,16 +181,16 @@ Import the workflow: [`integrations/n8n/track-stripe-mrr-daily.json`](../integra
 
 ```json
 {
-  "summary": "Metric \"health.weight.lb\" (42 points, 90d). Upward trend over 90d: latest 182.4, 2.1% vs start. No strong anomalies detected (MAD z-score threshold 3.5). Naive linear forecast (next 3 steps): 182.1, 181.9, 181.7.",
-  "trend": "Upward trend over 90d: latest 182.4, 2.1% vs start.",
+  "summary": "Metric \"github.stars.modelcontextprotocol.servers\" (14 points, 14d). Upward trend over 14d: latest 92228, 1.5% vs start. No strong anomalies detected (MAD z-score threshold 3.5). Naive linear forecast (next 3 steps): 92280, 92332, 92384.",
+  "trend": "Upward trend over 14d: latest 92228, 1.5% vs start.",
   "anomalies": [],
   "forecast": {
     "horizon": 3,
-    "next_values": [182.1, 181.9, 181.7],
+    "next_values": [92280, 92332, 92384],
     "method": "naive_linear_regression_on_index"
   },
-  "stats": { "latest": 182.4, "count": 42, "trend": "up", "pct_change": 2.1 },
-  "tokens_estimate": 120
+  "stats": { "latest": 92228, "count": 14, "trend": "up", "pct_change": 1.5 },
+  "tokens_estimate": 125
 }
 ```
 
@@ -259,33 +276,33 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 
 ## 7. Query a time range with a small series
 
-**Prompt:** *Show my weight for the last week — include about a dozen points for context.*
+**Prompt:** *Show GitHub stars for `modelcontextprotocol/servers` over the last 14 days — include about a dozen points for context.*
 
 **Tool:** `query`
 
 ```json
 {
-  "metric": "health.weight.lb",
-  "range": "7d",
+  "metric": "github.stars.modelcontextprotocol.servers",
+  "range": "14d",
   "token_budget": 250,
   "points": 12
 }
 ```
 
-**Range grammar:** `7d`, `90d`, `12w`, `1y`, `30y`, or `all` (see `parseRange` in the server).
+**Range grammar:** `7d`, `14d`, `90d`, `12w`, `1y`, `30y`, or `all` (see `parseRange` in the server).
 
 **Sample response:**
 
 ```json
 {
-  "m": "health.weight.lb",
-  "rg": "7d",
-  "s": { "l": 182.4, "mn": 181.2, "mx": 183.1, "mu": 182.0, "tr": "flat", "pct": 0.3, "n": 7 },
+  "m": "github.stars.modelcontextprotocol.servers",
+  "rg": "14d",
+  "s": { "l": 92228, "mn": 90862, "mx": 92228, "mu": 91520, "tr": "up", "pct": 1.5, "n": 14 },
   "pts": [
-    { "ts": 1731888000, "value": 182.0 },
-    { "ts": 1732147200, "value": 182.4 }
+    { "ts": 1763510400, "value": 91355 },
+    { "ts": 1763942400, "value": 92228 }
   ],
-  "tokens_estimate": 95
+  "tokens_estimate": 98
 }
 ```
 
@@ -293,15 +310,15 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 
 ## 8. Correct a point (upsert same date)
 
-**Prompt:** *Yesterday's weigh-in was wrong — it should be 181.9 lb at that day's timestamp.*
+**Prompt:** *Yesterday's GitHub star snapshot was off — use 91870 at that day's timestamp instead.*
 
 **Tool:** `track`
 
 ```json
 {
-  "metric": "health.weight.lb",
-  "points": [{ "ts": 1732147200, "value": 181.9 }],
-  "tags": { "note": "corrected misread" }
+  "metric": "github.stars.modelcontextprotocol.servers",
+  "points": [{ "ts": 1763856000, "value": 91870 }],
+  "tags": { "note": "corrected API snapshot" }
 }
 ```
 
@@ -312,10 +329,10 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 ```json
 {
   "ok": true,
-  "metric": "health.weight.lb",
+  "metric": "github.stars.modelcontextprotocol.servers",
   "written": 0,
   "replaced": 1,
-  "tokens_estimate": 22
+  "tokens_estimate": 24
 }
 ```
 
@@ -323,14 +340,14 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 
 ## 9. Delete a point — `forget`
 
-**Prompt:** *Remove the erroneous weigh-in from last Tuesday only — keep the rest of `health.weight.lb`.*
+**Prompt:** *Drop only the bad snapshot from last Tuesday — keep the rest of `github.stars.modelcontextprotocol.servers`.*
 
 **Tool:** `forget`
 
 ```json
 {
-  "metric": "health.weight.lb",
-  "ts": 1731888000
+  "metric": "github.stars.modelcontextprotocol.servers",
+  "ts": 1763769600
 }
 ```
 
@@ -341,9 +358,9 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 ```json
 {
   "ok": true,
-  "metric": "health.weight.lb",
+  "metric": "github.stars.modelcontextprotocol.servers",
   "deleted": 1,
-  "tokens_estimate": 18
+  "tokens_estimate": 20
 }
 ```
 
@@ -351,11 +368,11 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 
 ## 10. Multiple metrics — naming convention
 
-**Prompt:** *I'm tracking weight in pounds and MRR in dollars — keep namespaces separate.*
+**Prompt:** *I'm tracking GitHub stars and MRR in dollars — keep namespaces separate.*
 
 | Metric | Meaning |
 |--------|---------|
-| `health.weight.lb` | Body weight, pounds |
+| `github.stars.modelcontextprotocol.servers` | GitHub star count for `modelcontextprotocol/servers` |
 | `stripe.mrr.usd` | Monthly recurring revenue, USD |
 | `geo.plano_tx.population` | City population, count |
 
