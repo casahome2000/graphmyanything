@@ -28,7 +28,7 @@ import {
   type ToolRuntime,
 } from "./tools/runtime.js";
 
-const PACKAGE_VERSION = "0.2.3";
+const PACKAGE_VERSION = "0.2.4";
 
 export async function startMcpServer(): Promise<void> {
   const db = openDatabase();

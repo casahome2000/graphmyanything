@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4 — 2026-11-24
+
+- Docs-only: npm README sample chart and built-in **usage-guide** use the GitHub stars example (`github.stars.modelcontextprotocol.servers`) instead of `health.weight.lb`.
+
 ## 0.2.3 — 2026-11-23
 
 - **server.json** / **package.json** descriptions shortened for MCP registry (≤100 chars).
