@@ -35,7 +35,7 @@ Manual / latest from npm:
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.6<!-- /fact -->`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.7<!-- /fact -->`
 
 Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
 
@@ -87,7 +87,7 @@ See [hosted API](https://github.com/casahome2000/graphmyanything/blob/master/doc
 }
 ```
 
-Pin a version (optional): `"graphmyanything-mcp@<!-- fact:package.version -->0.2.6<!-- /fact -->"` as the second arg.
+Pin a version (optional): `"graphmyanything-mcp@<!-- fact:package.version -->0.2.7<!-- /fact -->"` as the second arg.
 
 ## Claude Desktop
 

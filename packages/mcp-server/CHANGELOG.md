@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.7 — 2026-11-25
+
+- **Starter prompt:** canonical first-prompt text for `setup` output, quickstart, and `facts.json` (`copy.starterPrompt`).
+- **`doctor`:** one line for API key storage (OS keychain, credentials file path, or not signed in) — never the secret.
+
 ## 0.2.6 — 2026-11-25
 
 - **TTY bare run:** `graphmyanything-mcp` on a terminal prints install/version/Node check and quickstart link on **stderr**, then **exits 0** (no hung stdio wait). MCP clients still use piped stdio; **`--stdio`** forces server mode on a TTY for manual testing.
