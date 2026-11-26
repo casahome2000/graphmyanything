@@ -2,7 +2,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { KeychainBackend } from "../src/secrets/keychain-backend.js";
+import {
+  pickKeychainBackend,
+  type KeychainBackend,
+} from "../src/secrets/keychain-backend.js";
 import {
   getStoredApiKey,
   setKeychainBackendForTests,
@@ -66,6 +69,30 @@ describe("secrets store", () => {
     expect(getStoredApiKey()).toBe("gma_migrate_me");
     const raw = JSON.parse(fs.readFileSync(cfg, "utf8")) as Record<string, unknown>;
     expect(raw.api_key).toBeUndefined();
+  });
+
+  it("on Windows keeps api_key on disk (no keychain backend)", () => {
+    const platform = Object.getOwnPropertyDescriptor(process, "platform");
+    Object.defineProperty(process, "platform", { value: "win32" });
+    setKeychainBackendForTests(null);
+    try {
+      expect(pickKeychainBackend()).toBeUndefined();
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "gma-win-"));
+      process.env.GRAPHMYANYTHING_CONFIG_PATH = path.join(
+        tmpDir,
+        "credentials.json",
+      );
+      setStoredApiKey("gma_windows_file_only_key");
+      expect(getStoredApiKey()).toBe("gma_windows_file_only_key");
+      const raw = JSON.parse(
+        fs.readFileSync(process.env.GRAPHMYANYTHING_CONFIG_PATH!, "utf8"),
+      ) as Record<string, unknown>;
+      expect(raw.api_key).toBe("gma_windows_file_only_key");
+      expect(raw.secret_storage).toBe("file");
+    } finally {
+      if (platform) Object.defineProperty(process, "platform", platform);
+      else delete (process as { platform?: string }).platform;
+    }
   });
 
   it("clears keychain and config", () => {

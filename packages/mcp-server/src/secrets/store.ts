@@ -28,6 +28,9 @@ function backend(): KeychainBackend | undefined {
 export function consumeKeychainFallbackNotice(): string | undefined {
   if (fallbackNotified || backend()) return undefined;
   fallbackNotified = true;
+  if (process.platform === "win32") {
+    return "API key will be stored in ~/.graphmyanything/credentials.json (0600) — Windows uses file storage (keychain read not supported yet).";
+  }
   return "API key will be stored in ~/.graphmyanything/credentials.json (0600) — OS keychain not available on this machine.";
 }
 

@@ -4,7 +4,7 @@
 
 - **TTY bare run:** `graphmyanything-mcp` on a terminal prints install/version/Node check and quickstart link on **stderr**, then **exits 0** (no hung stdio wait). MCP clients still use piped stdio; **`--stdio`** forces server mode on a TTY for manual testing.
 - **`setup` / `install`:** detects MCP clients, merges pinned absolute-path server config (backup first), optional sign-in, starter prompt.
-- **OS keychain** for API keys (macOS Keychain, Linux `secret-tool`, Windows Credential Manager `cmdkey`) with `0600` file fallback; migrate legacy files.
+- **OS keychain** for API keys on macOS/Linux (`0600` file fallback elsewhere). **Windows** stays file-only until keychain read is safe.
 - **Sync** prints `Connected as email` when the device-token response includes `account_email`.
 - **Agent guardrail** on tools, usage-guide, `llms.txt`, and package README (never read credentials files).
 - Docs: **`sync`** is sign-in only; **`setup`** is the main install path.

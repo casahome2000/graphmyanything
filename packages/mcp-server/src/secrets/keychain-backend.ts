@@ -183,10 +183,8 @@ export function pickKeychainBackend(
   custom?: KeychainBackend,
 ): KeychainBackend | undefined {
   if (custom) return custom.isAvailable() ? custom : undefined;
-  const candidates = [
-    macKeychainBackend(),
-    linuxSecretToolBackend(),
-    windowsCmdKeyBackend(),
-  ];
+  // Windows: cmdkey can store but not reliably read — use file-only until CredRead exists.
+  if (process.platform === "win32") return undefined;
+  const candidates = [macKeychainBackend(), linuxSecretToolBackend()];
   return candidates.find((b) => b.isAvailable());
 }
