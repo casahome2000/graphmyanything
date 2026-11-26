@@ -4,7 +4,6 @@ import { runLogout } from "./logout.js";
 import { runSelfTest } from "./self-test.js";
 import { runStatus } from "./status.js";
 import { runSync } from "./sync.js";
-import { runSetup } from "../setup/run.js";
 import { isHelpFlag, printCommandHelp, printRootHelp } from "./usage.js";
 
 const SETUP_ALIASES = new Set(["setup", "install"]);
@@ -62,6 +61,7 @@ export async function runCli(argv = process.argv): Promise<boolean> {
         else if (a === "--no-sync") skipSync = true;
         else if (!a.startsWith("-")) clientArg = a;
       }
+      const { runSetup } = await import("../setup/run.js");
       code = await runSetup({ clientArg, yes, skipSync });
       break;
     }
