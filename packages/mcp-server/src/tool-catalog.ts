@@ -63,7 +63,7 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
       type: "object",
       properties: {
         metric: { type: "string" },
-        range: { type: "string" },
+        range: { type: "string", description: RANGE_DESCRIBE },
       },
       required: ["metric"],
     },
@@ -97,8 +97,14 @@ export const GMA_TOOL_CATALOG: ToolDef[] = [
         ts: { type: "number" },
         from: { type: "number" },
         to: { type: "number" },
-        all: { type: "boolean" },
-        confirm: { type: "boolean" },
+        all: {
+          type: "boolean",
+          description: "Delete all points for metric; requires confirm:true.",
+        },
+        confirm: {
+          type: "boolean",
+          description: "Must be true when all:true.",
+        },
       },
       required: ["metric"],
     },

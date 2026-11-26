@@ -140,7 +140,7 @@ Reproducible benchmark: [`benchmarks/token-benchmark/`](benchmarks/token-benchma
 **Caveats (read before citing):**
 
 - Modeled flows from [`e2e-flows.ts`](benchmarks/token-benchmark/e2e-flows.ts), not live agent traces — counts are reproducible via `npm run benchmark:tokens`.
-- MCP **tool schema overhead** **<!-- fact:tools.listTokens -->524<!-- /fact -->** tokens (<!-- fact:tools.count -->5<!-- /fact --> tools, `<!-- fact:benchmark.tokenizer -->o200k<!-- /fact -->`) vs **<!-- fact:benchmark.pythonHarnessListTokens -->248<!-- /fact -->** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
+- MCP **tool schema overhead** **<!-- fact:tools.listTokens -->586<!-- /fact -->** tokens (<!-- fact:tools.count -->5<!-- /fact --> tools, `<!-- fact:benchmark.tokenizer -->o200k<!-- /fact -->`) vs **<!-- fact:benchmark.pythonHarnessListTokens -->248<!-- /fact -->** for a representative 6-tool Python harness (see benchmark tables); caching often applies schemas once after turn 1.
 - **Best-case** file Python (pre-cached script, no discovery) ≈ **<!-- fact:benchmark.bestCaseScriptTokens -->167<!-- /fact -->** tokens — deliberate lower bound; citing without full E2E is misleading.
 
 A script that already exists and needs no discovery can still be cheaper (~<!-- fact:benchmark.bestCaseScriptTokens -->167<!-- /fact --> tokens); GraphMyAnything wins on the full workflow and on repeat questions.

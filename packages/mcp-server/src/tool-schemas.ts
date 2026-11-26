@@ -42,7 +42,7 @@ export const chartToolArgsSchema = z.object({
 });
 
 export const FORGET_TOOL_DESCRIPTION = withAgentGuardrail(
-  "Delete points (metric required); see usage-guide.",
+  "Delete points (metric required). Whole metric: all:true and confirm:true. See usage-guide.",
 );
 
 export const forgetToolArgsSchema = z.object({
@@ -87,7 +87,7 @@ export const queryToolInputSchema = {
 
 export const insightToolInputSchema = {
   metric: z.string(),
-  range: z.string().optional(),
+  range: z.string().optional().describe(RANGE_DESCRIBE),
 };
 
 export const chartToolInputSchema = {
@@ -102,9 +102,15 @@ export const chartToolInputSchema = {
 
 export const forgetToolInputSchema = {
   metric: z.string(),
-  ts: z.number().optional(),
-  from: z.number().optional(),
-  to: z.number().optional(),
-  all: z.boolean().optional(),
-  confirm: z.boolean().optional(),
+  ts: z.number().optional().describe("Delete one point at Unix ts."),
+  from: z.number().optional().describe("Range delete start (with to)."),
+  to: z.number().optional().describe("Range delete end (with from)."),
+  all: z
+    .boolean()
+    .optional()
+    .describe("Delete every point for metric; requires confirm:true."),
+  confirm: z
+    .boolean()
+    .optional()
+    .describe("Must be true when all:true (whole-metric delete)."),
 };

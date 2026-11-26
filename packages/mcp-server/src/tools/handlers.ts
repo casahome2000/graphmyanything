@@ -58,23 +58,24 @@ export function handleTrack(
   return withTokensEstimate({ ok: true as const, metric, written, replaced });
 }
 
-export function handleForget(
-  db: GmaDatabase,
-  args: {
-    metric: string;
-    ts?: number;
-    from?: number;
-    to?: number;
-    all?: boolean;
-    confirm?: boolean;
-  },
-): { ok: true; metric: string; deleted: number } {
+export type ForgetArgs = {
+  metric: string;
+  ts?: number;
+  from?: number;
+  to?: number;
+  all?: boolean;
+  confirm?: boolean;
+};
+
+export function validateForgetArgs(args: ForgetArgs): string {
   const metric = args.metric.trim();
   if (!metric) throw new Error("metric is required");
 
   if (args.all) {
     if (args.confirm !== true) {
-      throw new Error("all:true requires confirm:true");
+      throw new Error(
+        "Deleting all points for a metric requires confirm:true — call forget with { metric, all: true, confirm: true } only.",
+      );
     }
     if (
       args.ts != null ||
@@ -95,8 +96,18 @@ export function handleForget(
       throw new Error("Use from+to alone for range delete");
     }
   } else {
-    throw new Error("Specify ts, from+to, or all:true");
+    throw new Error(
+      "Specify ts, from+to, or all:true with confirm:true for whole-metric delete",
+    );
   }
+  return metric;
+}
+
+export function handleForget(
+  db: GmaDatabase,
+  args: ForgetArgs,
+): { ok: true; metric: string; deleted: number } {
+  const metric = validateForgetArgs(args);
 
   const deleted = deletePoints(db, {
     metric,

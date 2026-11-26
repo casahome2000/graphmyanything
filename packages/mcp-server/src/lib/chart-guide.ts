@@ -1,3 +1,7 @@
+import { RANGE_DESCRIBE } from "./range.js";
+
+export { RANGE_DESCRIBE } from "./range.js";
+
 /** Full chart option guide — exposed as MCP resource `chart-guide`. */
 export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 
@@ -9,7 +13,7 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 ## Options
 - **theme**: \`dark\` (default) or \`light\` — match the host UI.
 - **labels**: \`last\` (default, clean) — one end value beside the last point; \`none\` — no value labels; \`extremes\` — first/last/min/max when they fit without overlap; \`all\` — every point (small series only).
-- **range**: same as query — \`7d\`, \`90d\`, \`12w\`, \`1y\`, \`all\` (default).
+- **range**: same as query — \`${RANGE_DESCRIBE}\` (default \`all\`).
 - **share**: default \`true\` in hosted mode; \`false\` skips the public URL (local \`path\` is still written).
 
 ## Output
@@ -19,8 +23,6 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 
 /** tools/list blurb — details live in resource chart-guide. */
 export const CHART_TOOL_DESCRIPTION = "Render SVG; read chart-guide.";
-
-export const RANGE_DESCRIBE = "7d|90d|1y|all";
 
 export const CHART_TYPE_DESCRIBE = "line|bar|area";
 

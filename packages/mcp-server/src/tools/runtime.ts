@@ -9,6 +9,7 @@ import {
   handleInsight,
   handleQuery,
   handleTrack,
+  validateForgetArgs,
 } from "./handlers.js";
 
 export type ToolRuntime = {
@@ -33,6 +34,7 @@ export async function runForget(
   rt: ToolRuntime,
   args: Parameters<typeof handleForget>[1],
 ): Promise<ReturnType<typeof handleForget>> {
+  validateForgetArgs(args);
   if (rt.mode === "hosted" && rt.client) {
     const remote = await rt.client.forget(args);
     handleForget(rt.db, args);

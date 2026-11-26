@@ -130,7 +130,7 @@ describe("handleForget", () => {
     const db = openDatabase(dbPath);
     handleTrack(db, { metric: "m.all", value: 1 });
     expect(() => handleForget(db, { metric: "m.all", all: true })).toThrow(
-      /confirm:true/,
+      /confirm:true.*all: true, confirm: true/,
     );
     const r = handleForget(db, {
       metric: "m.all",
