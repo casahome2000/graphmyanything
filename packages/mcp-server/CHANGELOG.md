@@ -1,10 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.8 — 2026-11-26
 
-- **`range`:** document `14d` and `30d` alongside `7d`, `90d`, `1y`, `all` in tool schemas and MCP guides (server already parsed them).
-- **`forget`:** clearer errors and schema hints for `all:true` + `confirm:true`.
-- **MCP resources:** initialize instructions include `resources/read` URIs; resources/list coverage in tests.
+- **`range`:** query, insight, and chart document `7d|14d|30d|90d|1y|all` in tool schemas and MCP guides (parser already accepted them).
+- **`forget`:** whole-metric delete error explains `all:true` requires `confirm:true`.
+- **MCP resources:** initialize instructions name `graphmyanything://docs/usage-guide` and `chart-guide` for `resources/read`.
 
 ## 0.2.7 — 2026-11-25
 
