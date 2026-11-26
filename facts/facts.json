@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "package": {
     "name": "graphmyanything-mcp",
-    "version": "0.2.6"
+    "version": "0.2.7"
   },
   "tools": {
     "count": 5,
@@ -63,6 +63,7 @@
     }
   },
   "copy": {
+    "starterPrompt": "Using the graphmyanything MCP tools (track, query, insight, forget, chart), backfill the last 14 days of GitHub star counts for modelcontextprotocol/servers into metric github.stars.modelcontextprotocol.servers (use realistic illustrative daily values shaped around the public API), query the 14-day trend, give a one-line insight, then chart it as a dark line chart and return the live share link.",
     "tagline": "Build once, ask forever.",
     "headline": "Build once. Ask forever.",
     "repoAbout": "Build once, ask forever. Chart and metric memory for AI agents over MCP: track, query, insight, forget, chart. Local-first, optional hosted sync. MIT.",

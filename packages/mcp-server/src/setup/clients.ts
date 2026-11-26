@@ -18,8 +18,7 @@ export const MCP_CLIENT_LABEL: Record<McpClientId, string> = {
   windsurf: "Windsurf",
 };
 
-export const STARTER_PROMPT =
-  "Backfill the last 14 days of GitHub stars for modelcontextprotocol/servers into metric github.stars.modelcontextprotocol.servers (illustrative daily counts), then query 14d and chart with a dark line chart.";
+export { STARTER_PROMPT } from "../lib/starter-prompt.js";
 
 export type ClientTarget =
   | { kind: "json-file"; path: string }

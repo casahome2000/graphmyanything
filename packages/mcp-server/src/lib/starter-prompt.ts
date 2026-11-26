@@ -1,0 +1,3 @@
+/** Canonical first prompt printed by `setup` and documented in quickstart / facts. */
+export const STARTER_PROMPT =
+  "Using the graphmyanything MCP tools (track, query, insight, forget, chart), backfill the last 14 days of GitHub star counts for modelcontextprotocol/servers into metric github.stars.modelcontextprotocol.servers (use realistic illustrative daily values shaped around the public API), query the 14-day trend, give a one-line insight, then chart it as a dark line chart and return the live share link.";

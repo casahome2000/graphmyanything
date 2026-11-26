@@ -1,6 +1,5 @@
-import { readConfig } from "../config.js";
+import { formatApiKeyStorageLine } from "../lib/api-key-storage-line.js";
 import { HostedClient } from "../hosted/client.js";
-import { maskApiKey } from "../lib/mask-secret.js";
 import { MIN_NODE, nodeTooOld } from "../bootstrap.js";
 import { resolveApiKey } from "../mode.js";
 
@@ -15,19 +14,8 @@ export async function runSelfTest(): Promise<number> {
   );
   if (!nodeOk) exit = 1;
 
-  const config = readConfig();
-  const key = resolveApiKey(config);
-  const fromEnv =
-    Boolean(process.env.GRAPHMYANYTHING_API_KEY?.trim()) ||
-    Boolean(process.env.GMA_API_KEY?.trim());
-  const storage = readConfig().secret_storage ?? (fromEnv ? "environment" : "unknown");
-  if (key) {
-    console.log(
-      `Credentials: API key ${fromEnv ? "from environment" : `stored (${storage})`} ${maskApiKey(key)}`,
-    );
-  } else {
-    console.log("Credentials: no API key saved");
-  }
+  const key = resolveApiKey();
+  console.log(formatApiKeyStorageLine());
 
   try {
     await new HostedClient({ apiKey: "" }).deviceStart();
