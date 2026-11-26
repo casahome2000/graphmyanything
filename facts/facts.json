@@ -13,7 +13,7 @@
       "forget",
       "chart"
     ],
-    "listTokens": 468
+    "listTokens": 524
   },
   "benchmark": {
     "tokenizer": "o200k",

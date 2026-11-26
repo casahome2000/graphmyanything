@@ -1,4 +1,4 @@
-import { readConfig, resolveConfigPath } from "../config.js";
+import { readConfig } from "../config.js";
 import { HostedClient } from "../hosted/client.js";
 import { maskApiKey } from "../lib/mask-secret.js";
 import { MIN_NODE, nodeTooOld } from "../bootstrap.js";
@@ -20,13 +20,13 @@ export async function runSelfTest(): Promise<number> {
   const fromEnv =
     Boolean(process.env.GRAPHMYANYTHING_API_KEY?.trim()) ||
     Boolean(process.env.GMA_API_KEY?.trim());
-  const credPath = resolveConfigPath();
+  const storage = readConfig().secret_storage ?? (fromEnv ? "environment" : "unknown");
   if (key) {
     console.log(
-      `Credentials: API key ${fromEnv ? "from environment" : "saved"} ${maskApiKey(key)} (${credPath})`,
+      `Credentials: API key ${fromEnv ? "from environment" : `stored (${storage})`} ${maskApiKey(key)}`,
     );
   } else {
-    console.log(`Credentials: no API key saved (${credPath})`);
+    console.log("Credentials: no API key saved");
   }
 
   try {

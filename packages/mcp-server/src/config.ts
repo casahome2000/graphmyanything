@@ -8,6 +8,7 @@ export type GmaConfig = {
   _warning?: string;
   mode?: GmaMode;
   api_key?: string;
+  secret_storage?: "keychain" | "file";
   /** Resume offset for batch upload during sync (row id in local DB). */
   sync_after_id?: number;
 };
@@ -61,6 +62,7 @@ export function readConfig(configPath?: string): GmaConfig {
 function serializeConfig(merged: GmaConfig): string {
   const { _warning: _drop, ...rest } = merged;
   if (merged.api_key === "") delete rest.api_key;
+  if (merged.secret_storage === "keychain") delete rest.api_key;
   const body = {
     _warning: CONFIG_SECRET_WARNING,
     ...rest,
@@ -80,6 +82,7 @@ export function writeConfig(
   ensureSecretDir(target);
   const merged = { ...readConfig(), ...patch };
   if (merged.api_key === "") delete merged.api_key;
+  if (merged.secret_storage === "keychain") delete merged.api_key;
   fs.writeFileSync(target, serializeConfig(merged), { mode: 0o600 });
   try {
     fs.chmodSync(target, 0o600);
@@ -100,6 +103,7 @@ export function writeConfig(
   return merged;
 }
 
+/** @deprecated Prefer {@link clearStoredApiKey} from secrets/store. */
 export function clearApiKey(configPath?: string): GmaConfig {
   const target = resolveWritePath(configPath);
   const current = readConfig();

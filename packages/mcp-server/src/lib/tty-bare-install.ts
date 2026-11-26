@@ -16,7 +16,6 @@ export function printTtyBareInstallCheck(
 ): void {
   write(`graphmyanything-mcp ${PACKAGE_VERSION} installed.`);
   write(formatNodeCheckLine());
-  write(
-    `Add it to your AI client's MCP config (pick your client): ${QUICKSTART_URL}`,
-  );
+  write(`Next step: run \`npx graphmyanything-mcp setup\` to add the server to your client.`);
+  write(`Manual config: ${QUICKSTART_URL}`);
 }

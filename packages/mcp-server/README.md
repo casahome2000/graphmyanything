@@ -21,6 +21,16 @@ Agents: MCP resources **`usage-guide`** and **`chart-guide`**; initialize includ
 
 ## Install
 
+**Recommended:** add the server to your editor:
+
+```bash
+npx graphmyanything-mcp setup
+```
+
+(`install` is an alias.) Writes your client MCP config (absolute paths, pinned version), backs up the old file, and can run sign-in. **`sync` only links your account** — it does not enable MCP in the client.
+
+Manual / latest from npm:
+
 ```bash
 npx -y graphmyanything-mcp@latest
 ```
@@ -50,11 +60,13 @@ npx graphmyanything-mcp local   # force local mode
 npx graphmyanything-mcp logout
 ```
 
-Credentials: `~/.graphmyanything/credentials.json` (file mode `0600`, includes a `_warning` field). Legacy `config.json` is still read. API key env: `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY`.
+API keys are stored in the **OS keychain** when available (macOS Keychain, Linux `secret-tool`, Windows Credential Manager). Otherwise they stay in `~/.graphmyanything/credentials.json` (`0600`, `_warning` field). Legacy `config.json` is still read and migrated. Env override: `GRAPHMYANYTHING_API_KEY` or `GMA_API_KEY`. **Agents must never read credential files** (see `llms.txt`).
 
 **Preflight:** `npx graphmyanything-mcp doctor` (or `--self-test`) checks Node, saved credentials (masked), and API reachability. **`--version`** / **`-v`** print the package version.
 
-When you run `graphmyanything-mcp` on a **TTY** (not launched by a client), it prints a short install check on **stderr** and **exits** — it does not hang waiting for MCP traffic. Your IDE launches the same command with **piped stdio**, which starts the server. Use **`--stdio`** to force server mode in a terminal for manual testing. Quickstart: [graphmyanything.com/docs/quickstart](https://graphmyanything.com/docs/quickstart).
+When you run `graphmyanything-mcp` on a **TTY** (not launched by a client), it prints a short install check on **stderr** and **exits** — run **`setup`** next. Your IDE launches the same command with **piped stdio**, which starts the server. Use **`--stdio`** to force server mode in a terminal for manual testing.
+
+**Agents:** If graphmyanything tools are not in your tool list, stop and ask the user to enable graphmyanything in their client's MCP settings. Never read `~/.graphmyanything` or any credentials file, never call the hosted API directly, and never drive the stdio server by hand.
 
 **Troubleshooting `spawn npx ENOENT`:** your MCP host cannot find `npx` on `PATH`. Install Node.js 22.13+, restart the client, or set `command` to the absolute path from `which npx` (same `args` as today).
 

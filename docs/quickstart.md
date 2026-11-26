@@ -6,7 +6,15 @@
 
 ## Install the MCP server
 
-Default (gets the latest published release):
+**Easiest (recommended):**
+
+```bash
+npx graphmyanything-mcp setup
+```
+
+Pick your client when prompted (or pass `cursor`, `claude-desktop`, `vscode`, `windsurf`, `claude-code`). This updates the client MCP config with absolute paths and a pinned version, backs up your old file, and can run account sign-in. **`sync` does not install or enable MCP** — it only links your GraphMyAnything account.
+
+Manual install (gets the latest published release):
 
 ```bash
 npx -y graphmyanything-mcp@latest
@@ -40,6 +48,7 @@ Other CLI commands:
 | `local` | Prefer local mode (keeps saved API key) |
 | `logout` | Remove API key from config |
 | `charts` | List recent local SVG chart files |
+| `setup` / `install` | Add MCP to your editor (main path) |
 | `doctor` | Node version, credentials (masked), API reachability |
 | `--version` / `-v` | Print installed package version |
 

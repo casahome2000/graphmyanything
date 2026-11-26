@@ -7,43 +7,14 @@ import {
 import { readConfig, writeConfig } from "../config.js";
 import { redactSecretsInText } from "../lib/mask-secret.js";
 import { resolveApiKey } from "../mode.js";
+import { linkDevice } from "./sync-auth.js";
+import { setStoredApiKey } from "../secrets/store.js";
 
 const BATCH = 1000;
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-async function linkDevice(): Promise<string | undefined> {
-  const client = new HostedClient({ apiKey: "" });
-  const start = await client.deviceStart();
-
-  console.log(
-    `Visit ${start.verification_uri} and enter code ${start.user_code}`,
-  );
-  console.log(`Or open ${start.verification_uri}?user_code=${start.user_code}`);
-
-  let intervalSec = start.interval;
-  const deadline = Date.now() + start.expires_in * 1000;
-
-  while (Date.now() < deadline) {
-    await sleep(intervalSec * 1000);
-    const tok = await client.deviceToken(start.device_code);
-    if (tok.status === "authorized") return tok.api_key;
-    if (tok.status === "expired") {
-      console.error("Device code expired. Run sync again.");
-      return undefined;
-    }
-    if (tok.status === "slow_down") intervalSec += 5;
-  }
-  console.error("Timed out waiting for authorization.");
-  return undefined;
-}
-
 export async function runSync(): Promise<number> {
-  // Reuse a saved key (resume after an interrupted upload) instead of
-  // asking the user to approve a new device every time.
   let apiKey = resolveApiKey();
+  let accountEmail: string | undefined;
   if (apiKey) {
     try {
       await new HostedClient({ apiKey }).getAccount();
@@ -51,13 +22,23 @@ export async function runSync(): Promise<number> {
       apiKey = undefined;
     }
   }
-  if (!apiKey) apiKey = await linkDevice();
-  if (!apiKey) return 1;
+  if (!apiKey) {
+    const linked = await linkDevice();
+    if (!linked) return 1;
+    apiKey = linked.api_key;
+    accountEmail = linked.account_email;
+  }
 
-  writeConfig({ api_key: apiKey, mode: "hosted" });
+  setStoredApiKey(apiKey);
 
   const authed = new HostedClient({ apiKey });
   const account = await authed.getAccount();
+  const email =
+    accountEmail ||
+    (typeof account.email === "string" ? account.email : undefined);
+  if (email) {
+    console.log(`Connected as ${email}`);
+  }
   console.log(
     `Signed in. Plan: ${account.plan}. Points: ${account.usage?.points ?? "?"} / ${account.limits?.points ?? "∞"}.`,
   );

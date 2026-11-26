@@ -88,7 +88,7 @@ describe("entry spawn", () => {
     const err = fs.readFileSync(out, "utf8");
     expect(err).toContain("installed.");
     expect(err).toContain(QUICKSTART_URL);
-    expect(err).toContain("to your AI client");
+    expect(err).toContain("setup");
     try {
       fs.unlinkSync(out);
     } catch {
