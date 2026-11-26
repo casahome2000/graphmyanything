@@ -6,6 +6,7 @@ import {
   mergeGraphmyanythingServer,
   type McpServerEntry,
 } from "../src/setup/merge-config.js";
+import { PACKAGE_VERSION } from "../src/version.js";
 
 describe("mergeGraphmyanythingServer", () => {
   let tmp: string;
@@ -31,7 +32,7 @@ describe("mergeGraphmyanythingServer", () => {
     );
     const entry: McpServerEntry = {
       command: "/usr/bin/npx",
-      args: ["-y", "graphmyanything-mcp@0.2.5"],
+      args: ["-y", `graphmyanything-mcp@${PACKAGE_VERSION}`],
     };
     mergeGraphmyanythingServer(configPath, entry);
     const out = JSON.parse(fs.readFileSync(configPath, "utf8")) as {
