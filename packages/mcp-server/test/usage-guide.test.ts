@@ -13,5 +13,9 @@ describe("MCP initialize instructions", () => {
   it("mentions usage-guide and chart-guide", () => {
     expect(MCP_SERVER_INSTRUCTIONS).toMatch(/usage-guide/);
     expect(MCP_SERVER_INSTRUCTIONS).toMatch(/chart-guide/);
+    expect(MCP_SERVER_INSTRUCTIONS).toMatch(/resources\/read/);
+    expect(MCP_SERVER_INSTRUCTIONS).toMatch(
+      /graphmyanything:\/\/docs\/usage-guide/,
+    );
   });
 });

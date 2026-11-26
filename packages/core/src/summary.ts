@@ -79,7 +79,9 @@ export function parseRange(
 
   const m = range.match(/^(\d+)([dhwmy])$/i);
   if (!m) {
-    throw new Error(`Invalid range "${range}". Use e.g. 7d, 90d, 12w, 1y, or all.`);
+    throw new Error(
+      `Invalid range "${range}". Use e.g. 7d, 14d, 30d, 90d, 1y, or all.`,
+    );
   }
   const n = Number(m[1]);
   const unit = m[2].toLowerCase();

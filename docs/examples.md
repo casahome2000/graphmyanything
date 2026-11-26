@@ -289,7 +289,7 @@ Live share pages include **hover tooltips** on chart markers when opened in a br
 }
 ```
 
-**Range grammar:** `7d`, `14d`, `90d`, `12w`, `1y`, `30y`, or `all` (see `parseRange` in the server).
+**Range grammar:** `7d`, `14d`, `30d`, `90d`, `1y`, or `all` (documented on query/insight/chart; `parseRange` also accepts other `{n}d|w|m|y`).
 
 **Sample response:**
 

@@ -26,8 +26,8 @@ export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, 
 ## Query vs insight vs chart
 | Need | Tool |
 |------|------|
-| Stats + optional series under budget | \`query\` (\`points: 0\`; \`also_chart\` drops pts) |
-| Plain English trend, anomalies, forecast | \`insight\` |
+| Stats + optional series under budget | \`query\` (\`range\`: \`7d\`, \`14d\`, \`30d\`, \`90d\`, \`1y\`, \`all\`; \`points: 0\`; \`also_chart\` drops pts) |
+| Plain English trend, anomalies, forecast | \`insight\` (same \`range\` values) |
 | SVG for the user | \`chart\` (resource **chart-guide**) |
 
 ## Token hints
@@ -38,7 +38,7 @@ Read **chart-guide** for chart options.
 
 /** Initialize \`instructions\` field (≤60 tokens, chars÷4). */
 export const MCP_SERVER_INSTRUCTIONS =
-  "Read MCP resources usage-guide and chart-guide before track/query/chart. Store reusable metrics; query stored history instead of re-fetching. usage-guide includes the agent guardrail.";
+  "resources/read graphmyanything://docs/usage-guide and graphmyanything://docs/chart-guide before track/query/chart. Store metrics; query history.";
 
 export function mcpInstructionsTokenEstimate(): number {
   return Math.ceil(MCP_SERVER_INSTRUCTIONS.length / 4);

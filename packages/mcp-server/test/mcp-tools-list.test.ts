@@ -8,7 +8,7 @@ import { mcpSpawnEnv } from "./mcp-spawn-env.js";
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const serverJs = path.join(root, "dist/index.js");
 
-const BASELINE_TOKENS = 641;
+const BASELINE_TOKENS = 674;
 const MAX_TOKEN_GROWTH = 400;
 
 function rpc(

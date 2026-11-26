@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **`range`:** document `14d` and `30d` alongside `7d`, `90d`, `1y`, `all` in tool schemas and MCP guides (server already parsed them).
+- **`forget`:** clearer errors and schema hints for `all:true` + `confirm:true`.
+- **MCP resources:** initialize instructions include `resources/read` URIs; resources/list coverage in tests.
+
 ## 0.2.7 — 2026-11-25
 
 - **Starter prompt:** canonical first-prompt text for `setup` output, quickstart, and `facts.json` (`copy.starterPrompt`).
