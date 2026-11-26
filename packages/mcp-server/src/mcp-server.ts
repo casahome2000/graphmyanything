@@ -28,7 +28,7 @@ import {
   type ToolRuntime,
 } from "./tools/runtime.js";
 
-import { maybePrintMcpTtyHint } from "./lib/stdio-hint.js";
+import { withAgentGuardrail } from "./lib/agent-guardrail.js";
 import { PACKAGE_VERSION } from "./version.js";
 
 export async function startMcpServer(): Promise<void> {
@@ -101,7 +101,9 @@ export async function startMcpServer(): Promise<void> {
     "track",
     {
       title: "Track",
-      description: "Upsert by metric+ts; written/replaced counts.",
+      description: withAgentGuardrail(
+        "Upsert by metric+ts; written/replaced counts.",
+      ),
       inputSchema: trackToolInputSchema,
     },
     async (args) => {
@@ -116,7 +118,7 @@ export async function startMcpServer(): Promise<void> {
     "query",
     {
       title: "Query",
-      description: "Summary + optional LTTB series.",
+      description: withAgentGuardrail("Summary + optional LTTB series."),
       inputSchema: queryToolInputSchema,
     },
     async (args) => {
@@ -131,7 +133,9 @@ export async function startMcpServer(): Promise<void> {
     "insight",
     {
       title: "Insight",
-      description: "Trend, anomalies, naive forecast.",
+      description: withAgentGuardrail(
+        "Trend, anomalies, naive forecast.",
+      ),
       inputSchema: insightToolInputSchema,
     },
     async (args) => {
@@ -146,7 +150,7 @@ export async function startMcpServer(): Promise<void> {
     "forget",
     {
       title: "Forget",
-      description: FORGET_TOOL_DESCRIPTION,
+      description: withAgentGuardrail(FORGET_TOOL_DESCRIPTION),
       inputSchema: forgetToolInputSchema,
     },
     async (args) => {
@@ -161,7 +165,7 @@ export async function startMcpServer(): Promise<void> {
     "chart",
     {
       title: "Chart",
-      description: CHART_TOOL_DESCRIPTION,
+      description: withAgentGuardrail(CHART_TOOL_DESCRIPTION),
       inputSchema: chartToolInputSchema,
     },
     async (args) => {
@@ -172,7 +176,6 @@ export async function startMcpServer(): Promise<void> {
     },
   );
 
-  maybePrintMcpTtyHint();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

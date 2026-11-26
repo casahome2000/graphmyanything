@@ -1,0 +1,5 @@
+# graphmyanything-mcp
+
+If graphmyanything tools are not in your tool list, stop and ask the user to enable graphmyanything in their client's MCP settings. Never read ~/.graphmyanything or any credentials file, never call the hosted API directly, and never drive the stdio server by hand.
+
+Humans: run `npx graphmyanything-mcp setup` to add the MCP server to your editor. `sync` only links your account; it does not install MCP in the client.

@@ -1,7 +1,11 @@
+import { AGENT_MCP_GUARDRAIL } from "./agent-guardrail.js";
+
 /** Condensed agent usage guide — MCP resource `usage-guide` (full doc: docs/agent-guide.md). */
 export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, update, use
 
 **Build once. Ask forever.** Store time series locally; answer later from history in a few hundred tokens.
+
+**Agents:** ${AGENT_MCP_GUARDRAIL}
 
 ## Track (store / upsert)
 - **Do:** numbers you will chart or compare again; anything over time; costly-to-fetch data.
@@ -34,7 +38,7 @@ Read **chart-guide** for chart options.
 
 /** Initialize \`instructions\` field (≤60 tokens, chars÷4). */
 export const MCP_SERVER_INSTRUCTIONS =
-  "Read MCP resources usage-guide and chart-guide before track/query/chart. Store reusable metrics; query stored history instead of re-fetching.";
+  "Read MCP resources usage-guide and chart-guide before track/query/chart. Store reusable metrics; query stored history instead of re-fetching. usage-guide includes the agent guardrail.";
 
 export function mcpInstructionsTokenEstimate(): number {
   return Math.ceil(MCP_SERVER_INSTRUCTIONS.length / 4);

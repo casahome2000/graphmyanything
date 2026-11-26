@@ -6,6 +6,8 @@ import { runStatus } from "./status.js";
 import { runSync } from "./sync.js";
 import { isHelpFlag, printCommandHelp, printRootHelp } from "./usage.js";
 
+const SETUP_ALIASES = new Set(["setup", "install"]);
+
 const COMMANDS = new Set([
   "sync",
   "status",
@@ -13,6 +15,7 @@ const COMMANDS = new Set([
   "logout",
   "charts",
   "doctor",
+  ...SETUP_ALIASES,
 ]);
 
 export async function runCli(argv = process.argv): Promise<boolean> {
@@ -21,8 +24,9 @@ export async function runCli(argv = process.argv): Promise<boolean> {
     printRootHelp();
     return true;
   }
+  const helpCmd = cmd === "install" ? "setup" : cmd;
   if (cmd && COMMANDS.has(cmd) && isHelpFlag(argv[3])) {
-    printCommandHelp(cmd);
+    printCommandHelp(helpCmd ?? cmd);
     return true;
   }
   if (!cmd || !COMMANDS.has(cmd)) return false;
@@ -47,6 +51,20 @@ export async function runCli(argv = process.argv): Promise<boolean> {
     case "doctor":
       code = await runSelfTest();
       break;
+    case "setup":
+    case "install": {
+      let clientArg: string | undefined;
+      let yes = false;
+      let skipSync = false;
+      for (const a of argv.slice(3)) {
+        if (a === "--yes" || a === "-y") yes = true;
+        else if (a === "--no-sync") skipSync = true;
+        else if (!a.startsWith("-")) clientArg = a;
+      }
+      const { runSetup } = await import("../setup/run.js");
+      code = await runSetup({ clientArg, yes, skipSync });
+      break;
+    }
     default:
       return false;
   }

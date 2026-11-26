@@ -6,7 +6,15 @@
 
 ## Install the MCP server
 
-Default (gets the latest published release):
+**Easiest (recommended):**
+
+```bash
+npx graphmyanything-mcp setup
+```
+
+Pick your client when prompted (or pass `cursor`, `claude-desktop`, `vscode`, `windsurf`, `claude-code`). This updates the client MCP config with absolute paths and a pinned version, backs up your old file, and can run account sign-in. **`sync` does not install or enable MCP** — it only links your GraphMyAnything account.
+
+Manual install (gets the latest published release):
 
 ```bash
 npx -y graphmyanything-mcp@latest
@@ -40,6 +48,7 @@ Other CLI commands:
 | `local` | Prefer local mode (keeps saved API key) |
 | `logout` | Remove API key from config |
 | `charts` | List recent local SVG chart files |
+| `setup` / `install` | Add MCP to your editor (main path) |
 | `doctor` | Node version, credentials (masked), API reachability |
 | `--version` / `-v` | Print installed package version |
 
@@ -167,9 +176,9 @@ The IDE could not find `npx` on its `PATH` (common right after installing Node, 
 2. **Restart** the MCP client (Cursor, Claude Desktop, VS Code, etc.) so it picks up your shell `PATH`.
 3. If it still fails, point `command` at the absolute `npx` path from `which npx` (keep the same `args`, e.g. `["-y", "graphmyanything-mcp@latest"]`).
 
-### Server seems idle with no output
+### Ran `npx graphmyanything-mcp` in a terminal
 
-When stdin is a **TTY** (you ran `npx graphmyanything-mcp` in a terminal), the server prints one line on **stderr** with a link to [graphmyanything.com/docs](https://graphmyanything.com/docs) and waits for an MCP client. Piped stdio (normal IDE launch) stays silent on stderr so MCP JSON framing is not disturbed.
+That is expected. On a **TTY**, the CLI prints a short install check on **stderr** (version, Node, link to this quickstart) and **exits 0** — it is not waiting for you to type MCP messages. Your **IDE** launches the same command with piped stdio, which keeps the server running. To test stdio manually in a terminal, use `npx graphmyanything-mcp --stdio`.
 
 ### Hosted sign-in
 

@@ -11,6 +11,10 @@ export function isVersionFlag(arg: string | undefined): boolean {
   return arg === "--version" || arg === "-v";
 }
 
+export function isStdioFlag(arg: string | undefined): boolean {
+  return arg === "--stdio";
+}
+
 const ENV_BLOCK = `Environment:
   GRAPHMYANYTHING_API_KEY   Hosted API key (Bearer). Alias: GMA_API_KEY
   GMA_API_KEY               Same as GRAPHMYANYTHING_API_KEY
@@ -24,8 +28,11 @@ export function printRootHelp(): void {
   const text = `graphmyanything-mcp — Metric memory MCP server (stdio) or CLI
 
 Usage:
-  graphmyanything-mcp                 Start MCP server on stdio (default)
-  graphmyanything-mcp sync            Link device + upload local SQLite to hosted
+  graphmyanything-mcp                 Installed check on a TTY; MCP stdio when piped
+  graphmyanything-mcp --stdio         Force MCP stdio server (e.g. manual testing on a TTY)
+  graphmyanything-mcp setup [client]  Add MCP server to your editor (use this first)
+  graphmyanything-mcp install         Alias for setup
+  graphmyanything-mcp sync            Link account only (does not enable MCP in client)
   graphmyanything-mcp status          Mode, paths, and hosted account summary
   graphmyanything-mcp local           Force local-only mode in config
   graphmyanything-mcp logout          Clear saved API key
@@ -35,6 +42,7 @@ Usage:
   graphmyanything-mcp --help
   graphmyanything-mcp -v, --version   Print package version
   graphmyanything-mcp --self-test     Same checks as doctor
+  graphmyanything-mcp --stdio         Run MCP on stdio even when stdin is a TTY
   graphmyanything-mcp <command> --help
 
 ${ENV_BLOCK}
@@ -46,13 +54,35 @@ Examples:
   npx graphmyanything-mcp sync
   GMA_API_KEY=gma_… npx graphmyanything-mcp status
   npx -y graphmyanything-mcp@latest
+  npx graphmyanything-mcp --stdio   # manual MCP stdio test on a TTY
 `;
   process.stdout.write(text);
 }
 
 const COMMAND_HELP: Record<string, string> = {
+  setup: `graphmyanything-mcp setup [client] — Add graphmyanything to your MCP client
+
+Detects Cursor, Claude Desktop, Claude Code, VS Code, or Windsurf. Writes absolute
+npx paths (pinned version) into the client config (backup first). Optionally runs
+account sign-in (device code). Does not replace other MCP servers.
+
+Usage:
+  graphmyanything-mcp setup [client] [--yes]
+  graphmyanything-mcp install [client]
+
+Flags:
+  --yes, -y     Skip prompts (pick first detected client; default yes to sign-in)
+
+Examples:
+  graphmyanything-mcp setup
+  graphmyanything-mcp setup cursor --yes
+
+${ENV_BLOCK}
+`,
+
   sync: `graphmyanything-mcp sync — Link account and upload local metrics
 
+Sign-in only: does NOT add or enable the MCP server in your editor (use setup first).
 Uploads points from your local SQLite DB to your hosted GraphMyAnything account.
 If no API key is saved, opens device authorization at ${CONNECT}.
 

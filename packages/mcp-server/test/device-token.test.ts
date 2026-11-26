@@ -25,6 +25,19 @@ describe("deviceToken matches the hosted API contract", () => {
       mk(200, { ok: true, access_token: "gma_abc", token_type: "Bearer" }).deviceToken("d"),
     ).resolves.toEqual({ status: "authorized", api_key: "gma_abc" });
   });
+  it("accepts account_email when present", async () => {
+    await expect(
+      mk(200, {
+        ok: true,
+        access_token: "gma_abc",
+        account_email: "you@example.com",
+      }).deviceToken("d"),
+    ).resolves.toEqual({
+      status: "authorized",
+      api_key: "gma_abc",
+      account_email: "you@example.com",
+    });
+  });
   it("throws on unknown errors", async () => {
     await expect(mk(500, { error: "Something went wrong." }).deviceToken("d")).rejects.toThrow();
   });

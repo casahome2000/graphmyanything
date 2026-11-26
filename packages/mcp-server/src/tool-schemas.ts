@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { withAgentGuardrail } from "./lib/agent-guardrail.js";
 import { RANGE_DESCRIBE } from "./lib/chart-guide.js";
 
 /** Zod shapes shared by MCP registration and schema validation tests. */
@@ -40,8 +41,9 @@ export const chartToolArgsSchema = z.object({
   include_embed: z.boolean().optional(),
 });
 
-export const FORGET_TOOL_DESCRIPTION =
-  "Delete points (metric required); see usage-guide.";
+export const FORGET_TOOL_DESCRIPTION = withAgentGuardrail(
+  "Delete points (metric required); see usage-guide.",
+);
 
 export const forgetToolArgsSchema = z.object({
   metric: z.string(),

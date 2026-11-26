@@ -85,7 +85,7 @@ export class HostedClient {
     | { status: "pending" }
     | { status: "slow_down" }
     | { status: "expired" }
-    | { status: "authorized"; api_key: string }
+    | { status: "authorized"; api_key: string; account_email?: string }
   > {
     const res = await this.fetchFn(`${this.base}/device/token`, {
       method: "POST",
@@ -105,7 +105,13 @@ export class HostedClient {
         : typeof body.api_key === "string"
           ? body.api_key
           : undefined;
-    if (res.ok && key) return { status: "authorized", api_key: key };
+    if (res.ok && key) {
+      const account_email =
+        typeof body.account_email === "string"
+          ? body.account_email
+          : undefined;
+      return { status: "authorized", api_key: key, account_email };
+    }
     // RFC 8628-style polling errors (the server answers 428/400 with an error code).
     const err = typeof body.error === "string" ? body.error : "";
     if (err === "authorization_pending" || body.status === "pending") {
@@ -124,6 +130,7 @@ export class HostedClient {
 
   async getAccount(): Promise<{
     plan: string;
+    email?: string;
     limits: { points?: number; metrics?: number; window_days?: number; live_links?: number };
     usage?: { points?: number; metrics?: number };
   }> {
