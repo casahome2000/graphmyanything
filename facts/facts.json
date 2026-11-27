@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "package": {
     "name": "graphmyanything-mcp",
-    "version": "0.2.9"
+    "version": "0.2.10"
   },
   "tools": {
     "count": 5,
