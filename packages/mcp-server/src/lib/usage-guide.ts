@@ -19,9 +19,10 @@ export const USAGE_GUIDE_RESOURCE = `# GraphMyAnything — when to keep, store, 
 - Deletes are permanent. In **hosted** mode, \`forget\` removes data on the server and from local SQLite for the same filter.
 
 ## Hosted mode
-- Enable with \`graphmyanything-mcp sync\`, config API key, or \`GRAPHMYANYTHING_API_KEY\` / \`GMA_API_KEY\`.
+- Enable with \`graphmyanything-mcp sync\` (no MCP config edits). After \`sync\` while the server is already running, retry the tool — mode picks up credentials on the next call. **Do not edit mcp.json**; just retry after \`sync\`.
+- Optional: \`GRAPHMYANYTHING_API_KEY\` / \`GMA_API_KEY\`, or \`GRAPHMYANYTHING_MODE=local\` to force local-only.
 - Reads use the hosted API (subject to plan **read_window_days** on Free: 90-day query/chart window; full history stored).
-- Writes mirror to local SQLite. \`chart\` can return share links: \`graphmyanything.com/c/<hex-id>\`.
+- Writes mirror to local SQLite. Local points from before \`sync\` upload on \`sync\` (and when mode flips to hosted). \`chart\` can return share links: \`graphmyanything.com/c/<hex-id>\` (needs hosted; if unsigned-in, run \`sync\` and retry).
 
 ## Query vs insight vs chart
 | Need | Tool |
@@ -38,7 +39,7 @@ Read **chart-guide** for chart options.
 
 /** Initialize \`instructions\` field (≤60 tokens, chars÷4). */
 export const MCP_SERVER_INSTRUCTIONS =
-  "resources/read graphmyanything://docs/usage-guide and graphmyanything://docs/chart-guide before track/query/chart. Store metrics; query history.";
+  "resources/read graphmyanything://docs/usage-guide and graphmyanything://docs/chart-guide before track/query/chart. Store metrics; sync for hosted; retry after sync—do not edit MCP config.";
 
 export function mcpInstructionsTokenEstimate(): number {
   return Math.ceil(MCP_SERVER_INSTRUCTIONS.length / 4);

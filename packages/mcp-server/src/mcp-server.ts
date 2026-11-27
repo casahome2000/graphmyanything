@@ -17,8 +17,7 @@ import {
   trackToolInputSchema,
 } from "./tool-schemas.js";
 import { readConfig } from "./config.js";
-import { resolveApiKey, resolveMode } from "./mode.js";
-import { HostedClient } from "./hosted/client.js";
+import { resolveApiKey } from "./mode.js";
 import {
   runChart,
   runForget,
@@ -34,22 +33,19 @@ import { PACKAGE_VERSION } from "./version.js";
 export async function startMcpServer(): Promise<void> {
   const db = openDatabase();
   const config = readConfig();
-  const mode = resolveMode(config);
-  const apiKey = resolveApiKey(config);
-
-  const rt: ToolRuntime = {
-    mode,
-    db,
-    client:
-      mode === "hosted" && apiKey ? new HostedClient({ apiKey }) : undefined,
-  };
-
-  if (mode === "hosted" && !apiKey) {
+  const forcedMode = process.env.GRAPHMYANYTHING_MODE?.trim().toLowerCase();
+  if (forcedMode === "hosted" && !resolveApiKey(config)) {
     console.error(
       "Hosted mode requested but no API key found. Run `graphmyanything-mcp sync` or set GRAPHMYANYTHING_API_KEY.",
     );
     process.exit(1);
   }
+
+  const rt: ToolRuntime = {
+    mode: "local",
+    db,
+    client: undefined,
+  };
 
   const server = new McpServer(
     {
