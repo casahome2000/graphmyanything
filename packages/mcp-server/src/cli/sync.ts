@@ -1,16 +1,10 @@
 import { HostedClient } from "../hosted/client.js";
-import {
-  listPointsAfterId,
-  openDatabase,
-  totalPointCount,
-} from "../db.js";
-import { readConfig, writeConfig } from "../config.js";
+import { openDatabase, totalPointCount } from "../db.js";
+import { uploadLocalBacklogToHosted } from "../lib/local-backlog-upload.js";
 import { redactSecretsInText } from "../lib/mask-secret.js";
 import { resolveApiKey } from "../mode.js";
 import { linkDevice } from "./sync-auth.js";
 import { setStoredApiKey } from "../secrets/store.js";
-
-const BATCH = 1000;
 
 export async function runSync(): Promise<number> {
   let apiKey = resolveApiKey();
@@ -45,38 +39,24 @@ export async function runSync(): Promise<number> {
 
   const db = openDatabase();
   const total = totalPointCount(db);
-  let afterId = readConfig().sync_after_id ?? 0;
   let uploaded = 0;
 
-  while (true) {
-    const batch = listPointsAfterId(db, afterId, BATCH);
-    if (batch.length === 0) break;
-
-    try {
-      await authed.trackBatch(
-        batch.map((r) => ({
-          metric: r.metric,
-          ts: r.ts,
-          value: r.value,
-          tags: r.tags,
-        })),
+  try {
+    const result = await uploadLocalBacklogToHosted(authed, db);
+    uploaded = result.uploaded;
+    if (uploaded > 0) {
+      process.stderr.write(
+        `Uploaded ${uploaded}/${total} points…\n`,
       );
-    } catch (e) {
-      db.close();
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error(
-        `Upload stopped after ${uploaded}/${total} points: ${redactSecretsInText(msg)}\n` +
-          "Your API key is saved; run `graphmyanything-mcp sync` again to resume.",
-      );
-      return 1;
     }
-
-    afterId = batch[batch.length - 1]!.id;
-    uploaded += batch.length;
-    writeConfig({ sync_after_id: afterId });
-    process.stderr.write(
-      `Uploaded ${uploaded}/${total} points (checkpoint id ${afterId})…\n`,
+  } catch (e) {
+    db.close();
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(
+      `Upload stopped after ${uploaded}/${total} points: ${redactSecretsInText(msg)}\n` +
+        "Your API key is saved; run `graphmyanything-mcp sync` again to resume.",
     );
+    return 1;
   }
 
   db.close();
