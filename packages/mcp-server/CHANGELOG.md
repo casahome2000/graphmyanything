@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.9 — 2026-11-27
+
+- **Hosted MCP:** on API **401**, re-read credentials from keychain or file once and retry so `sync` while the server is running can take effect without restarting the client.
+- **`doctor`:** invalid or revoked keys report **API key rejected (revoked or from a deleted account)** with a version-pinned `sync` next step; real network errors stay **unreachable**.
+- **Docs:** README troubleshooting lists keychain service `graphmyanything-mcp`, account `graphmyanything`, `logout`, and manual reset commands.
+
 ## 0.2.8 — 2026-11-26
 
 - **`range`:** query, insight, and chart document `7d|14d|30d|90d|1y|all` in tool schemas and MCP guides (parser already accepted them).
