@@ -26,13 +26,21 @@ export class HostedApiError extends Error {
 
 export class HostedClient {
   private readonly base: string;
-  private readonly key: string;
+  private key: string;
   private readonly fetchFn: typeof fetch;
 
   constructor(opts: HostedClientOptions) {
     this.base = (opts.baseUrl ?? resolveApiBase()).replace(/\/$/, "");
     this.key = opts.apiKey;
     this.fetchFn = opts.fetchImpl ?? fetch;
+  }
+
+  getApiKey(): string {
+    return this.key;
+  }
+
+  setApiKey(apiKey: string): void {
+    this.key = apiKey;
   }
 
   private headers(json = true): HeadersInit {
