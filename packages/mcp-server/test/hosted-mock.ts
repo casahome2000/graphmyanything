@@ -9,6 +9,10 @@ export type MockHostedState = {
     tags: Record<string, string>;
   }[];
   deviceAuthorized?: boolean;
+  /** If set, only these Bearer tokens pass the auth gate (default `gma_test_key`). */
+  acceptedApiKeys?: string[];
+  /** Return 401 from GET /account even when the Bearer token is accepted. */
+  forceAccount401?: boolean;
 };
 
 export function createMockHostedApi(
@@ -50,11 +54,16 @@ export function createMockHostedApi(
       }
 
       const auth = req.headers.authorization ?? "";
-      if (!auth.startsWith("Bearer gma_test_key")) {
+      const bearer = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+      const accepted = state.acceptedApiKeys ?? ["gma_test_key"];
+      if (!accepted.includes(bearer)) {
         return send(401, { error: "unauthorized" });
       }
 
       if (req.method === "GET" && path === "/api/v1/account") {
+        if (state.forceAccount401) {
+          return send(401, { error: "Invalid or revoked API key." });
+        }
         return send(200, {
           plan: "pro",
           limits: { max_points: 1_000_000, max_metrics: 1000 },

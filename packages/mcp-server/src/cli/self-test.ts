@@ -1,5 +1,9 @@
 import { formatApiKeyStorageLine } from "../lib/api-key-storage-line.js";
 import { HostedClient } from "../hosted/client.js";
+import {
+  formatDoctorSyncCommand,
+  isApiKeyRejectedError,
+} from "../hosted/credential-refresh.js";
 import { MIN_NODE, nodeTooOld } from "../bootstrap.js";
 import { resolveApiKey } from "../mode.js";
 
@@ -26,9 +30,17 @@ export async function runSelfTest(): Promise<number> {
       console.log("Hosted API: reachable (device/start OK)");
     }
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error(`Hosted API: unreachable (${msg})`);
-    exit = 1;
+    if (key && isApiKeyRejectedError(e)) {
+      console.error(
+        "Hosted API: API key rejected (revoked or from a deleted account)",
+      );
+      console.error(`Next: ${formatDoctorSyncCommand()}`);
+      exit = 1;
+    } else {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`Hosted API: unreachable (${msg})`);
+      exit = 1;
+    }
   }
 
   return exit;

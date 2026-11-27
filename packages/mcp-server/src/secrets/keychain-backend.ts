@@ -1,7 +1,12 @@
 import { spawnSync } from "node:child_process";
 
-const SERVICE = "graphmyanything-mcp";
-const ACCOUNT = "graphmyanything";
+/** macOS `security` / Linux secret-tool service attribute. */
+export const KEYCHAIN_SERVICE = "graphmyanything-mcp";
+/** macOS `security` account (`-a`) / Linux secret-tool username attribute. */
+export const KEYCHAIN_ACCOUNT = "graphmyanything";
+
+const SERVICE = KEYCHAIN_SERVICE;
+const ACCOUNT = KEYCHAIN_ACCOUNT;
 
 export type KeychainBackend = {
   readonly name: string;

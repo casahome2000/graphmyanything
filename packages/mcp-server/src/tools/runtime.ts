@@ -1,5 +1,6 @@
 import type { GmaDatabase } from "../db.js";
 import { HostedClient } from "../hosted/client.js";
+import { callWithCredentialRefresh } from "../hosted/credential-refresh.js";
 import type { GmaMode } from "../config.js";
 import { mergeHostedChartResponse } from "../lib/chart-response.js";
 import { withTokensEstimate } from "../lib/tokens.js";
@@ -16,14 +17,28 @@ export type ToolRuntime = {
   mode: GmaMode;
   db: GmaDatabase;
   client?: HostedClient;
+  /** Test hook: override key re-read on 401 (defaults to live resolveApiKey). */
+  resolveApiKey?: () => string | undefined;
 };
+
+async function hostedCall<T>(
+  rt: ToolRuntime,
+  run: (client: HostedClient) => Promise<T>,
+): Promise<T> {
+  const client = rt.client;
+  if (!client) throw new Error("hosted client missing");
+  const resolveKey = rt.resolveApiKey;
+  return resolveKey
+    ? callWithCredentialRefresh(client, run, resolveKey)
+    : callWithCredentialRefresh(client, run);
+}
 
 export async function runTrack(
   rt: ToolRuntime,
   args: Parameters<typeof handleTrack>[1],
 ): Promise<ReturnType<typeof handleTrack>> {
   if (rt.mode === "hosted" && rt.client) {
-    const remote = await rt.client.track(args);
+    const remote = await hostedCall(rt, (c) => c.track(args));
     handleTrack(rt.db, args);
     return withTokensEstimate(remote);
   }
@@ -36,7 +51,7 @@ export async function runForget(
 ): Promise<ReturnType<typeof handleForget>> {
   validateForgetArgs(args);
   if (rt.mode === "hosted" && rt.client) {
-    const remote = await rt.client.forget(args);
+    const remote = await hostedCall(rt, (c) => c.forget(args));
     handleForget(rt.db, args);
     return withTokensEstimate(remote);
   }
@@ -48,7 +63,7 @@ export async function runQuery(
   args: Parameters<typeof handleQuery>[1],
 ): Promise<Record<string, unknown>> {
   if (rt.mode === "hosted" && rt.client) {
-    return rt.client.query(args);
+    return hostedCall(rt, (c) => c.query(args));
   }
   return handleQuery(rt.db, args);
 }
@@ -58,7 +73,9 @@ export async function runInsight(
   args: Parameters<typeof handleInsight>[1],
 ): Promise<ReturnType<typeof handleInsight>> {
   if (rt.mode === "hosted" && rt.client) {
-    return (await rt.client.insight(args)) as ReturnType<typeof handleInsight>;
+    return (await hostedCall(rt, (c) => c.insight(args))) as ReturnType<
+      typeof handleInsight
+    >;
   }
   return handleInsight(rt.db, args);
 }
@@ -72,7 +89,9 @@ export async function runChart(
 ): Promise<Record<string, unknown>> {
   if (rt.mode === "hosted" && rt.client) {
     const { include_embed: _embed, ...apiArgs } = args;
-    const remote = (await rt.client.chart(apiArgs)) as Record<string, unknown>;
+    const remote = (await hostedCall(rt, (c) =>
+      c.chart(apiArgs),
+    )) as Record<string, unknown>;
     const local = handleChart(rt.db, args);
     const merged = mergeHostedChartResponse(remote, {
       includeEmbed: args.include_embed === true,

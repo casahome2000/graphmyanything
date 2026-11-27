@@ -70,6 +70,32 @@ When you run `graphmyanything-mcp` on a **TTY** (not launched by a client), it p
 
 **Troubleshooting `spawn npx ENOENT`:** your MCP host cannot find `npx` on `PATH`. Install Node.js 22.13+, restart the client, or set `command` to the absolute path from `which npx` (same `args` as today).
 
+**Invalid, revoked, or stale API key:** `doctor` may report **API key rejected (revoked or from a deleted account)** when the stored key no longer works (deleted account, revoked key, or an old keychain entry under a *different* service name). Run the `sync` command `doctor` prints, then **restart the MCP server** in your client so the long-running process reloads credentials. `sync` alone does not update an already-running server.
+
+API key storage names (for manual cleanup):
+
+| Platform | Service / attributes | Account / username |
+|----------|----------------------|--------------------|
+| macOS Keychain | `graphmyanything-mcp` (`-s`) | `graphmyanything` (`-a`) |
+| Linux secret-tool | `service=graphmyanything-mcp` | `username=graphmyanything` |
+| File fallback | `~/.graphmyanything/credentials.json` (0600) | — |
+
+Clean reset (then `sync` again):
+
+```bash
+# Prefer CLI logout (clears keychain + config secret; keeps metrics DB)
+npx -y graphmyanything-mcp@latest logout
+
+# macOS — delete only the package keychain item (not `graphmyanything` without `-mcp`)
+security delete-generic-password -s graphmyanything-mcp -a graphmyanything
+
+# Linux
+secret-tool clear service graphmyanything-mcp username graphmyanything
+
+# Nuclear: credentials + local config (metrics DB and charts may remain elsewhere)
+rm -rf ~/.graphmyanything
+```
+
 See [hosted API](https://github.com/casahome2000/graphmyanything/blob/master/docs/hosted-api.md).
 
 ## Cursor
