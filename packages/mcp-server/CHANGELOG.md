@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10 — 2026-11-27
+
+- **Hosted mode:** re-resolve credentials on each tool call; after `sync` while the server is running, the next `track`/`chart` uses hosted with no `mcp.json` edit or client restart (`GRAPHMYANYTHING_MODE=local` still forces local).
+- **Local backlog:** first switch local→hosted uploads SQLite points not yet checkpointed (same resume logic as `sync`).
+- **`chart` + share:** without sign-in, a short message to run version-pinned `sync` and retry — do not edit MCP config (usage guide / initialize instructions).
+
 ## 0.2.9 — 2026-11-27
 
 - **Hosted MCP:** on API **401**, re-read credentials from keychain or file once and retry so `sync` while the server is running can take effect without restarting the client.
