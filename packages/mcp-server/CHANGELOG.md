@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.11 — 2026-11-28
+
+- **Docs / copy:** hosted pricing is **Free** plus **Pro** at **$9/mo**; removed Founding **$49** offer, preorder, and waitlist language from README, package README, agent guide, hosted API, and integrations docs (`facts/facts.json` plan keys unchanged).
+
 ## 0.2.10 — 2026-11-27
 
 - **Hosted mode:** re-resolve credentials on each tool call; after `sync` while the server is running, the next `track`/`chart` uses hosted with no `mcp.json` edit or client restart (`GRAPHMYANYTHING_MODE=local` still forces local).
