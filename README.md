@@ -44,7 +44,7 @@ Data stays on your machine by default. **`graphmyanything-mcp sync`** (v0.2+) op
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.10<!-- /fact -->`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.11<!-- /fact -->`
 
 ### Local paths & env vars
 
@@ -118,7 +118,7 @@ claude mcp add graphmyanything -- npx -y graphmyanything-mcp@latest
 
 ## n8n
 
-Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `<!-- fact:package.version -->0.2.10<!-- /fact -->`).
+Scheduled **track → query → insight → chart** template: [`integrations/n8n/`](integrations/n8n/) (import `track-stripe-mrr-daily.json`, MCP Client stdio, `graphmyanything-mcp@latest` with optional pin `<!-- fact:package.version -->0.2.11<!-- /fact -->`).
 
 ## Why tokens matter (one chart question)
 
