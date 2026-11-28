@@ -204,6 +204,33 @@ export class HostedClient {
     return s ? `?${s}` : "";
   }
 
+  private seriesQueryString(
+    args: {
+      metric?: string;
+      metrics?: string[];
+      series?: { name: string; label?: string; color?: string }[];
+      range?: string;
+      [key: string]: string | number | boolean | undefined | string[] | { name: string; label?: string; color?: string }[] | undefined;
+    },
+    extraKeys: string[] = [],
+  ): string {
+    const q = new URLSearchParams();
+    if (args.series && args.series.length > 0) {
+      q.set("series", JSON.stringify(args.series));
+    } else if (args.metrics && args.metrics.length > 0) {
+      for (const m of args.metrics) q.append("metrics", m);
+    } else if (args.metric) {
+      q.set("metric", args.metric);
+    }
+    for (const key of extraKeys) {
+      const v = args[key];
+      if (v === undefined || Array.isArray(v) || typeof v === "object") continue;
+      q.set(key, String(v));
+    }
+    const s = q.toString();
+    return s ? `?${s}` : "";
+  }
+
   async query(args: {
     metric: string;
     range?: string;
@@ -219,18 +246,22 @@ export class HostedClient {
   }
 
   async insight(args: {
-    metric: string;
+    metric?: string;
+    metrics?: string[];
+    series?: { name: string; label?: string; color?: string }[];
     range?: string;
   }): Promise<Record<string, unknown>> {
     const res = await this.fetchFn(
-      `${this.base}/insight${this.queryString(args)}`,
+      `${this.base}/insight${this.seriesQueryString(args, ["range"])}`,
       { headers: this.headers(false) },
     );
     return this.parse(res);
   }
 
   async chart(args: {
-    metric: string;
+    metric?: string;
+    metrics?: string[];
+    series?: { name: string; label?: string; color?: string }[];
     range?: string;
     type?: string;
     theme?: string;
@@ -238,7 +269,13 @@ export class HostedClient {
     share?: boolean;
   }): Promise<Record<string, unknown>> {
     const res = await this.fetchFn(
-      `${this.base}/chart${this.queryString(args)}`,
+      `${this.base}/chart${this.seriesQueryString(args, [
+        "range",
+        "type",
+        "theme",
+        "labels",
+        "share",
+      ])}`,
       { headers: this.headers(false) },
     );
     return this.parse(res);

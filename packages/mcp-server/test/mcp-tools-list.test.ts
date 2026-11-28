@@ -9,7 +9,8 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const serverJs = path.join(root, "dist/index.js");
 
 const BASELINE_TOKENS = 674;
-const MAX_TOKEN_GROWTH = 400;
+/** Multi-metric insight/chart args increased tools/list size (~605 over v0.2.11 baseline). */
+const MAX_TOKEN_GROWTH = 650;
 
 function rpc(
   child: ReturnType<typeof spawn>,

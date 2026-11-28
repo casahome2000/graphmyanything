@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.12 — 2026-11-28
+
+### Added
+- Multi-metric **insight** and **chart** (2–5 series): aligned time buckets, `per_series` / `comparison` / `correlation` / `divergences`, multi-series SVG with legend and accessible default palette. Single `metric` remains backward compatible.
+- Hosted API client sends `metrics` or `series` query params for multi requests.
+
 ## 0.2.11 — 2026-11-28
 
 - **Docs / copy:** hosted pricing is **Free** plus **Pro** at **$9/mo**; removed Founding **$49** offer, preorder, and waitlist language from README, package README, agent guide, hosted API, and integrations docs (`facts/facts.json` plan keys unchanged).
