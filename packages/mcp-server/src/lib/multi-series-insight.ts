@@ -1,0 +1,1 @@
+export * from "../vendor/core/multi-series-insight.js";

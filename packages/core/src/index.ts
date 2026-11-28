@@ -5,3 +5,7 @@ export * from "./terse-summary.js";
 export * from "./tokens.js";
 export * from "./query.js";
 export * from "./svg-chart.js";
+export * from "./time-buckets.js";
+export * from "./multi-series-insight.js";
+export * from "./chart-series-colors.js";
+export * from "./svg-chart-multi.js";

@@ -15,8 +15,40 @@ import {
   type ChartType,
   type ChartTheme,
 } from "../lib/svg-chart.js";
+import { renderSvgMultiSeriesChart } from "../lib/svg-chart-multi.js";
+import type { ChartSeriesRenderInput } from "../lib/svg-chart-multi.js";
+import { generateMultiSeriesInsight } from "../lib/multi-series-insight.js";
+import {
+  buildAlignedChartSeries,
+  buildInsightSeriesInputs,
+  chartTitleFromSeries,
+  loadSeriesPoints,
+} from "../lib/chart-series.js";
+import {
+  resolveSeriesFromToolArgs,
+  safeChartFileStem,
+  type SeriesInput,
+} from "../lib/multi-metric.js";
 import { HOSTED_CHART_URL_NOTE } from "../paths.js";
 import { withTokensEstimate } from "../lib/tokens.js";
+
+export type InsightToolArgs = {
+  metric?: string;
+  metrics?: string[];
+  series?: SeriesInput[];
+  range?: string;
+};
+
+export type ChartToolArgs = {
+  metric?: string;
+  metrics?: string[];
+  series?: SeriesInput[];
+  range?: string;
+  type?: ChartType;
+  theme?: ChartTheme;
+  labels?: ChartLabelsMode;
+  share?: boolean;
+};
 
 function normalizeTags(tags?: Record<string, string>): Record<string, string> {
   return tags ?? {};
@@ -139,47 +171,64 @@ export function handleQuery(
   return buildQueryPayload(metric, points, args);
 }
 
+function renderChartSvg(
+  title: string,
+  series: ChartSeriesRenderInput[],
+  args: Pick<ChartToolArgs, "type" | "theme" | "labels">,
+): string {
+  const type = args.type ?? "line";
+  const theme = args.theme ?? "dark";
+  const labels = args.labels ?? "last";
+  if (series.length > 1) {
+    return renderSvgMultiSeriesChart(title, series, type, theme, labels);
+  }
+  const first = series[0];
+  return renderSvgChart(
+    first?.label ?? title,
+    first?.points ?? [],
+    type,
+    theme,
+    labels,
+  );
+}
+
 export function handleInsight(
   db: GmaDatabase,
-  args: { metric: string; range?: string },
+  args: InsightToolArgs,
 ): ReturnType<typeof generateInsight> & { tokens_estimate: number } {
-  const metric = args.metric.trim();
   const rangeLabel = args.range ?? "all";
-  const { fromTs, toTs } = parseRange(args.range);
-  const rows = queryPoints(db, metric, fromTs, toTs);
-  const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
-  return withTokensEstimate(generateInsight(metric, points, rangeLabel));
+  const series = resolveSeriesFromToolArgs(args);
+  if (series.length === 1) {
+    const metric = series[0]!.name;
+    const { fromTs, toTs } = parseRange(args.range);
+    const rows = queryPoints(db, metric, fromTs, toTs);
+    const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
+    return withTokensEstimate(generateInsight(metric, points, rangeLabel));
+  }
+
+  const byMetric = loadSeriesPoints(db, series, args.range);
+  const insightSeries = buildInsightSeriesInputs(series, byMetric, args.range);
+  return withTokensEstimate(
+    generateMultiSeriesInsight(rangeLabel, insightSeries),
+  );
 }
 
 export function handleChart(
   db: GmaDatabase,
-  args: {
-    metric: string;
-    range?: string;
-    type?: ChartType;
-    theme?: ChartTheme;
-    labels?: ChartLabelsMode;
-    share?: boolean;
-  },
+  args: ChartToolArgs,
 ): {
   path: string;
   url: null;
   hosted_url_note: string;
   tokens_estimate: number;
 } {
-  const metric = args.metric.trim();
-  const type = args.type ?? "line";
+  const series = resolveSeriesFromToolArgs(args);
   const theme = args.theme ?? "dark";
-  const { fromTs, toTs } = parseRange(args.range);
-  const rows = queryPoints(db, metric, fromTs, toTs);
-  const points: DataPoint[] = rows.map((r) => ({ ts: r.ts, value: r.value }));
-  const display =
-    points.length <= 500
-      ? points
-      : lttb(points, 500);
-  const labels = args.labels ?? "last";
-  const svg = renderSvgChart(metric, display, type, theme, labels);
-  const filePath = writeChartFile(metric, svg);
+  const byMetric = loadSeriesPoints(db, series, args.range);
+  const title = chartTitleFromSeries(series);
+  const aligned = buildAlignedChartSeries(series, byMetric, args.range, theme);
+  const svg = renderChartSvg(title, aligned, args);
+  const filePath = writeChartFile(safeChartFileStem(series), svg);
   return withTokensEstimate({
     path: filePath,
     url: null as null,

@@ -23,7 +23,7 @@ npx -y graphmyanything-mcp@latest
 Optional pin (reproducible):
 
 ```bash
-npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.11<!-- /fact -->
+npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.12<!-- /fact -->
 ```
 
 Clients launch the same command over **stdio** — you do not run `npx` yourself during normal chat; the IDE does.
@@ -33,7 +33,7 @@ Clients launch the same command over **stdio** — you do not run `npx` yourself
 Link the CLI to your GraphMyAnything account and upload existing local history (local DB is kept as backup):
 
 ```bash
-npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.11<!-- /fact --> sync
+npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.12<!-- /fact --> sync
 ```
 
 You will get a short code to enter at [graphmyanything.com/connect](https://graphmyanything.com/connect). After auth, metrics sync in batches and MCP tools use the hosted API for reads while **writes still mirror to local SQLite**.
@@ -120,7 +120,7 @@ docker build -t graphmyanything-mcp https://github.com/casahome2000/graphmyanyth
 docker run -i --rm -v gma-data:/data graphmyanything-mcp
 ```
 
-The image sets `GRAPHMYANYTHING_DB_PATH=/data/metrics.db`. It installs `graphmyanything-mcp` **<!-- fact:package.version -->0.2.11<!-- /fact -->** by default (`GMA_MCP_VERSION` build-arg). Point your MCP host at `docker run -i … graphmyanything-mcp` as the stdio command.
+The image sets `GRAPHMYANYTHING_DB_PATH=/data/metrics.db`. It installs `graphmyanything-mcp` **<!-- fact:package.version -->0.2.12<!-- /fact -->** by default (`GMA_MCP_VERSION` build-arg). Point your MCP host at `docker run -i … graphmyanything-mcp` as the stdio command.
 
 ## First prompt
 

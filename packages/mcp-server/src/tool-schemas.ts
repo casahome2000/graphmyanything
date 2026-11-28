@@ -26,20 +26,55 @@ export const queryToolArgsSchema = z.object({
   also_chart: z.boolean().optional(),
 });
 
-export const insightToolArgsSchema = z.object({
-  metric: z.string(),
-  range: z.string().optional(),
+const seriesItemSchema = z.object({
+  name: z.string(),
+  label: z.string().optional(),
+  color: z.string().optional(),
 });
 
-export const chartToolArgsSchema = z.object({
-  metric: z.string(),
-  range: z.string().optional(),
-  type: z.enum(["line", "bar", "area"]).optional(),
-  theme: z.enum(["dark", "light"]).optional(),
-  labels: z.enum(["none", "last", "extremes", "all"]).optional(),
-  share: z.boolean().optional(),
-  include_embed: z.boolean().optional(),
-});
+function multiMetricRefine(
+  data: {
+    metric?: string;
+    metrics?: string[];
+    series?: z.infer<typeof seriesItemSchema>[];
+  },
+  ctx: z.RefinementCtx,
+) {
+  const hasMetric = Boolean(data.metric?.trim());
+  const hasMetrics = (data.metrics?.length ?? 0) >= 2;
+  const hasSeries = (data.series?.length ?? 0) >= 2;
+  const modes = [hasMetric, hasMetrics, hasSeries].filter(Boolean).length;
+  if (modes !== 1) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Provide exactly one of: metric (single), metrics (2–5 names), or series (2–5 objects with name)",
+    });
+  }
+}
+
+export const insightToolArgsSchema = z
+  .object({
+    metric: z.string().optional(),
+    metrics: z.array(z.string()).min(2).max(5).optional(),
+    series: z.array(seriesItemSchema).min(2).max(5).optional(),
+    range: z.string().optional(),
+  })
+  .superRefine(multiMetricRefine);
+
+export const chartToolArgsSchema = z
+  .object({
+    metric: z.string().optional(),
+    metrics: z.array(z.string()).min(2).max(5).optional(),
+    series: z.array(seriesItemSchema).min(2).max(5).optional(),
+    range: z.string().optional(),
+    type: z.enum(["line", "bar", "area"]).optional(),
+    theme: z.enum(["dark", "light"]).optional(),
+    labels: z.enum(["none", "last", "extremes", "all"]).optional(),
+    share: z.boolean().optional(),
+    include_embed: z.boolean().optional(),
+  })
+  .superRefine(multiMetricRefine);
 
 export const FORGET_TOOL_DESCRIPTION = withAgentGuardrail(
   "Delete points (metric required). Whole metric: all:true and confirm:true. See usage-guide.",
@@ -85,13 +120,40 @@ export const queryToolInputSchema = {
   also_chart: z.boolean().optional(),
 };
 
+const MULTI_METRICS_DESCRIBE = "2–5 names; not with metric.";
+const MULTI_SERIES_DESCRIBE = "2–5 {name,label?,color?}; not with metric.";
+
 export const insightToolInputSchema = {
-  metric: z.string(),
+  metric: z.string().optional().describe("Single metric."),
+  metrics: z
+    .array(z.string())
+    .min(2)
+    .max(5)
+    .optional()
+    .describe(MULTI_METRICS_DESCRIBE),
+  series: z
+    .array(seriesItemSchema)
+    .min(2)
+    .max(5)
+    .optional()
+    .describe(MULTI_SERIES_DESCRIBE),
   range: z.string().optional().describe(RANGE_DESCRIBE),
 };
 
 export const chartToolInputSchema = {
-  metric: z.string(),
+  metric: z.string().optional().describe("Single metric."),
+  metrics: z
+    .array(z.string())
+    .min(2)
+    .max(5)
+    .optional()
+    .describe(MULTI_METRICS_DESCRIBE),
+  series: z
+    .array(seriesItemSchema)
+    .min(2)
+    .max(5)
+    .optional()
+    .describe(MULTI_SERIES_DESCRIBE),
   range: z.string().optional().describe(RANGE_DESCRIBE),
   type: z.enum(["line", "bar", "area"]).optional(),
   theme: z.enum(["dark", "light"]).optional(),

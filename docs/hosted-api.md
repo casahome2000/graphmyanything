@@ -121,13 +121,19 @@ Query params: `metric` (required), `range`, `token_budget`, `points` (`auto` or 
 
 ### `GET /insight`
 
-Query params: `metric` (required), `range`.
+Query params:
 
-**Response 200** — same shape as local MCP `insight`.
+- Single: `metric` (required if not multi), `range`.
+- Multi (2–5): `metrics` (comma-separated or repeated query values), **or** `series` (JSON array of `{ name, label?, color? }`).
+
+**Response 200** — same shape as local MCP `insight`. Multi responses add `metrics`, `per_series`, `comparison`, `correlation` (Pearson on aligned time buckets when at least 3 overlapping points, with caveat text), optional `divergences`, and `multi_metric: true`.
 
 ### `GET /chart`
 
-Query params: `metric` (required), `range`, `type`, `theme`, `labels`, `share` (boolean, default `true`).
+Query params:
+
+- Single: `metric` (required if not multi), `range`, `type`, `theme`, `labels`, `share` (boolean, default `true`).
+- Multi (2–5): same `metrics` / `series` forms as insight.
 
 **Response 200**
 

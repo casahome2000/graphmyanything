@@ -35,7 +35,7 @@ Manual / latest from npm:
 npx -y graphmyanything-mcp@latest
 ```
 
-**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.11<!-- /fact -->`
+**Pin a version (optional):** `npx -y graphmyanything-mcp@<!-- fact:package.version -->0.2.12<!-- /fact -->`
 
 Requires Node.js **22.13+** (built-in `node:sqlite`, no native compile step). Metrics persist at `~/.graphmyanything/metrics.db` (override with `GRAPHMYANYTHING_DB_PATH`). Charts are written beside the DB (`<db-dir>/charts/`) when the DB path is custom, or override with `GRAPHMYANYTHING_CHARTS_DIR`; default `~/.graphmyanything/charts/`.
 
@@ -113,7 +113,7 @@ See [hosted API](https://github.com/casahome2000/graphmyanything/blob/master/doc
 }
 ```
 
-Pin a version (optional): `"graphmyanything-mcp@<!-- fact:package.version -->0.2.11<!-- /fact -->"` as the second arg.
+Pin a version (optional): `"graphmyanything-mcp@<!-- fact:package.version -->0.2.12<!-- /fact -->"` as the second arg.
 
 ## Claude Desktop
 
@@ -142,6 +142,7 @@ claude mcp add graphmyanything -- npx -y graphmyanything-mcp@latest
 track(metric="stripe.mrr", value=84210, tags={"plan":"pro"})
 query(metric="stripe.mrr", range="90d", token_budget=200)
 insight(metric="stripe.mrr", range="90d")
+insight(metrics=["stripe.mrr","stripe.subscribers"], range="90d")
 chart(metric="stripe.mrr", range="90d", type="area", theme="dark", labels="last")
 → {"path":"/Users/you/.graphmyanything/charts/stripe.mrr-….svg","url":null,"hosted_url_note":"Local chart only. Run `npx -y graphmyanything-mcp@latest sync` to get live chart links.","tokens_estimate":42}
 ```

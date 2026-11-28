@@ -4,7 +4,7 @@ export type ChartType = "line" | "bar" | "area";
 export type ChartTheme = "dark" | "light";
 export type ChartLabelsMode = "none" | "last" | "extremes" | "all";
 
-const THEMES: Record<
+export const CHART_THEMES: Record<
   ChartTheme,
   { bg: string; grid: string; text: string; stroke: string; fill: string }
 > = {
@@ -43,19 +43,19 @@ const SEC_DAY = 86_400;
 const SEC_YEAR = 365 * SEC_DAY;
 const MARKER_R = 3.5;
 const LABEL_FONT_SIZE = 9;
-const TITLE_BOTTOM_Y = 30;
+export const TITLE_BOTTOM_Y = 30;
 
-function formatMetricLabel(metric: string): string {
+export function formatMetricLabel(metric: string): string {
   return metric.replace(/\./g, " · ");
 }
 
-function formatNumber(n: number): string {
+export function formatNumber(n: number): string {
   if (Math.abs(n) >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (Math.abs(n) >= 10_000) return `${(n / 1_000).toFixed(1)}k`;
   return n.toFixed(n % 1 === 0 ? 0 : 2);
 }
 
-function escapeXml(s: string): string {
+export function escapeXml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -192,6 +192,28 @@ function pickYearlyXTicks(
     return thinned.slice(0, maxTicks);
   }
   return uniq;
+}
+
+export function thinXTickCollisions(
+  ticks: number[],
+  innerW: number,
+  xMin: number,
+  xMax: number,
+): number[] {
+  if (ticks.length <= 2) return ticks;
+  const minPx = Math.max(56, approxTextWidth("Sep '26", 10));
+  const scaleX = (ts: number) => ((ts - xMin) / (xMax - xMin || 1)) * innerW;
+  const out: number[] = [ticks[0]!];
+  for (let i = 1; i < ticks.length - 1; i++) {
+    const t = ticks[i]!;
+    if (scaleX(t) - scaleX(out[out.length - 1]!) >= minPx) {
+      out.push(t);
+    }
+  }
+  if (ticks[ticks.length - 1] !== out[out.length - 1]) {
+    out.push(ticks[ticks.length - 1]!);
+  }
+  return out.slice(0, 8);
 }
 
 export function pickXAxisTicks(
@@ -445,7 +467,7 @@ export function renderSvgChart(
   const pad = { t: 36, r: 36, b: 56, l: 60 };
   const innerW = W - pad.l - pad.r;
   const innerH = H - pad.t - pad.b;
-  const t = THEMES[theme];
+  const t = CHART_THEMES[theme];
   const titleFill = theme === "dark" ? "#f4f4f7" : "#1a1a1a";
 
   if (points.length === 0) {
@@ -502,7 +524,8 @@ export function renderSvgChart(
     })
     .join("\n  ");
 
-  const xTicks = pickXAxisTicks(xMin, xMax, innerW, points);
+  let xTicks = pickXAxisTicks(xMin, xMax, innerW, points);
+  xTicks = thinXTickCollisions(xTicks, innerW, xMin, xMax);
   const xAxisY = baseY.toFixed(2);
   const xBaseline = `<line x1="${pad.l}" y1="${xAxisY}" x2="${W - pad.r}" y2="${xAxisY}" stroke="${t.grid}"/>`;
   const xTickEls = xTicks

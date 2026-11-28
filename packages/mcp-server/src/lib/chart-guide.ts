@@ -16,6 +16,14 @@ export const CHART_GUIDE_RESOURCE = `# GraphMyAnything chart tool
 - **range**: same as query — \`${RANGE_DESCRIBE}\` (default \`all\`).
 - **share**: default \`true\` in hosted mode; \`false\` skips the public URL (local \`path\` is still written).
 
+## Multi-metric (2–5)
+Use **one** of:
+- \`metric\` — single series (unchanged).
+- \`metrics\` — array of 2–5 metric names.
+- \`series\` — array of \`{ name, label?, color? }\` (2–5 entries).
+
+Multi charts share one time axis (aligned buckets), include a color legend, and use an accessible default palette. Multi **insight** adds \`per_series\`, \`comparison\`, \`correlation\` (Pearson on aligned buckets, when at least 3 overlapping points), \`divergences\`, and \`multi_metric: true\`.
+
 ## Output
 - **Local mode:** SVG on disk; response includes \`path\`. \`url\` is null.
 - **Hosted mode** (after \`sync\` or API key): \`path\` (local backup) plus \`url\` at \`https://graphmyanything.com/c/<hex-id>\` when \`share\` is not false. Set \`include_embed: true\` to add \`embed_svg\` / \`embed_png\` (and related snippets). Share pages support hover tooltips on markers in a browser.
