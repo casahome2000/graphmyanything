@@ -62,7 +62,7 @@ The key is returned once; later polls answer `authorization_pending` or `invalid
 }
 ```
 
-**Founding** plans use higher limits (<!-- fact:plans.founding.metrics -->50<!-- /fact --> metrics, <!-- fact:plans.founding.points fmt:compact -->1M<!-- /fact --> points, full-history `read_window_days`, <!-- fact:plans.founding.shareLinks -->100<!-- /fact --> live links). Billing at [graphmyanything.com](https://graphmyanything.com): **Free** as above; **Founding** <!-- fact:plans.founding.priceUsd fmt:usd0 -->$49<!-- /fact --> for the first <!-- fact:plans.founding.termMonths -->12<!-- /fact --> months, then <!-- fact:plans.founding.thenMonthlyUsd fmt:usd0 -->$9<!-- /fact -->/mo (auto-renews; cancel anytime).
+**Pro** plans use higher limits (<!-- fact:plans.founding.metrics -->50<!-- /fact --> metrics, <!-- fact:plans.founding.points fmt:compact -->1M<!-- /fact --> points, full-history `read_window_days`, <!-- fact:plans.founding.shareLinks -->100<!-- /fact --> live links, no wordmark on shared charts). Billing at [graphmyanything.com](https://graphmyanything.com): **Free** as above; **Pro** <!-- fact:plans.founding.thenMonthlyUsd fmt:usd0 -->$9<!-- /fact -->/mo (auto-renews; cancel anytime).
 
 ## Metrics
 

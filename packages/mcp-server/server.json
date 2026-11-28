@@ -9,13 +9,13 @@
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.2.10",
+  "version": "0.2.11",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "graphmyanything-mcp",
-      "version": "0.2.10",
+      "version": "0.2.11",
       "transport": {
         "type": "stdio"
       },

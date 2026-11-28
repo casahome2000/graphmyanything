@@ -176,7 +176,7 @@ Human-readable docs in this repo:
 
 ### Plan limits (hosted)
 
-| | **Free** | **Founding** |
+| | **Free** | **Pro** |
 |--|----------|--------------|
 | Distinct metrics | <!-- fact:plans.free.metrics -->3<!-- /fact --> | <!-- fact:plans.founding.metrics -->50<!-- /fact --> |
 | Stored points | <!-- fact:plans.free.points fmt:int -->10,000<!-- /fact --> | <!-- fact:plans.founding.points fmt:int -->1,000,000<!-- /fact --> |
